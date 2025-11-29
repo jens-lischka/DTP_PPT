@@ -1151,6 +1151,17 @@
         });
 
         function initializeApp() {
+            // First, check if localStorage is overloaded and clear if needed
+            try {
+                const historySize = (localStorage.getItem('image_history') || '').length;
+                if (historySize > 100000) { // If history is > 100KB, it's the old format
+                    console.warn('Clearing oversized history from old format...');
+                    localStorage.removeItem('image_history');
+                }
+            } catch (e) {
+                localStorage.clear();
+            }
+
             // Load saved API key
             const savedKey = localStorage.getItem('openai_api_key');
             if (savedKey) {
@@ -1163,15 +1174,7 @@
             try {
                 const savedHistory = localStorage.getItem('image_history');
                 if (savedHistory) {
-                    const parsed = JSON.parse(savedHistory);
-                    // Check if history is too large (old format with full images)
-                    if (savedHistory.length > 500000) { // ~500KB threshold
-                        console.warn('History too large, clearing...');
-                        localStorage.removeItem('image_history');
-                        state.history = [];
-                    } else {
-                        state.history = parsed;
-                    }
+                    state.history = JSON.parse(savedHistory);
                     renderHistory();
                 }
             } catch (e) {
@@ -1266,7 +1269,24 @@
             const key = elements.apiKeyInput.value.trim();
             if (key && key !== '••••••••••••••••') {
                 state.apiKey = key;
-                localStorage.setItem('openai_api_key', key);
+                
+                // Try to save, clear history if quota exceeded
+                try {
+                    localStorage.setItem('openai_api_key', key);
+                } catch (e) {
+                    console.warn('localStorage full, clearing history to make room...');
+                    localStorage.removeItem('image_history');
+                    state.history = [];
+                    renderHistory();
+                    try {
+                        localStorage.setItem('openai_api_key', key);
+                    } catch (e2) {
+                        // Clear everything and try again
+                        localStorage.clear();
+                        localStorage.setItem('openai_api_key', key);
+                    }
+                }
+                
                 elements.apiKeyInput.value = '••••••••••••••••';
                 updateApiKeyStatus(true);
                 showStatus('API key saved successfully', 'success', 'images');
