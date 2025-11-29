@@ -716,7 +716,7 @@
             </div>
             <div class="header-text">
                 <h1>AI Image Generator</h1>
-                <p>Powered by OpenAI DALL-E</p>
+                <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
 
@@ -776,8 +776,9 @@
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="qualitySelect">
-                            <option value="standard">Standard</option>
-                            <option value="hd">HD</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low (faster)</option>
+                            <option value="high">High</option>
                         </select>
                     </div>
                 </div>
@@ -886,8 +887,9 @@
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="iconQualitySelect">
-                            <option value="standard">Standard</option>
-                            <option value="hd">HD</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low (faster)</option>
+                            <option value="high">High</option>
                         </select>
                     </div>
                 </div>
@@ -964,8 +966,9 @@
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="portraitQualitySelect">
-                            <option value="hd">HD</option>
-                            <option value="standard">Standard</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low (faster)</option>
                         </select>
                     </div>
                 </div>
@@ -1040,7 +1043,7 @@
             <div class="feedback-info">
                 <h3>Contact</h3>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    📧 Email: <a href="mailto:feedback@example.com">feedback@example.com</a><br>
+                    📧 Email: <a href="/cdn-cgi/l/email-protection#4b2d2e2e2f292a28200b2e332a263b272e65282426"><span class="__cf_email__" data-cfemail="b3d5d6d6d7d1d2d0d8f3d6cbd2dec3dfd69dd0dcde">[email&#160;protected]</span></a><br>
                     🐙 GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a>
                 </p>
             </div>
@@ -1056,7 +1059,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ======================
         // State Management
         // ======================
@@ -1372,12 +1375,12 @@
                         'Authorization': `Bearer ${state.apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'dall-e-3',
+                        model: 'gpt-image-1',
                         prompt: prompt,
                         n: 1,
                         size: size,
                         quality: quality,
-                        response_format: 'b64_json'
+                        output_format: 'png'
                     })
                 });
 
@@ -1555,12 +1558,4 @@
 
             const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
             statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.className = `status-message visible ${type}`;
-            
-            if (type === 'success' || type === 'info') {
-                setTimeout(() => statusEl.classList.remove('visible'), 3000);
-            }
-        }
-    </script>
-</body>
-</html>
+            statusEl.cla
