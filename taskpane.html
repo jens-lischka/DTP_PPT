@@ -716,7 +716,7 @@
             </div>
             <div class="header-text">
                 <h1>AI Image Generator</h1>
-                <p>Powered by OpenAI gpt-image-1</p>
+                <p>Powered by OpenAI DALL-E</p>
             </div>
         </div>
 
@@ -776,9 +776,8 @@
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="qualitySelect">
-                            <option value="medium">Medium</option>
-                            <option value="low">Low (faster)</option>
-                            <option value="high">High</option>
+                            <option value="standard">Standard</option>
+                            <option value="hd">HD</option>
                         </select>
                     </div>
                 </div>
@@ -887,9 +886,8 @@
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="iconQualitySelect">
-                            <option value="medium">Medium</option>
-                            <option value="low">Low (faster)</option>
-                            <option value="high">High</option>
+                            <option value="standard">Standard</option>
+                            <option value="hd">HD</option>
                         </select>
                     </div>
                 </div>
@@ -966,9 +964,8 @@
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="portraitQualitySelect">
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low (faster)</option>
+                            <option value="hd">HD</option>
+                            <option value="standard">Standard</option>
                         </select>
                     </div>
                 </div>
@@ -1043,7 +1040,7 @@
             <div class="feedback-info">
                 <h3>Contact</h3>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    📧 Email: <a href="/cdn-cgi/l/email-protection#4b2d2e2e2f292a28200b2e332a263b272e65282426"><span class="__cf_email__" data-cfemail="b3d5d6d6d7d1d2d0d8f3d6cbd2dec3dfd69dd0dcde">[email&#160;protected]</span></a><br>
+                    📧 Email: <a href="mailto:feedback@example.com">feedback@example.com</a><br>
                     🐙 GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a>
                 </p>
             </div>
@@ -1059,7 +1056,7 @@
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // ======================
         // State Management
         // ======================
@@ -1151,17 +1148,6 @@
         });
 
         function initializeApp() {
-            // First, check if localStorage is overloaded and clear if needed
-            try {
-                const historySize = (localStorage.getItem('image_history') || '').length;
-                if (historySize > 100000) { // If history is > 100KB, it's the old format
-                    console.warn('Clearing oversized history from old format...');
-                    localStorage.removeItem('image_history');
-                }
-            } catch (e) {
-                localStorage.clear();
-            }
-
             // Load saved API key
             const savedKey = localStorage.getItem('openai_api_key');
             if (savedKey) {
@@ -1170,17 +1156,11 @@
                 updateApiKeyStatus(true);
             }
 
-            // Load history with error handling
-            try {
-                const savedHistory = localStorage.getItem('image_history');
-                if (savedHistory) {
-                    state.history = JSON.parse(savedHistory);
-                    renderHistory();
-                }
-            } catch (e) {
-                console.warn('Could not load history:', e);
-                localStorage.removeItem('image_history');
-                state.history = [];
+            // Load history
+            const savedHistory = localStorage.getItem('image_history');
+            if (savedHistory) {
+                state.history = JSON.parse(savedHistory);
+                renderHistory();
             }
 
             setupEventListeners();
@@ -1269,24 +1249,7 @@
             const key = elements.apiKeyInput.value.trim();
             if (key && key !== '••••••••••••••••') {
                 state.apiKey = key;
-                
-                // Try to save, clear history if quota exceeded
-                try {
-                    localStorage.setItem('openai_api_key', key);
-                } catch (e) {
-                    console.warn('localStorage full, clearing history to make room...');
-                    localStorage.removeItem('image_history');
-                    state.history = [];
-                    renderHistory();
-                    try {
-                        localStorage.setItem('openai_api_key', key);
-                    } catch (e2) {
-                        // Clear everything and try again
-                        localStorage.clear();
-                        localStorage.setItem('openai_api_key', key);
-                    }
-                }
-                
+                localStorage.setItem('openai_api_key', key);
                 elements.apiKeyInput.value = '••••••••••••••••';
                 updateApiKeyStatus(true);
                 showStatus('API key saved successfully', 'success', 'images');
@@ -1409,12 +1372,12 @@
                         'Authorization': `Bearer ${state.apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-image-1',
+                        model: 'dall-e-3',
                         prompt: prompt,
                         n: 1,
                         size: size,
                         quality: quality,
-                        output_format: 'png'
+                        response_format: 'b64_json'
                     })
                 });
 
@@ -1500,86 +1463,10 @@
         // History Management
         // ======================
         function addToHistory(imageUrl, prompt, size = '1024x1024') {
-            // Create a small thumbnail to save storage space
-            createThumbnail(imageUrl, 100, (thumbnailUrl) => {
-                state.history.unshift({ 
-                    url: thumbnailUrl,  // Store small thumbnail
-                    fullUrl: imageUrl,   // Keep full URL in memory only
-                    prompt: prompt, 
-                    size: size, 
-                    timestamp: Date.now() 
-                });
-                
-                // Keep only 6 items to save space
-                if (state.history.length > 6) {
-                    state.history = state.history.slice(0, 6);
-                }
-                
-                // Try to save to localStorage with error handling
-                try {
-                    // Only save thumbnails and prompts, not full images
-                    const historyToSave = state.history.map(item => ({
-                        url: item.url,
-                        prompt: item.prompt,
-                        size: item.size,
-                        timestamp: item.timestamp
-                    }));
-                    localStorage.setItem('image_history', JSON.stringify(historyToSave));
-                } catch (e) {
-                    console.warn('localStorage quota exceeded, clearing old history');
-                    // If quota exceeded, clear history and try again
-                    localStorage.removeItem('image_history');
-                    state.history = state.history.slice(0, 2);
-                    try {
-                        const historyToSave = state.history.map(item => ({
-                            url: item.url,
-                            prompt: item.prompt,
-                            size: item.size,
-                            timestamp: item.timestamp
-                        }));
-                        localStorage.setItem('image_history', JSON.stringify(historyToSave));
-                    } catch (e2) {
-                        // Give up on persistence
-                        console.warn('Could not save history to localStorage');
-                    }
-                }
-                renderHistory();
-            });
-        }
-
-        // Create a small thumbnail from a base64 image
-        function createThumbnail(dataUrl, maxSize, callback) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Calculate thumbnail size
-                let width = img.width;
-                let height = img.height;
-                if (width > height) {
-                    if (width > maxSize) {
-                        height = height * (maxSize / width);
-                        width = maxSize;
-                    }
-                } else {
-                    if (height > maxSize) {
-                        width = width * (maxSize / height);
-                        height = maxSize;
-                    }
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // Use JPEG for smaller file size
-                callback(canvas.toDataURL('image/jpeg', 0.6));
-            };
-            img.onerror = function() {
-                callback(dataUrl); // Fallback to original
-            };
-            img.src = dataUrl;
+            state.history.unshift({ url: imageUrl, prompt: prompt, size: size, timestamp: Date.now() });
+            if (state.history.length > 8) state.history = state.history.slice(0, 8);
+            localStorage.setItem('image_history', JSON.stringify(state.history));
+            renderHistory();
         }
 
         function renderHistory() {
@@ -1600,12 +1487,10 @@
         function loadFromHistory(index) {
             const item = state.history[index];
             if (item) {
-                // If we have the full URL in memory, use it; otherwise use the thumbnail
-                const imageUrl = item.fullUrl || item.url;
-                state.currentImageUrl = imageUrl;
-                state.currentImageBase64 = imageUrl.split(',')[1];
+                state.currentImageUrl = item.url;
+                state.currentImageBase64 = item.url.split(',')[1];
                 state.currentImageSize = item.size || '1024x1024';
-                elements.previewImage.src = imageUrl;
+                elements.previewImage.src = item.url;
                 elements.previewImage.style.display = 'block';
                 elements.previewLoading.style.display = 'none';
                 elements.previewSection.classList.add('visible');
@@ -1670,4 +1555,12 @@
 
             const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
             statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.cla
+            statusEl.className = `status-message visible ${type}`;
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
