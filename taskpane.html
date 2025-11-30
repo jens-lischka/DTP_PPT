@@ -200,17 +200,22 @@
 
         .btn-save-key {
             padding: 8px 16px;
-            background: var(--neutral-lighter);
-            border: 1px solid var(--neutral-light);
+            background: var(--primary);
+            color: white;
+            border: none;
             border-radius: var(--radius);
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.15s;
         }
 
         .btn-save-key:hover {
-            background: var(--neutral-light);
+            background: var(--primary-hover);
+        }
+
+        .btn-save-key:active {
+            background: var(--primary-pressed);
         }
 
         /* Prompt Section */
@@ -750,8 +755,58 @@
                 </div>
                 <div class="api-key-input-wrapper">
                     <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
-                    <button class="btn-save-key" id="btnSaveKey">Save</button>
+                    <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
                 </div>
+                <script>
+                    // Immediate binding for Save button (runs as soon as button exists)
+                    (function() {
+                        var btn = document.getElementById('btnSaveKey');
+                        var input = document.getElementById('apiKeyInput');
+                        var statusEl = document.getElementById('apiKeyStatus');
+                        
+                        btn.onclick = function() {
+                            console.log('Save button clicked');
+                            var key = input.value.trim();
+                            if (!key || key === '••••••••••••••••') {
+                                alert('Please enter your API key first');
+                                return;
+                            }
+                            
+                            // Store in window for global access
+                            window._openaiApiKey = key;
+                            
+                            // Also store in state if it exists
+                            if (typeof state !== 'undefined') {
+                                state.apiKey = key;
+                            }
+                            
+                            // Try localStorage (clear history first to make room)
+                            try {
+                                localStorage.removeItem('image_history');
+                                localStorage.setItem('openai_api_key', key);
+                                console.log('Key saved to localStorage');
+                            } catch(e) {
+                                console.log('localStorage failed, key only in memory');
+                            }
+                            
+                            // Update UI
+                            input.value = '••••••••••••••••';
+                            statusEl.textContent = 'Connected';
+                            statusEl.className = 'api-key-status connected';
+                            
+                            // Enable generate buttons
+                            var btns = document.querySelectorAll('.btn-generate');
+                            btns.forEach(function(b) { b.disabled = false; });
+                            
+                            // Update generate buttons if function exists
+                            if (typeof updateGenerateButtons === 'function') {
+                                updateGenerateButtons();
+                            }
+                            
+                            alert('API key saved!');
+                        };
+                    })();
+                </script>
             </div>
 
             <!-- Prompt Section -->
@@ -1145,12 +1200,26 @@
         // Office.js Initialization
         // ======================
         Office.onReady((info) => {
-            if (info.host === Office.HostType.PowerPoint) {
-                initializeApp();
-            }
+            console.log('Office ready:', info.host);
+            initializeApp();
+        });
+
+        // Also initialize after DOM is ready (fallback)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Give Office.js a moment, then init anyway
+            setTimeout(() => {
+                if (!state.apiKey && !elements.btnSaveKey._listenerAdded) {
+                    console.log('Fallback initialization');
+                    initializeApp();
+                }
+            }, 1000);
         });
 
         function initializeApp() {
+            // Prevent double initialization
+            if (elements.btnSaveKey._listenerAdded) return;
+            elements.btnSaveKey._listenerAdded = true;
+            
             // Clear oversized data from localStorage
             try {
                 const historySize = (localStorage.getItem('image_history') || '').length;
@@ -1387,7 +1456,9 @@
                 previewImage = elements.portraitPreviewImage;
             }
 
-            if (!prompt || !state.apiKey || state.isGenerating) return;
+            // Get API key from state or global fallback
+            const apiKey = state.apiKey || window._openaiApiKey;
+            if (!prompt || !apiKey || state.isGenerating) return;
 
             state.isGenerating = true;
             updateGenerateButtons();
@@ -1404,7 +1475,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${state.apiKey}`
+                        'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
                         model: 'gpt-image-1',
@@ -1627,7 +1698,7 @@
         // UI Helpers
         // ======================
         function updateGenerateButtons() {
-            const hasApiKey = state.apiKey.length > 0;
+            const hasApiKey = (state.apiKey && state.apiKey.length > 0) || (window._openaiApiKey && window._openaiApiKey.length > 0);
             
             elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
             elements.btnGenerateIcon.disabled = !elements.iconPromptInput.value.trim() || !hasApiKey || state.isGenerating;
@@ -1654,4 +1725,12 @@
 
             const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
             statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.cla
+            statusEl.className = `status-message visible ${type}`;
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
