@@ -972,6 +972,60 @@
             outline: none;
             border-color: var(--primary);
         }
+
+        /* Icon Style Grid */
+        .icon-style-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .icon-style-card {
+            border: 2px solid var(--neutral-light);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: var(--white);
+        }
+
+        .icon-style-card:hover {
+            border-color: var(--neutral-dark);
+        }
+
+        .icon-style-card.selected {
+            border-color: var(--primary);
+            background: #e7f3ff;
+        }
+
+        .icon-style-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .icon-style-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius);
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .icon-style-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--neutral-darker);
+        }
+
+        .icon-style-desc {
+            font-size: 11px;
+            color: var(--neutral-dark);
+        }
     </style>
 </head>
 <body>
@@ -982,7 +1036,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.2</span></h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.3</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -1180,41 +1234,62 @@
 
         <!-- ==================== ICONS TAB ==================== -->
         <div class="tab-content" id="tab-icons">
-            <!-- Prompt Section -->
+            <!-- Style Selection -->
             <div class="prompt-section">
-                <label for="iconPromptInput">Describe your icon</label>
-                <textarea 
-                    id="iconPromptInput" 
-                    class="prompt-textarea" 
-                    placeholder="A shopping cart, a gear, a lightbulb..."
-                ></textarea>
-                
-                <label style="margin-top: 12px;">Style</label>
-                <div class="style-presets" id="iconStyles">
-                    <button class="style-preset selected" data-style="flat minimal">Flat</button>
-                    <button class="style-preset" data-style="3d rendered">3D</button>
-                    <button class="style-preset" data-style="outline line art">Outline</button>
-                    <button class="style-preset" data-style="gradient glossy">Gradient</button>
-                    <button class="style-preset" data-style="hand drawn sketch">Sketch</button>
-                    <button class="style-preset" data-style="pixel art retro">Pixel</button>
-                </div>
-
-                <div class="options-row">
-                    <div class="option-group">
-                        <label>Background</label>
-                        <select id="iconBgSelect">
-                            <option value="transparent white">White</option>
-                            <option value="transparent">Transparent</option>
-                            <option value="dark background">Dark</option>
-                            <option value="colorful gradient">Gradient</option>
-                        </select>
+                <label>Select Style</label>
+                <div class="icon-style-grid" id="iconStyleGrid">
+                    <div class="icon-style-card selected" data-style="1">
+                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #ffe135, #f5c842);">
+                            🍌
+                        </div>
+                        <div class="icon-style-name">Style 1</div>
+                        <div class="icon-style-desc">Banana</div>
                     </div>
+                    <div class="icon-style-card" data-style="2">
+                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
+                            🔜
+                        </div>
+                        <div class="icon-style-name">Style 2</div>
+                        <div class="icon-style-desc">Coming soon</div>
+                    </div>
+                    <div class="icon-style-card" data-style="3">
+                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
+                            🔜
+                        </div>
+                        <div class="icon-style-name">Style 3</div>
+                        <div class="icon-style-desc">Coming soon</div>
+                    </div>
+                    <div class="icon-style-card" data-style="4">
+                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
+                            🔜
+                        </div>
+                        <div class="icon-style-name">Style 4</div>
+                        <div class="icon-style-desc">Coming soon</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Input -->
+            <div class="prompt-section">
+                <label for="iconSubjectInput">Enter Subject</label>
+                <input 
+                    type="text"
+                    id="iconSubjectInput" 
+                    class="cs-input"
+                    placeholder="play button, house, car, lightbulb..."
+                    style="font-size: 14px;"
+                >
+                <p style="font-size: 11px; color: var(--neutral-dark); margin-top: 6px;">
+                    Enter a simple object or symbol. The selected style will be applied automatically.
+                </p>
+
+                <div class="options-row" style="margin-top: 12px;">
                     <div class="option-group">
                         <label>Quality</label>
                         <select id="iconQualitySelect">
+                            <option value="high">High</option>
                             <option value="medium">Medium</option>
                             <option value="low">Low (faster)</option>
-                            <option value="high">High</option>
                         </select>
                     </div>
                 </div>
@@ -1586,7 +1661,7 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.2<br><br>
+                    <strong>AI Image Generator</strong> v1.3<br><br>
                     Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
@@ -1609,7 +1684,7 @@
             selectedShape: null,
             activeTab: 'images',
             // Icon tab state
-            iconStyle: 'flat minimal',
+            iconStyleNumber: 1,
             iconImageBase64: null,
             // Portrait tab state
             portraitStyle: 'professional corporate headshot, studio lighting',
@@ -1650,9 +1725,8 @@
             shapeInfoText: document.getElementById('shapeInfoText'),
             
             // Icons tab
-            iconPromptInput: document.getElementById('iconPromptInput'),
-            iconStyles: document.querySelectorAll('#iconStyles .style-preset'),
-            iconBgSelect: document.getElementById('iconBgSelect'),
+            iconSubjectInput: document.getElementById('iconSubjectInput'),
+            iconStyleGrid: document.querySelectorAll('#iconStyleGrid .icon-style-card'),
             iconQualitySelect: document.getElementById('iconQualitySelect'),
             btnGenerateIcon: document.getElementById('btnGenerateIcon'),
             iconStatusMessage: document.getElementById('iconStatusMessage'),
@@ -1792,14 +1866,20 @@
 
             // Icons tab
             elements.btnGenerateIcon.addEventListener('click', () => generateImage('icons'));
-            elements.iconPromptInput.addEventListener('input', updateGenerateButtons);
+            elements.iconSubjectInput.addEventListener('input', updateGenerateButtons);
             elements.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
             elements.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
-            elements.iconStyles.forEach(preset => {
-                preset.addEventListener('click', () => {
-                    elements.iconStyles.forEach(p => p.classList.remove('selected'));
-                    preset.classList.add('selected');
-                    state.iconStyle = preset.dataset.style;
+            elements.iconStyleGrid.forEach(card => {
+                card.addEventListener('click', () => {
+                    const styleNum = parseInt(card.dataset.style);
+                    // Only allow Style 1 for now
+                    if (styleNum !== 1) {
+                        alert('This style is coming soon! Please use Style 1 for now.');
+                        return;
+                    }
+                    elements.iconStyleGrid.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    state.iconStyleNumber = styleNum;
                 });
             });
 
@@ -1952,10 +2032,76 @@
                 previewLoading = elements.previewLoading;
                 previewImage = elements.previewImage;
             } else if (tab === 'icons') {
-                const basePrompt = elements.iconPromptInput.value.trim();
-                const style = state.iconStyle;
-                const bg = elements.iconBgSelect.value;
-                prompt = `Icon of ${basePrompt}, ${style} style, ${bg}, clean simple design, centered, high quality`;
+                const subject = elements.iconSubjectInput.value.trim();
+                const styleNum = state.iconStyleNumber;
+                
+                // Build prompt based on style
+                if (styleNum === 1) {
+                    // Style 1: Banana style - use JSON prompt
+                    const jsonPrompt = {
+                        "object": subject,
+                        "task_type": "generation",
+                        "priority": {
+                            "primary": "create a banana-themed rendition of the object",
+                            "secondary": "merge banana characteristics with the object's functional design"
+                        },
+                        "parameters": {
+                            "banana_integration": {
+                                "style": "organic and seamless",
+                                "features": ["curved banana form", "peel textures", "yellow coloration", "subtle spotting"]
+                            },
+                            "object_design": {
+                                "reference_object_key": "object",
+                                "maintain_functionality": true
+                            }
+                        },
+                        "subject": {
+                            "main": "banana-inspired version of the object",
+                            "attributes": {
+                                "physical": "smooth yellow banana texture shaped to match the object's silhouette",
+                                "pose": "studio product angle",
+                                "expression": "none"
+                            }
+                        },
+                        "environment": {
+                            "setting": "clean product studio backdrop",
+                            "lighting": {
+                                "type": "soft",
+                                "direction": "front",
+                                "quality": "diffused"
+                            }
+                        },
+                        "style": {
+                            "artistic": "photorealistic",
+                            "camera": {
+                                "angle": "eye_level",
+                                "lens": "normal",
+                                "aperture": "shallow_depth_of_field"
+                            },
+                            "mood": "modern and playful",
+                            "color_palette": "banana yellow with natural peel browns"
+                        },
+                        "technical": {
+                            "resolution": "high",
+                            "aspect_ratio": "1:1",
+                            "quality": "maximum"
+                        },
+                        "constraints": {
+                            "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
+                            "ensure": ["clear banana identity", "clear object identity"]
+                        },
+                        "output_specs": {
+                            "include_synthid": true,
+                            "file_type": "high_resolution_image",
+                            "transparent_background": true
+                        }
+                    };
+                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
+                } else {
+                    // Placeholder for other styles
+                    prompt = `Icon of ${subject}, clean simple design, centered, high quality`;
+                }
+                
                 quality = elements.iconQualitySelect.value;
                 statusEl = elements.iconStatusMessage;
                 previewSection = elements.iconPreviewSection;
@@ -2474,7 +2620,7 @@
             const hasApiKey = (state.apiKey && state.apiKey.length > 0) || (window._openaiApiKey && window._openaiApiKey.length > 0);
             
             elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
-            elements.btnGenerateIcon.disabled = !elements.iconPromptInput.value.trim() || !hasApiKey || state.isGenerating;
+            elements.btnGenerateIcon.disabled = !elements.iconSubjectInput.value.trim() || !hasApiKey || state.isGenerating;
             elements.btnGeneratePortrait.disabled = !elements.portraitPromptInput.value.trim() || !hasApiKey || state.isGenerating;
             
             const btnText = state.isGenerating ? '<div class="spinner"></div><span>Generating...</span>' : '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate</span>';
