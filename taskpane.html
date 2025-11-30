@@ -95,11 +95,11 @@
 
         .tab {
             flex: 1;
-            padding: 12px 8px;
+            padding: 10px 4px;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 500;
             color: var(--neutral-dark);
             cursor: pointer;
@@ -107,11 +107,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
         }
 
         .tab i {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .tab:hover {
@@ -710,6 +710,268 @@
         .feedback-info a:hover {
             text-decoration: underline;
         }
+
+        /* SlideWiki Tab Styles */
+        .slides-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .slide-file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--neutral-lighter);
+            border: 2px solid transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .slide-file-item:hover {
+            background: var(--neutral-light);
+        }
+
+        .slide-file-item.selected {
+            border-color: var(--primary);
+            background: #e7f3ff;
+        }
+
+        .slide-file-item i {
+            font-size: 24px;
+            color: #d04423;
+        }
+
+        .slide-file-info {
+            flex: 1;
+        }
+
+        .slide-file-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--neutral-darker);
+        }
+
+        .slide-file-meta {
+            font-size: 11px;
+            color: var(--neutral-dark);
+        }
+
+        .slide-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .slide-thumb {
+            aspect-ratio: 16/9;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.15s;
+            background: var(--neutral-lighter);
+            position: relative;
+        }
+
+        .slide-thumb:hover {
+            border-color: var(--neutral-dark);
+        }
+
+        .slide-thumb.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
+        }
+
+        .slide-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide-thumb .slide-number {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .slide-thumb .slide-check {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .slide-thumb.selected .slide-check {
+            display: flex;
+        }
+
+        /* CS Request Tab Styles */
+        .cs-header {
+            background: linear-gradient(135deg, #0a2351, #1a4380);
+            color: white;
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+        }
+
+        .cs-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .cs-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .cs-form {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cs-category {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--neutral-light);
+        }
+
+        .cs-category:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .cs-category-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .cs-category-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--neutral-darker);
+        }
+
+        .cs-category-info {
+            font-size: 12px;
+            cursor: help;
+        }
+
+        .cs-category-desc {
+            font-size: 11px;
+            color: var(--neutral-dark);
+            margin-bottom: 8px;
+        }
+
+        .cs-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .cs-radio,
+        .cs-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--neutral-darker);
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .cs-radio input,
+        .cs-checkbox input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .cs-new-badge {
+            background: #f5a623;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 4px;
+        }
+
+        .cs-details {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--neutral-light);
+        }
+
+        .cs-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--neutral-dark);
+            margin-bottom: 4px;
+            margin-top: 12px;
+        }
+
+        .cs-label:first-child {
+            margin-top: 0;
+        }
+
+        .cs-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--neutral-light);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .cs-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .cs-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 12px;
+            border: 1px solid var(--neutral-light);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .cs-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -720,7 +982,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator</h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.2</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -739,9 +1001,17 @@
                 <i class="ms-Icon ms-Icon--Contact"></i>
                 <span>Portraits</span>
             </button>
+            <button class="tab" data-tab="slidewiki">
+                <i class="ms-Icon ms-Icon--Library"></i>
+                <span>SlideWiki</span>
+            </button>
+            <button class="tab" data-tab="csrequest">
+                <i class="ms-Icon ms-Icon--Ticket"></i>
+                <span>CS Request</span>
+            </button>
             <button class="tab" data-tab="feedback">
                 <i class="ms-Icon ms-Icon--Feedback"></i>
-                <span>Feedback</span>
+                <span>More</span>
             </button>
         </div>
 
@@ -1067,6 +1337,216 @@
             </div>
         </div>
 
+        <!-- ==================== SLIDEWIKI TAB ==================== -->
+        <div class="tab-content" id="tab-slidewiki">
+            <!-- SharePoint Connection -->
+            <div class="api-key-section">
+                <div class="api-key-header">
+                    <label>SharePoint Connection</label>
+                    <span id="sharepointStatus" class="api-key-status disconnected">Not Connected</span>
+                </div>
+                <button class="btn-generate" id="btnConnectSharePoint" style="margin-top: 8px;">
+                    <i class="ms-Icon ms-Icon--PlugConnected"></i>
+                    <span>Connect to Microsoft 365</span>
+                </button>
+                <div class="api-key-help" style="margin-top: 8px;">
+                    Sign in with your Microsoft account to access SharePoint slides.
+                </div>
+            </div>
+
+            <!-- Folder Path -->
+            <div class="prompt-section">
+                <label for="sharepointPath">SharePoint Site URL</label>
+                <input 
+                    type="text" 
+                    id="sharepointPath" 
+                    class="prompt-textarea" 
+                    style="min-height: auto; padding: 10px 12px;"
+                    placeholder="https://company.sharepoint.com/sites/..."
+                    value="https://mmcglobal.sharepoint.com/sites/SlideWiki"
+                >
+                <button class="btn-generate" id="btnLoadSlides" style="margin-top: 12px;" disabled>
+                    <i class="ms-Icon ms-Icon--FolderOpen"></i>
+                    <span>Load Slides</span>
+                </button>
+            </div>
+
+            <!-- Slides List -->
+            <div class="prompt-section" id="slidesListSection" style="display: none;">
+                <label>Available Presentations</label>
+                <div id="slidesList" class="slides-list">
+                    <!-- Slides will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Slide Preview -->
+            <div class="preview-section" id="slidePreviewSection">
+                <div class="preview-header">
+                    <h2>Slide Preview</h2>
+                </div>
+                <div id="slidePreviewLoading" class="preview-loading" style="display: none;">
+                    <div class="spinner-large"></div>
+                    <p>Loading slides...</p>
+                </div>
+                <div id="slidePreviewGrid" class="slide-preview-grid">
+                    <!-- Slide thumbnails will appear here -->
+                    <div class="history-empty">
+                        Connect to SharePoint and load a presentation to see slides here.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insert Button -->
+            <div class="action-buttons" id="slideActions" style="display: none;">
+                <button class="btn-action btn-insert" id="btnInsertSlide">
+                    <i class="ms-Icon ms-Icon--AddTo"></i>
+                    <span>Insert Selected Slides</span>
+                </button>
+            </div>
+
+            <!-- Status Message -->
+            <div id="slidewikiStatusMessage" class="status-message"></div>
+
+            <!-- Demo Mode Notice -->
+            <div class="feedback-section" style="margin-top: 16px; background: #fff4ce;">
+                <h2 style="color: #8a6914;">🚧 Demo Mode</h2>
+                <p style="font-size: 13px; color: #8a6914;">
+                    This is a demo showing how SlideWiki will work. To enable real SharePoint access, we need to set up Microsoft Graph API.<br><br>
+                    <strong>Your SharePoint site:</strong><br>
+                    <code style="font-size: 11px; background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">mmcglobal.sharepoint.com/sites/SlideWiki</code><br><br>
+                    <strong>To enable:</strong><br>
+                    1. Register an Azure AD app<br>
+                    2. Grant Files.Read.All permission<br>
+                    3. Share the Client ID with me<br><br>
+                    <a href="https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" style="color: #8a6914;">→ Open Azure Portal</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== CS REQUEST TAB ==================== -->
+        <div class="tab-content" id="tab-csrequest">
+            <!-- Header -->
+            <div class="cs-header">
+                <h2>Creative Studio Request</h2>
+                <p>Submit your request and we'll get back to you quickly.</p>
+            </div>
+
+            <!-- Request Form -->
+            <div class="cs-form">
+                <!-- Presentation Section -->
+                <div class="cs-category">
+                    <div class="cs-category-header">
+                        <span class="cs-category-title">Presentation</span>
+                        <span class="cs-category-info" title="Anything presentation-related">ℹ️</span>
+                    </div>
+                    <p class="cs-category-desc">Anything presentation-related</p>
+                    <div class="cs-options">
+                        <label class="cs-radio"><input type="radio" name="presentation" value="quickfix"> Quick fix</label>
+                        <label class="cs-radio"><input type="radio" name="presentation" value="refine"> Refine</label>
+                        <label class="cs-radio"><input type="radio" name="presentation" value="redesign"> Redesign</label>
+                        <label class="cs-radio"><input type="radio" name="presentation" value="bespoke"> Bespoke</label>
+                        <label class="cs-radio"><input type="radio" name="presentation" value="template"> Template</label>
+                    </div>
+                </div>
+
+                <!-- Design Section -->
+                <div class="cs-category">
+                    <div class="cs-category-header">
+                        <span class="cs-category-title">Design</span>
+                        <span class="cs-category-info" title="Any non-presentation design">ℹ️</span>
+                    </div>
+                    <p class="cs-category-desc">Any non-presentation design</p>
+                    <div class="cs-options">
+                        <label class="cs-checkbox"><input type="checkbox" name="design" value="publications"> Publications & reports</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="design" value="social"> Social media</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="design" value="flyers"> Flyers/Ads</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="design" value="events"> Events assets</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="design" value="other"> Other</label>
+                    </div>
+                </div>
+
+                <!-- Web Section -->
+                <div class="cs-category">
+                    <div class="cs-category-header">
+                        <span class="cs-category-title">Web</span>
+                        <span class="cs-category-info" title="Anything digital">ℹ️</span>
+                    </div>
+                    <p class="cs-category-desc">Anything digital</p>
+                    <div class="cs-options">
+                        <label class="cs-checkbox"><input type="checkbox" name="web" value="assets"> Web assets (e.g. exhibits)</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="web" value="magazine"> Digital magazine</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="web" value="microsite"> Microsite</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="web" value="uxui"> UX/UI</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="web" value="other"> Other</label>
+                    </div>
+                </div>
+
+                <!-- Video/Photo Section -->
+                <div class="cs-category">
+                    <div class="cs-category-header">
+                        <span class="cs-category-title">Video/Photo</span>
+                        <span class="cs-category-info" title="Any video, photo or animation">ℹ️</span>
+                    </div>
+                    <p class="cs-category-desc">Any video, photo or animation</p>
+                    <div class="cs-options">
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="production"> Video production</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="filming"> Video filming</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="profile"> Profile photo</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="event"> Event shooting</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="animation"> Animation</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="podcast"> Podcast</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="script"> Script development</label>
+                        <label class="cs-checkbox"><input type="checkbox" name="video" value="other"> Other</label>
+                    </div>
+                </div>
+
+                <!-- Brand Section -->
+                <div class="cs-category">
+                    <div class="cs-category-header">
+                        <span class="cs-category-title">Brand</span>
+                        <span class="cs-category-info" title="Any brand-related project">ℹ️</span>
+                    </div>
+                    <p class="cs-category-desc">Any brand-related project</p>
+                    <div class="cs-options">
+                        <label class="cs-radio"><input type="radio" name="brand" value="logos"> Logos</label>
+                        <label class="cs-radio"><input type="radio" name="brand" value="subbranding"> Sub-branding</label>
+                        <label class="cs-radio"><input type="radio" name="brand" value="merchandise"> Merchandise 2026 <span class="cs-new-badge">New</span></label>
+                        <label class="cs-radio"><input type="radio" name="brand" value="other"> Other</label>
+                    </div>
+                </div>
+
+                <!-- Project Details -->
+                <div class="cs-details">
+                    <label class="cs-label">Project Title</label>
+                    <input type="text" id="csProjectTitle" class="cs-input" placeholder="Brief title for your request">
+                    
+                    <label class="cs-label">Description</label>
+                    <textarea id="csDescription" class="cs-textarea" placeholder="Describe your project, timeline, and any specific requirements..."></textarea>
+                    
+                    <label class="cs-label">Deadline</label>
+                    <input type="date" id="csDeadline" class="cs-input">
+                </div>
+
+                <!-- Submit Button -->
+                <button class="btn-generate" id="btnSubmitCSRequest" style="margin-top: 16px;">
+                    <i class="ms-Icon ms-Icon--Send"></i>
+                    <span>Submit Request</span>
+                </button>
+
+                <!-- Status Message -->
+                <div id="csStatusMessage" class="status-message"></div>
+            </div>
+
+            <!-- Link to Full Portal -->
+            <div class="feedback-info" style="margin-top: 16px;">
+                <h3>Need the full portal?</h3>
+                <p style="font-size: 13px; color: var(--neutral-dark);">
+                    For more options and to track your requests, visit the full Creative Studio Portal:<br><br>
+                    <a href="https://mmcglobal.sharepoint.com/sites/CreativeStudio" target="_blank">→ Open Creative Studio Portal</a>
+                </p>
+            </div>
+        </div>
+
         <!-- ==================== FEEDBACK TAB ==================== -->
         <div class="tab-content" id="tab-feedback">
             <div class="feedback-section">
@@ -1106,8 +1586,8 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.0.0<br><br>
-                    Generate AI images, icons, and portraits using OpenAI's DALL-E 3 and insert them directly into your PowerPoint slides.<br><br>
+                    <strong>AI Image Generator</strong> v1.2<br><br>
+                    Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
             </div>
@@ -1133,7 +1613,12 @@
             iconImageBase64: null,
             // Portrait tab state
             portraitStyle: 'professional corporate headshot, studio lighting',
-            portraitImageBase64: null
+            portraitImageBase64: null,
+            // SlideWiki state
+            sharepointConnected: false,
+            sharepointFiles: [],
+            selectedSlides: [],
+            currentPresentation: null
         };
 
         // ======================
@@ -1189,6 +1674,27 @@
             portraitPreviewImage: document.getElementById('portraitPreviewImage'),
             btnRegeneratePortrait: document.getElementById('btnRegeneratePortrait'),
             btnInsertPortrait: document.getElementById('btnInsertPortrait'),
+            
+            // SlideWiki tab
+            sharepointStatus: document.getElementById('sharepointStatus'),
+            btnConnectSharePoint: document.getElementById('btnConnectSharePoint'),
+            sharepointPath: document.getElementById('sharepointPath'),
+            btnLoadSlides: document.getElementById('btnLoadSlides'),
+            slidesListSection: document.getElementById('slidesListSection'),
+            slidesList: document.getElementById('slidesList'),
+            slidePreviewSection: document.getElementById('slidePreviewSection'),
+            slidePreviewLoading: document.getElementById('slidePreviewLoading'),
+            slidePreviewGrid: document.getElementById('slidePreviewGrid'),
+            slideActions: document.getElementById('slideActions'),
+            btnInsertSlide: document.getElementById('btnInsertSlide'),
+            slidewikiStatusMessage: document.getElementById('slidewikiStatusMessage'),
+            
+            // CS Request tab
+            csProjectTitle: document.getElementById('csProjectTitle'),
+            csDescription: document.getElementById('csDescription'),
+            csDeadline: document.getElementById('csDeadline'),
+            btnSubmitCSRequest: document.getElementById('btnSubmitCSRequest'),
+            csStatusMessage: document.getElementById('csStatusMessage'),
             
             // Feedback tab
             feedbackText: document.getElementById('feedbackText'),
@@ -1309,6 +1815,17 @@
                     state.portraitStyle = preset.dataset.style;
                 });
             });
+
+            // SlideWiki tab
+            elements.btnConnectSharePoint.addEventListener('click', connectToSharePoint);
+            elements.sharepointPath.addEventListener('input', () => {
+                elements.btnLoadSlides.disabled = !elements.sharepointPath.value.trim() || !state.sharepointConnected;
+            });
+            elements.btnLoadSlides.addEventListener('click', loadSharePointSlides);
+            elements.btnInsertSlide.addEventListener('click', insertSelectedSlides);
+
+            // CS Request tab
+            elements.btnSubmitCSRequest.addEventListener('click', submitCSRequest);
 
             // Feedback tab
             elements.btnSubmitFeedback.addEventListener('click', submitFeedback);
@@ -1674,6 +2191,262 @@
             localStorage.removeItem('image_history');
             renderHistory();
             showStatus('History cleared', 'info', 'images');
+        }
+
+        // ======================
+        // SlideWiki Functions
+        // ======================
+        async function connectToSharePoint() {
+            elements.btnConnectSharePoint.disabled = true;
+            elements.btnConnectSharePoint.innerHTML = '<div class="spinner"></div><span>Connecting...</span>';
+            
+            try {
+                // For demo: simulate connection
+                // In production, this would use Microsoft Graph API with MSAL authentication
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                state.sharepointConnected = true;
+                elements.sharepointStatus.textContent = 'Connected';
+                elements.sharepointStatus.className = 'api-key-status connected';
+                elements.btnConnectSharePoint.innerHTML = '<i class="ms-Icon ms-Icon--CheckMark"></i><span>Connected</span>';
+                elements.btnConnectSharePoint.style.background = 'var(--success)';
+                elements.btnLoadSlides.disabled = !elements.sharepointPath.value.trim();
+                
+                showSlidewikiStatus('Connected to Microsoft 365!', 'success');
+            } catch (error) {
+                showSlidewikiStatus('Connection failed: ' + error.message, 'error');
+                elements.btnConnectSharePoint.innerHTML = '<i class="ms-Icon ms-Icon--PlugConnected"></i><span>Connect to Microsoft 365</span>';
+            }
+            
+            elements.btnConnectSharePoint.disabled = false;
+        }
+
+        async function loadSharePointSlides() {
+            const folderUrl = elements.sharepointPath.value.trim();
+            if (!folderUrl) return;
+            
+            elements.btnLoadSlides.disabled = true;
+            elements.slidePreviewLoading.style.display = 'flex';
+            elements.slidePreviewGrid.innerHTML = '';
+            showSlidewikiStatus('Loading presentations...', 'info');
+            
+            try {
+                // For demo: simulate loading files
+                // In production, this would call Microsoft Graph API
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Demo data - replace with actual Graph API call
+                const demoFiles = [
+                    { name: 'The strategy house.pptx', slides: 8, modified: '2025-01-29', id: '7D017D76-286F-40BE-9421-DA327AA79B82' },
+                    { name: 'Company Overview.pptx', slides: 12, modified: '2025-01-15', id: 'demo-1' },
+                    { name: 'Q4 Report.pptx', slides: 6, modified: '2025-01-10', id: 'demo-2' }
+                ];
+                
+                state.sharepointFiles = demoFiles;
+                elements.slidesListSection.style.display = 'block';
+                
+                // Render file list
+                elements.slidesList.innerHTML = demoFiles.map((file, index) => `
+                    <div class="slide-file-item" data-index="${index}">
+                        <i class="ms-Icon ms-Icon--PowerPointDocument"></i>
+                        <div class="slide-file-info">
+                            <div class="slide-file-name">${file.name}</div>
+                            <div class="slide-file-meta">${file.slides} slides • Modified ${file.modified}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add click handlers
+                document.querySelectorAll('.slide-file-item').forEach(item => {
+                    item.addEventListener('click', () => loadPresentationSlides(parseInt(item.dataset.index)));
+                });
+                
+                showSlidewikiStatus('Found ' + demoFiles.length + ' presentations', 'success');
+            } catch (error) {
+                showSlidewikiStatus('Failed to load: ' + error.message, 'error');
+            }
+            
+            elements.btnLoadSlides.disabled = false;
+            elements.slidePreviewLoading.style.display = 'none';
+        }
+
+        async function loadPresentationSlides(fileIndex) {
+            const file = state.sharepointFiles[fileIndex];
+            if (!file) return;
+            
+            // Highlight selected file
+            document.querySelectorAll('.slide-file-item').forEach((item, i) => {
+                item.classList.toggle('selected', i === fileIndex);
+            });
+            
+            elements.slidePreviewLoading.style.display = 'flex';
+            state.currentPresentation = file;
+            state.selectedSlides = [];
+            
+            try {
+                // For demo: simulate loading slide thumbnails
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Generate demo slide thumbnails with realistic themes
+                const slideThemes = [
+                    { title: 'Title', color: '#1a365d', subtitle: 'The Strategy House' },
+                    { title: 'Agenda', color: '#2c5282', subtitle: 'Overview' },
+                    { title: 'Vision', color: '#2b6cb0', subtitle: 'Our Direction' },
+                    { title: 'Strategy', color: '#3182ce', subtitle: 'Key Pillars' },
+                    { title: 'Goals', color: '#4299e1', subtitle: '2025 Targets' },
+                    { title: 'Roadmap', color: '#63b3ed', subtitle: 'Timeline' },
+                    { title: 'Team', color: '#90cdf4', subtitle: 'Who We Are' },
+                    { title: 'Q&A', color: '#bee3f8', subtitle: 'Questions' }
+                ];
+                
+                const slides = slideThemes.slice(0, file.slides).map((theme, i) => ({
+                    index: i + 1,
+                    ...theme
+                }));
+                
+                elements.slidePreviewGrid.innerHTML = slides.map(slide => `
+                    <div class="slide-thumb" data-slide="${slide.index}">
+                        <div style="width:100%;height:100%;background:linear-gradient(135deg, ${slide.color}, ${slide.color}dd);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;padding:8px;text-align:center;">
+                            <div style="font-size:14px;font-weight:bold;">${slide.title}</div>
+                            <div style="font-size:9px;opacity:0.8;margin-top:2px;">${slide.subtitle}</div>
+                        </div>
+                        <span class="slide-number">${slide.index}</span>
+                        <span class="slide-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
+                    </div>
+                `).join('');
+                
+                // Add click handlers for slide selection
+                document.querySelectorAll('.slide-thumb').forEach(thumb => {
+                    thumb.addEventListener('click', () => {
+                        const slideNum = parseInt(thumb.dataset.slide);
+                        thumb.classList.toggle('selected');
+                        
+                        if (thumb.classList.contains('selected')) {
+                            if (!state.selectedSlides.includes(slideNum)) {
+                                state.selectedSlides.push(slideNum);
+                            }
+                        } else {
+                            state.selectedSlides = state.selectedSlides.filter(s => s !== slideNum);
+                        }
+                        
+                        // Show/hide insert button
+                        elements.slideActions.style.display = state.selectedSlides.length > 0 ? 'flex' : 'none';
+                        elements.btnInsertSlide.innerHTML = `<i class="ms-Icon ms-Icon--AddTo"></i><span>Insert ${state.selectedSlides.length} Slide${state.selectedSlides.length > 1 ? 's' : ''}</span>`;
+                    });
+                });
+                
+                showSlidewikiStatus('Loaded ' + file.slides + ' slides from ' + file.name, 'success');
+            } catch (error) {
+                showSlidewikiStatus('Failed to load slides: ' + error.message, 'error');
+            }
+            
+            elements.slidePreviewLoading.style.display = 'none';
+        }
+
+        async function insertSelectedSlides() {
+            if (state.selectedSlides.length === 0) return;
+            
+            elements.btnInsertSlide.disabled = true;
+            elements.btnInsertSlide.innerHTML = '<div class="spinner"></div><span>Inserting...</span>';
+            
+            try {
+                // For demo: simulate inserting slides
+                // In production: download slides via Graph API and insert using PowerPoint API
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                showSlidewikiStatus(`Inserted ${state.selectedSlides.length} slide(s) from ${state.currentPresentation.name}!`, 'success');
+                
+                // Clear selection
+                state.selectedSlides = [];
+                document.querySelectorAll('.slide-thumb.selected').forEach(thumb => {
+                    thumb.classList.remove('selected');
+                });
+                elements.slideActions.style.display = 'none';
+                
+            } catch (error) {
+                showSlidewikiStatus('Failed to insert: ' + error.message, 'error');
+            }
+            
+            elements.btnInsertSlide.disabled = false;
+            elements.btnInsertSlide.innerHTML = '<i class="ms-Icon ms-Icon--AddTo"></i><span>Insert Selected Slides</span>';
+        }
+
+        function showSlidewikiStatus(message, type) {
+            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
+            elements.slidewikiStatusMessage.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
+            elements.slidewikiStatusMessage.className = `status-message visible ${type}`;
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => elements.slidewikiStatusMessage.classList.remove('visible'), 4000);
+            }
+        }
+
+        // ======================
+        // CS Request
+        // ======================
+        function submitCSRequest() {
+            // Gather form data
+            const presentation = document.querySelector('input[name="presentation"]:checked');
+            const design = Array.from(document.querySelectorAll('input[name="design"]:checked')).map(cb => cb.value);
+            const web = Array.from(document.querySelectorAll('input[name="web"]:checked')).map(cb => cb.value);
+            const video = Array.from(document.querySelectorAll('input[name="video"]:checked')).map(cb => cb.value);
+            const brand = document.querySelector('input[name="brand"]:checked');
+            
+            const projectTitle = elements.csProjectTitle.value.trim();
+            const description = elements.csDescription.value.trim();
+            const deadline = elements.csDeadline.value;
+            
+            // Validation
+            if (!presentation && design.length === 0 && web.length === 0 && video.length === 0 && !brand) {
+                showCSStatus('Please select at least one service type.', 'error');
+                return;
+            }
+            
+            if (!projectTitle) {
+                showCSStatus('Please enter a project title.', 'error');
+                return;
+            }
+            
+            // Compile request data
+            const requestData = {
+                services: {
+                    presentation: presentation ? presentation.value : null,
+                    design: design,
+                    web: web,
+                    video: video,
+                    brand: brand ? brand.value : null
+                },
+                projectTitle: projectTitle,
+                description: description,
+                deadline: deadline,
+                submittedAt: new Date().toISOString()
+            };
+            
+            console.log('CS Request submitted:', requestData);
+            
+            // Show success message
+            showCSStatus('Request submitted successfully! The Creative Studio team will contact you soon.', 'success');
+            
+            // Clear form
+            document.querySelectorAll('.cs-form input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('.cs-form input[type="checkbox"]').forEach(c => c.checked = false);
+            elements.csProjectTitle.value = '';
+            elements.csDescription.value = '';
+            elements.csDeadline.value = '';
+            
+            // In production, you would send this to your backend or create a SharePoint list item
+            // Example: await fetch('https://your-api.com/cs-requests', { method: 'POST', body: JSON.stringify(requestData) });
+        }
+
+        function showCSStatus(message, type) {
+            const statusEl = elements.csStatusMessage;
+            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
+            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
+            statusEl.className = `status-message visible ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => statusEl.classList.remove('visible'), 5000);
+            }
         }
 
         // ======================
