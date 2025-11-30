@@ -1036,7 +1036,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.3</span></h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.4</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -1246,11 +1246,11 @@
                         <div class="icon-style-desc">Banana</div>
                     </div>
                     <div class="icon-style-card" data-style="2">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
-                            🔜
+                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #1a237e, #3949ab);">
+                            🦢
                         </div>
                         <div class="icon-style-name">Style 2</div>
-                        <div class="icon-style-desc">Coming soon</div>
+                        <div class="icon-style-desc">Origami</div>
                     </div>
                     <div class="icon-style-card" data-style="3">
                         <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
@@ -1661,7 +1661,7 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.3<br><br>
+                    <strong>AI Image Generator</strong> v1.4<br><br>
                     Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
@@ -1872,9 +1872,9 @@
             elements.iconStyleGrid.forEach(card => {
                 card.addEventListener('click', () => {
                     const styleNum = parseInt(card.dataset.style);
-                    // Only allow Style 1 for now
-                    if (styleNum !== 1) {
-                        alert('This style is coming soon! Please use Style 1 for now.');
+                    // Only allow Style 1 and 2 for now
+                    if (styleNum > 2) {
+                        alert('This style is coming soon! Please use Style 1 or 2 for now.');
                         return;
                     }
                     elements.iconStyleGrid.forEach(c => c.classList.remove('selected'));
@@ -2089,6 +2089,67 @@
                         "constraints": {
                             "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
                             "ensure": ["clear banana identity", "clear object identity"]
+                        },
+                        "output_specs": {
+                            "include_synthid": true,
+                            "file_type": "high_resolution_image",
+                            "transparent_background": true
+                        }
+                    };
+                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
+                } else if (styleNum === 2) {
+                    // Style 2: Origami style - midnight blue paper
+                    const jsonPrompt = {
+                        "object": subject,
+                        "task_type": "generation",
+                        "priority": {
+                            "primary": "create an origami-style rendition of the object",
+                            "secondary": "merge origami characteristics with the object's functional design"
+                        },
+                        "parameters": {
+                            "origami_integration": {
+                                "style": "organic and seamless",
+                                "features": ["precise fold geometry", "paper creases", "midnight blue paper grain", "clean edges"]
+                            },
+                            "object_design": {
+                                "reference_object_key": "object",
+                                "maintain_functionality": true
+                            }
+                        },
+                        "subject": {
+                            "main": "origami-inspired version of the object",
+                            "attributes": {
+                                "physical": "folded midnight blue paper with visible creases, slight paper grain, shaped to match the object's silhouette",
+                                "pose": "studio product angle",
+                                "expression": "none"
+                            }
+                        },
+                        "environment": {
+                            "setting": "clean product studio backdrop",
+                            "lighting": {
+                                "type": "soft",
+                                "direction": "front",
+                                "quality": "diffused"
+                            }
+                        },
+                        "style": {
+                            "artistic": "photorealistic",
+                            "camera": {
+                                "angle": "eye_level",
+                                "lens": "normal",
+                                "aperture": "shallow_depth_of_field"
+                            },
+                            "mood": "modern and playful",
+                            "color_palette": "midnight blue with natural fold shadows and subtle highlights"
+                        },
+                        "technical": {
+                            "resolution": "high",
+                            "aspect_ratio": "1:1",
+                            "quality": "maximum"
+                        },
+                        "constraints": {
+                            "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
+                            "ensure": ["clear origami identity", "clear object identity"]
                         },
                         "output_specs": {
                             "include_synthid": true,
