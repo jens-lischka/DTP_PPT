@@ -1286,7 +1286,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.6</span></h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.7</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -1585,6 +1585,26 @@
 
         <!-- ==================== PORTRAITS TAB ==================== -->
         <div class="tab-content" id="tab-portraits">
+            <!-- Frontify API Key Section -->
+            <div class="api-key-section">
+                <div class="api-key-header">
+                    <label>Frontify API Key</label>
+                    <span class="api-key-status" id="frontifyKeyStatus">Not configured</span>
+                </div>
+                <div class="api-key-input-row">
+                    <input 
+                        type="password" 
+                        id="frontifyKeyInput" 
+                        class="api-key-input" 
+                        placeholder="Enter your Frontify API key..."
+                    >
+                    <button class="btn-save-key" id="btnSaveFrontifyKey" style="background: var(--primary);">Save</button>
+                </div>
+                <p class="api-key-help">
+                    Get your API key from <a href="https://brand.oliverwyman.com/settings/api" target="_blank">Frontify Settings → API</a>
+                </p>
+            </div>
+
             <!-- Search Section -->
             <div class="prompt-section">
                 <label for="portraitSearchInput">Search People</label>
@@ -1595,8 +1615,9 @@
                         class="cs-input search-input"
                         placeholder="Search by name, role, department..."
                         style="font-size: 14px; padding-right: 80px;"
+                        disabled
                     >
-                    <button class="search-btn" id="btnSearchPortrait">
+                    <button class="search-btn" id="btnSearchPortrait" disabled>
                         <i class="ms-Icon ms-Icon--Search"></i>
                     </button>
                     <button class="clear-btn" id="btnClearPortraitSearch" style="display: none;">
@@ -1606,12 +1627,12 @@
                 
                 <!-- Quick Tags -->
                 <div class="portrait-tags">
-                    <button class="portrait-tag" data-tag="business">Business</button>
-                    <button class="portrait-tag" data-tag="casual">Casual</button>
-                    <button class="portrait-tag" data-tag="executive">Executive</button>
-                    <button class="portrait-tag" data-tag="creative">Creative</button>
-                    <button class="portrait-tag" data-tag="diverse">Diverse</button>
-                    <button class="portrait-tag" data-tag="team">Team</button>
+                    <button class="portrait-tag" data-tag="business" disabled>Business</button>
+                    <button class="portrait-tag" data-tag="casual" disabled>Casual</button>
+                    <button class="portrait-tag" data-tag="executive" disabled>Executive</button>
+                    <button class="portrait-tag" data-tag="creative" disabled>Creative</button>
+                    <button class="portrait-tag" data-tag="diverse" disabled>Diverse</button>
+                    <button class="portrait-tag" data-tag="team" disabled>Team</button>
                 </div>
             </div>
 
@@ -1678,10 +1699,13 @@
 
             <!-- API Connection Info -->
             <div class="feedback-info" style="margin-top: 16px;">
-                <h3>📷 Frontify People Library</h3>
+                <h3>🔐 Secure API Access</h3>
                 <p style="font-size: 12px; color: var(--neutral-dark);">
-                    Connected to <strong>brand.oliverwyman.com</strong><br><br>
-                    Search the People library by name, role, or use tags to filter results.
+                    Your API key is stored locally on your device and never shared.<br><br>
+                    <strong>Get your API key:</strong><br>
+                    1. Go to <a href="https://brand.oliverwyman.com" target="_blank">brand.oliverwyman.com</a><br>
+                    2. Navigate to Settings → API<br>
+                    3. Generate or copy your API token
                 </p>
             </div>
         </div>
@@ -1935,7 +1959,7 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.6<br><br>
+                    <strong>AI Image Generator</strong> v1.7<br><br>
                     Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
@@ -1961,6 +1985,7 @@
             iconStyleNumber: 1,
             iconImageBase64: null,
             // Portrait tab state (People Library Search)
+            frontifyApiKey: localStorage.getItem('frontify_api_key') || '',
             portraitSearchQuery: '',
             portraitSearchResults: [],
             portraitCurrentPage: 1,
@@ -2018,7 +2043,11 @@
             btnRegenerateIcon: document.getElementById('btnRegenerateIcon'),
             btnInsertIcon: document.getElementById('btnInsertIcon'),
             
-            // Portraits tab
+            // Portraits tab - Frontify API
+            frontifyKeyInput: document.getElementById('frontifyKeyInput'),
+            btnSaveFrontifyKey: document.getElementById('btnSaveFrontifyKey'),
+            frontifyKeyStatus: document.getElementById('frontifyKeyStatus'),
+            // Portraits tab - Search
             portraitSearchInput: document.getElementById('portraitSearchInput'),
             btnSearchPortrait: document.getElementById('btnSearchPortrait'),
             btnClearPortraitSearch: document.getElementById('btnClearPortraitSearch'),
@@ -2171,6 +2200,14 @@
                 });
             });
 
+            // Portraits tab - Frontify API Key
+            elements.btnSaveFrontifyKey.addEventListener('click', saveFrontifyApiKey);
+            elements.frontifyKeyInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveFrontifyApiKey();
+            });
+            // Initialize Frontify key status
+            initializeFrontifyKey();
+
             // Portraits tab (People Library Search)
             elements.btnSearchPortrait.addEventListener('click', () => searchPortraits());
             elements.portraitSearchInput.addEventListener('keypress', (e) => {
@@ -2181,6 +2218,10 @@
             elements.btnLoadMorePortraits.addEventListener('click', loadMorePortraits);
             elements.portraitTags.forEach(tag => {
                 tag.addEventListener('click', () => {
+                    if (!state.frontifyApiKey && !window._frontifyApiKey) {
+                        showPortraitStatus('Please configure your Frontify API key first', 'error');
+                        return;
+                    }
                     elements.portraitTags.forEach(t => t.classList.remove('active'));
                     tag.classList.add('active');
                     elements.portraitSearchInput.value = tag.dataset.tag;
@@ -2688,9 +2729,83 @@
         
         // Frontify API Configuration
         const FRONTIFY_CONFIG = {
-            API_ENDPOINT: 'https://brand.oliverwyman.com/graphql',
-            API_KEY: 'ceFhnYAaYfEBUggA6Ut3SA46P6AVHp2vhHzWE8P5'
+            API_ENDPOINT: 'https://brand.oliverwyman.com/graphql'
+            // API key is provided by user and stored in state.frontifyApiKey
         };
+
+        // Global fallback for Frontify API key (similar to OpenAI)
+        window._frontifyApiKey = localStorage.getItem('frontify_api_key') || '';
+
+        // Initialize Frontify API key from localStorage
+        function initializeFrontifyKey() {
+            try {
+                const savedKey = localStorage.getItem('frontify_api_key');
+                if (savedKey) {
+                    state.frontifyApiKey = savedKey;
+                    window._frontifyApiKey = savedKey;
+                    elements.frontifyKeyInput.value = savedKey;
+                    elements.frontifyKeyStatus.textContent = 'Connected';
+                    elements.frontifyKeyStatus.className = 'api-key-status connected';
+                    enablePortraitSearch(true);
+                } else {
+                    enablePortraitSearch(false);
+                }
+            } catch (e) {
+                console.error('Error loading Frontify API key:', e);
+                enablePortraitSearch(false);
+            }
+        }
+
+        // Save Frontify API key
+        function saveFrontifyApiKey() {
+            const key = elements.frontifyKeyInput.value.trim();
+            
+            if (!key) {
+                showPortraitStatus('Please enter an API key', 'error');
+                return;
+            }
+
+            // Store in multiple places for reliability
+            state.frontifyApiKey = key;
+            window._frontifyApiKey = key;
+
+            try {
+                localStorage.setItem('frontify_api_key', key);
+            } catch (e) {
+                console.warn('Could not save to localStorage:', e);
+            }
+
+            elements.frontifyKeyStatus.textContent = 'Connected';
+            elements.frontifyKeyStatus.className = 'api-key-status connected';
+            enablePortraitSearch(true);
+            
+            showPortraitStatus('API key saved! You can now search the People library.', 'success');
+        }
+
+        // Enable/disable portrait search based on API key
+        function enablePortraitSearch(enabled) {
+            elements.portraitSearchInput.disabled = !enabled;
+            elements.btnSearchPortrait.disabled = !enabled;
+            elements.portraitTags.forEach(tag => {
+                tag.disabled = !enabled;
+                tag.style.opacity = enabled ? '1' : '0.5';
+                tag.style.cursor = enabled ? 'pointer' : 'not-allowed';
+            });
+
+            if (!enabled) {
+                elements.portraitEmptyState.innerHTML = `
+                    <i class="ms-Icon ms-Icon--Permissions" style="font-size: 48px; color: var(--neutral-light);"></i>
+                    <h3>API Key Required</h3>
+                    <p>Enter your Frontify API key above to search the People library.</p>
+                `;
+            } else {
+                elements.portraitEmptyState.innerHTML = `
+                    <i class="ms-Icon ms-Icon--Contact" style="font-size: 48px; color: var(--neutral-light);"></i>
+                    <h3>Search for People</h3>
+                    <p>Enter a search term or click a tag to find portraits from your library.</p>
+                `;
+            }
+        }
 
         // Library IDs
         const LIBRARY_IDS = {
@@ -2729,11 +2844,18 @@
 
         // Fetch assets from Frontify
         async function searchFrontifyAssets(libraryId, query, page = 1, limit = 50) {
+            // Get API key from state or global fallback
+            const apiKey = state.frontifyApiKey || window._frontifyApiKey;
+            
+            if (!apiKey) {
+                throw new Error('Frontify API key not configured');
+            }
+
             const response = await fetch(FRONTIFY_CONFIG.API_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${FRONTIFY_CONFIG.API_KEY}`
+                    'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
                     query: SEARCH_ASSETS_QUERY,
@@ -2747,6 +2869,9 @@
             });
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Invalid API key. Please check your Frontify API key.');
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -2769,6 +2894,13 @@
         }
 
         async function searchPortraits(query) {
+            // Check for API key first
+            const apiKey = state.frontifyApiKey || window._frontifyApiKey;
+            if (!apiKey) {
+                showPortraitStatus('Please configure your Frontify API key first', 'error');
+                return;
+            }
+
             const searchQuery = query || elements.portraitSearchInput.value.trim();
             
             if (!searchQuery) {
