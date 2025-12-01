@@ -8,8 +8,8 @@
     <!-- Office.js -->
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     
-    <!-- Frontify Finder -->
-    <script src="https://unpkg.com/@frontify/frontify-finder@latest/dist/index.js"></script>
+    <!-- Frontify Finder (version 3.0.1) -->
+    <script src="https://unpkg.com/@frontify/frontify-finder@3.0.1/dist/index.js"></script>
     
     <!-- Fluent UI Icons -->
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
@@ -2743,30 +2743,70 @@
                 return;
             }
 
+            // Debug: Log available methods
+            console.log('FrontifyFinder object:', FrontifyFinder);
+            console.log('Available methods:', Object.keys(FrontifyFinder));
+
             showPortraitStatus('Opening Frontify...', 'info');
 
             try {
-                FrontifyFinder.open({
-                    domain: FRONTIFY_CONFIG.DOMAIN,
-                    clientId: clientId,
-                    options: {
-                        allowMultiSelect: false,
-                        permanentDownloadUrls: true,
-                        filters: [
-                            { key: 'project', values: [FRONTIFY_CONFIG.PEOPLE_LIBRARY_ID] }
-                        ]
-                    },
-                    success: function(assets) {
-                        console.log('Frontify assets selected:', assets);
-                        if (assets && assets.length > 0) {
-                            handleFrontifyAssetSelected(assets[0]);
+                // Try the 'create' method (as shown in ESM documentation)
+                if (typeof FrontifyFinder.create === 'function') {
+                    FrontifyFinder.create({
+                        clientId: clientId,
+                        domain: FRONTIFY_CONFIG.DOMAIN,
+                        options: {
+                            allowMultiSelect: false,
+                            permanentDownloadUrls: true,
+                            filters: [
+                                { key: 'project', values: [FRONTIFY_CONFIG.PEOPLE_LIBRARY_ID] }
+                            ]
                         }
-                    },
-                    cancel: function() {
-                        console.log('Frontify Finder cancelled');
-                        showPortraitStatus('Selection cancelled', 'info');
+                    }).then(result => {
+                        console.log('Frontify result:', result);
+                        if (result && result.length > 0) {
+                            handleFrontifyAssetSelected(result[0]);
+                        } else {
+                            showPortraitStatus('Selection cancelled', 'info');
+                        }
+                    }).catch(error => {
+                        console.error('Frontify error:', error);
+                        showPortraitStatus('Frontify error: ' + error.message, 'error');
+                    });
+                }
+                // Fallback to 'open' method
+                else if (typeof FrontifyFinder.open === 'function') {
+                    FrontifyFinder.open({
+                        domain: FRONTIFY_CONFIG.DOMAIN,
+                        clientId: clientId,
+                        options: {
+                            allowMultiSelect: false,
+                            permanentDownloadUrls: true,
+                            filters: [
+                                { key: 'project', values: [FRONTIFY_CONFIG.PEOPLE_LIBRARY_ID] }
+                            ]
+                        },
+                        success: function(assets) {
+                            console.log('Frontify assets selected:', assets);
+                            if (assets && assets.length > 0) {
+                                handleFrontifyAssetSelected(assets[0]);
+                            }
+                        },
+                        cancel: function() {
+                            console.log('Frontify Finder cancelled');
+                            showPortraitStatus('Selection cancelled', 'info');
+                        }
+                    });
+                }
+                else {
+                    // Log all available methods for debugging
+                    const methods = [];
+                    for (let key in FrontifyFinder) {
+                        methods.push(key + ': ' + typeof FrontifyFinder[key]);
                     }
-                });
+                    console.error('No known methods found. Available:', methods.join(', '));
+                    showPortraitStatus('Frontify Finder API not compatible. Check console for details.', 'error');
+                }
             } catch (error) {
                 console.error('Error opening Frontify Finder:', error);
                 showPortraitStatus('Failed to open Frontify: ' + error.message, 'error');
