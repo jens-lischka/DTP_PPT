@@ -1286,7 +1286,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.5</span></h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.6</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -1676,13 +1676,12 @@
                 </div>
             </div>
 
-            <!-- API Configuration Notice -->
+            <!-- API Connection Info -->
             <div class="feedback-info" style="margin-top: 16px;">
-                <h3>📷 People Library</h3>
+                <h3>📷 Frontify People Library</h3>
                 <p style="font-size: 12px; color: var(--neutral-dark);">
-                    <strong>Demo Mode:</strong> Currently showing sample data.<br><br>
-                    To connect your actual people library (Frontify, SharePoint, etc.), configure the API endpoint in settings.<br><br>
-                    <a href="#" onclick="alert('API configuration coming soon!'); return false;">→ Configure API</a>
+                    Connected to <strong>brand.oliverwyman.com</strong><br><br>
+                    Search the People library by name, role, or use tags to filter results.
                 </p>
             </div>
         </div>
@@ -1936,7 +1935,7 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.5<br><br>
+                    <strong>AI Image Generator</strong> v1.6<br><br>
                     Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
@@ -1969,6 +1968,7 @@
             portraitIsLoading: false,
             portraitIsLoadingMore: false,
             portraitHasSearched: false,
+            portraitTotalResults: 0,
             selectedPortrait: null,
             portraitImageBase64: null,
             // SlideWiki state
@@ -2683,28 +2683,90 @@
         }
 
         // ======================
-        // Portrait/People Search Functions
+        // Portrait/People Search Functions (Frontify API)
         // ======================
         
-        // Demo data - Replace with actual API call
-        const DEMO_PORTRAITS = [
-            { id: '1', name: 'Sarah Johnson', role: 'CEO', department: 'Executive', tags: ['business', 'executive', 'leadership'], image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face' },
-            { id: '2', name: 'Michael Chen', role: 'CTO', department: 'Technology', tags: ['business', 'executive', 'tech'], image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face' },
-            { id: '3', name: 'Emily Davis', role: 'Marketing Director', department: 'Marketing', tags: ['business', 'creative', 'marketing'], image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face' },
-            { id: '4', name: 'James Wilson', role: 'Sales Manager', department: 'Sales', tags: ['business', 'sales', 'team'], image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face' },
-            { id: '5', name: 'Lisa Anderson', role: 'HR Director', department: 'Human Resources', tags: ['business', 'hr', 'team'], image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face' },
-            { id: '6', name: 'David Brown', role: 'Finance Manager', department: 'Finance', tags: ['business', 'finance', 'executive'], image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face' },
-            { id: '7', name: 'Jennifer Lee', role: 'Product Manager', department: 'Product', tags: ['business', 'creative', 'tech'], image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face' },
-            { id: '8', name: 'Robert Taylor', role: 'Engineer', department: 'Engineering', tags: ['tech', 'engineering', 'casual'], image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face' },
-            { id: '9', name: 'Amanda Martinez', role: 'Designer', department: 'Design', tags: ['creative', 'design', 'casual'], image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face' },
-            { id: '10', name: 'Christopher White', role: 'Consultant', department: 'Consulting', tags: ['business', 'consulting', 'executive'], image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=face' },
-            { id: '11', name: 'Michelle Thompson', role: 'Analyst', department: 'Analytics', tags: ['business', 'analytics', 'team'], image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face' },
-            { id: '12', name: 'Daniel Garcia', role: 'Developer', department: 'Engineering', tags: ['tech', 'engineering', 'casual'], image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&crop=face' },
-            { id: '13', name: 'Rachel Kim', role: 'UX Designer', department: 'Design', tags: ['creative', 'design', 'ux'], image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=400&fit=crop&crop=face' },
-            { id: '14', name: 'Kevin Johnson', role: 'Account Executive', department: 'Sales', tags: ['business', 'sales', 'diverse'], image: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=400&fit=crop&crop=face' },
-            { id: '15', name: 'Sophia Patel', role: 'Data Scientist', department: 'Data', tags: ['tech', 'data', 'diverse'], image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face' },
-            { id: '16', name: 'Marcus Williams', role: 'Project Manager', department: 'Operations', tags: ['business', 'team', 'diverse'], image: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop&crop=face' },
-        ];
+        // Frontify API Configuration
+        const FRONTIFY_CONFIG = {
+            API_ENDPOINT: 'https://brand.oliverwyman.com/graphql',
+            API_KEY: 'ceFhnYAaYfEBUggA6Ut3SA46P6AVHp2vhHzWE8P5'
+        };
+
+        // Library IDs
+        const LIBRARY_IDS = {
+            ICONS: 'eyJpZGVudGlmaWVyIjo2NTMsInR5cGUiOiJwcm9qZWN0In0=',
+            LOGOS: 'eyJpZGVudGlmaWVyIjo1NzEyLCJ0eXBlIjoicHJvamVjdCJ9',
+            PEOPLE: 'eyJpZGVudGlmaWVyIjoxMTYsInR5cGUiOiJwcm9qZWN0In0=',
+            IMAGERY: 'eyJpZGVudGlmaWVyIjoyMiwidHlwZSI6InByb2plY3QifQ==',
+            SLIDES: 'eyJpZGVudGlmaWVyIjo1NzExLCJ0eXBlIjoicHJvamVjdCJ9'
+        };
+
+        // GraphQL query for searching assets
+        const SEARCH_ASSETS_QUERY = `
+            query SearchAssets($projectId: ID!, $query: String, $page: Int, $limit: Int) {
+                library(id: $projectId) {
+                    assets(query: $query, page: $page, limit: $limit) {
+                        total
+                        hasNextPage
+                        items {
+                            id
+                            title
+                            description
+                            tags {
+                                value
+                            }
+                            previewUrl
+                            ... on Image {
+                                downloadUrl
+                                width
+                                height
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+
+        // Fetch assets from Frontify
+        async function searchFrontifyAssets(libraryId, query, page = 1, limit = 50) {
+            const response = await fetch(FRONTIFY_CONFIG.API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${FRONTIFY_CONFIG.API_KEY}`
+                },
+                body: JSON.stringify({
+                    query: SEARCH_ASSETS_QUERY,
+                    variables: {
+                        projectId: libraryId,
+                        query: query,
+                        page: page,
+                        limit: limit
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        // Transform Frontify asset to portrait format
+        function transformAssetToPortrait(asset) {
+            return {
+                id: asset.id,
+                name: asset.title || 'Unknown',
+                role: asset.description || '',
+                department: '',
+                tags: asset.tags ? asset.tags.map(t => t.value) : [],
+                image: asset.previewUrl || asset.downloadUrl,
+                downloadUrl: asset.downloadUrl,
+                width: asset.width,
+                height: asset.height
+            };
+        }
 
         async function searchPortraits(query) {
             const searchQuery = query || elements.portraitSearchInput.value.trim();
@@ -2730,38 +2792,42 @@
             elements.btnClearPortraitSearch.style.display = 'flex';
 
             try {
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 800));
+                // Call Frontify API
+                const data = await searchFrontifyAssets(LIBRARY_IDS.PEOPLE, searchQuery, 1, 50);
 
-                // Demo: Filter demo data based on query
-                // In production, this would call your actual API
-                const results = DEMO_PORTRAITS.filter(p => 
-                    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    p.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    p.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    p.tags.some(t => t.includes(searchQuery.toLowerCase()))
-                );
+                if (data.errors) {
+                    console.error('GraphQL errors:', data.errors);
+                    throw new Error(data.errors[0]?.message || 'Search failed');
+                }
+
+                const items = data.data?.library?.assets?.items || [];
+                const hasNext = data.data?.library?.assets?.hasNextPage || false;
+                const total = data.data?.library?.assets?.total || items.length;
+
+                // Transform assets to portrait format
+                const results = items.map(transformAssetToPortrait);
 
                 state.portraitSearchResults = results;
-                state.portraitHasMore = results.length > 9; // Demo: limit to 9 initially
+                state.portraitHasMore = hasNext;
+                state.portraitTotalResults = total;
 
-                renderPortraitResults(results.slice(0, 9));
+                renderPortraitResults(results);
                 
                 if (results.length === 0) {
                     elements.portraitNoResults.style.display = 'flex';
                 } else {
-                    showPortraitStatus(`Found ${results.length} result${results.length !== 1 ? 's' : ''}`, 'success');
-                    elements.portraitResultsCount.textContent = `Showing ${Math.min(9, results.length)} of ${results.length}`;
+                    showPortraitStatus(`Found ${total} result${total !== 1 ? 's' : ''}`, 'success');
+                    elements.portraitResultsCount.textContent = `Showing ${results.length} of ${total}`;
                     elements.portraitResultsCount.style.display = 'block';
                     
-                    if (results.length > 9) {
+                    if (hasNext) {
                         elements.btnLoadMorePortraits.style.display = 'flex';
                     }
                 }
 
             } catch (error) {
                 console.error('Portrait search error:', error);
-                showPortraitStatus('Search failed. Please try again.', 'error');
+                showPortraitStatus(`Search failed: ${error.message}`, 'error');
                 elements.portraitNoResults.style.display = 'flex';
             } finally {
                 state.portraitIsLoading = false;
@@ -2777,20 +2843,27 @@
             elements.loadMoreSpinner.style.display = 'block';
 
             try {
-                await new Promise(resolve => setTimeout(resolve, 500));
+                const nextPage = state.portraitCurrentPage + 1;
+                const data = await searchFrontifyAssets(LIBRARY_IDS.PEOPLE, state.portraitSearchQuery, nextPage, 50);
 
-                const startIndex = state.portraitCurrentPage * 9;
-                const nextResults = state.portraitSearchResults.slice(startIndex, startIndex + 9);
-                
-                state.portraitCurrentPage++;
-                state.portraitHasMore = startIndex + 9 < state.portraitSearchResults.length;
+                if (data.errors) {
+                    throw new Error(data.errors[0]?.message || 'Failed to load more');
+                }
 
-                appendPortraitResults(nextResults);
+                const items = data.data?.library?.assets?.items || [];
+                const hasNext = data.data?.library?.assets?.hasNextPage || false;
+
+                // Transform and append
+                const newResults = items.map(transformAssetToPortrait);
+                state.portraitSearchResults = [...state.portraitSearchResults, ...newResults];
+                state.portraitCurrentPage = nextPage;
+                state.portraitHasMore = hasNext;
+
+                appendPortraitResults(newResults);
                 
-                const shown = Math.min(startIndex + nextResults.length, state.portraitSearchResults.length);
-                elements.portraitResultsCount.textContent = `Showing ${shown} of ${state.portraitSearchResults.length}`;
+                elements.portraitResultsCount.textContent = `Showing ${state.portraitSearchResults.length} of ${state.portraitTotalResults}`;
                 
-                if (!state.portraitHasMore) {
+                if (!hasNext) {
                     elements.btnLoadMorePortraits.style.display = 'none';
                 }
 
@@ -2823,16 +2896,27 @@
             const card = document.createElement('div');
             card.className = 'portrait-card';
             card.dataset.id = portrait.id;
+            
+            // Parse name and role from title (often formatted as "Name - Role" or just "Name")
+            let displayName = portrait.name;
+            let displayRole = portrait.role;
+            
+            if (portrait.name.includes(' - ')) {
+                const parts = portrait.name.split(' - ');
+                displayName = parts[0].trim();
+                displayRole = parts[1]?.trim() || portrait.role;
+            }
+            
             card.innerHTML = `
-                <img src="${portrait.image}" alt="${portrait.name}" loading="lazy">
+                <img src="${portrait.image}" alt="${displayName}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2240%22>👤</text></svg>'">
                 <div class="portrait-card-overlay">
-                    <div class="portrait-card-name">${portrait.name}</div>
-                    <div class="portrait-card-role">${portrait.role}</div>
+                    <div class="portrait-card-name">${displayName}</div>
+                    ${displayRole ? `<div class="portrait-card-role">${displayRole}</div>` : ''}
                 </div>
                 <div class="selected-check"><i class="ms-Icon ms-Icon--CheckMark"></i></div>
             `;
             
-            card.addEventListener('click', () => selectPortrait(portrait, card));
+            card.addEventListener('click', () => selectPortrait({...portrait, displayName, displayRole}, card));
             return card;
         }
 
@@ -2847,16 +2931,18 @@
             // Show preview
             elements.portraitPreviewImage.src = portrait.image;
             elements.portraitMetadata.innerHTML = `
-                <div class="portrait-metadata-name">${portrait.name}</div>
-                <div class="portrait-metadata-role">${portrait.role} • ${portrait.department}</div>
-                <div class="portrait-metadata-tags">
-                    ${portrait.tags.map(t => `<span class="portrait-metadata-tag">${t}</span>`).join('')}
-                </div>
+                <div class="portrait-metadata-name">${portrait.displayName || portrait.name}</div>
+                ${portrait.displayRole ? `<div class="portrait-metadata-role">${portrait.displayRole}</div>` : ''}
+                ${portrait.tags && portrait.tags.length > 0 ? `
+                    <div class="portrait-metadata-tags">
+                        ${portrait.tags.map(t => `<span class="portrait-metadata-tag">${t}</span>`).join('')}
+                    </div>
+                ` : ''}
             `;
             elements.portraitPreviewSection.classList.add('visible');
 
-            // Store base64 for insertion (in production, fetch the actual image)
-            fetchPortraitBase64(portrait.image);
+            // Fetch base64 for insertion
+            fetchPortraitBase64(portrait.downloadUrl || portrait.image);
         }
 
         async function fetchPortraitBase64(imageUrl) {
@@ -2882,6 +2968,8 @@
                 return;
             }
 
+            showPortraitStatus('Inserting image...', 'info');
+
             try {
                 await PowerPoint.run(async (context) => {
                     const slide = context.presentation.getSelectedSlides().getItemAt(0);
@@ -2891,13 +2979,14 @@
                         slide.shapes.addImage(state.portraitImageBase64);
                     } else {
                         // Insert from URL
-                        const image = slide.shapes.addImage(state.selectedPortrait.image);
+                        const image = slide.shapes.addImage(state.selectedPortrait.downloadUrl || state.selectedPortrait.image);
                     }
                     
                     await context.sync();
                 });
 
-                showPortraitStatus(`Inserted portrait of ${state.selectedPortrait.name}`, 'success');
+                const name = state.selectedPortrait.displayName || state.selectedPortrait.name;
+                showPortraitStatus(`Inserted: ${name}`, 'success');
             } catch (error) {
                 console.error('Insert portrait error:', error);
                 showPortraitStatus('Failed to insert portrait. Please try again.', 'error');
@@ -2910,6 +2999,7 @@
             state.portraitHasSearched = false;
             state.selectedPortrait = null;
             state.portraitImageBase64 = null;
+            state.portraitTotalResults = 0;
 
             elements.portraitSearchInput.value = '';
             elements.portraitResultsGrid.innerHTML = '';
