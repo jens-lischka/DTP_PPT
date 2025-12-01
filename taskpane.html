@@ -1026,6 +1026,256 @@
             font-size: 11px;
             color: var(--neutral-dark);
         }
+
+        /* Portrait Search Styles */
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper .search-input {
+            padding-right: 80px;
+        }
+
+        .search-btn, .clear-btn {
+            position: absolute;
+            right: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .clear-btn {
+            right: 44px;
+            background: var(--neutral-light);
+            color: var(--neutral-dark);
+        }
+
+        .clear-btn:hover {
+            background: var(--neutral);
+        }
+
+        .portrait-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .portrait-tag {
+            background: var(--surface);
+            border: 1px solid var(--neutral-light);
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--neutral-darker);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .portrait-tag:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .portrait-tag.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .portrait-results-section {
+            margin-top: 16px;
+        }
+
+        .portrait-loading, .portrait-empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--neutral-dark);
+        }
+
+        .portrait-empty-state h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 12px 0 4px;
+            color: var(--neutral-darker);
+        }
+
+        .portrait-empty-state p {
+            font-size: 13px;
+        }
+
+        .portrait-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .portrait-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .portrait-card:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .portrait-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
+        }
+
+        .portrait-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .portrait-card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            padding: 8px 6px 6px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .portrait-card:hover .portrait-card-overlay {
+            opacity: 1;
+        }
+
+        .portrait-card-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .portrait-card-role {
+            font-size: 10px;
+            color: rgba(255,255,255,0.8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .portrait-card .selected-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .portrait-card.selected .selected-check {
+            display: flex;
+        }
+
+        .btn-load-more {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            background: var(--surface);
+            border: 1px solid var(--neutral-light);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--neutral-darker);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-load-more:hover {
+            background: var(--neutral-light);
+        }
+
+        .btn-load-more:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner-small {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--neutral-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .results-count {
+            text-align: center;
+            font-size: 12px;
+            color: var(--neutral-dark);
+            margin-top: 8px;
+        }
+
+        .portrait-metadata {
+            padding: 12px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+        }
+
+        .portrait-metadata-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--neutral-darker);
+        }
+
+        .portrait-metadata-role {
+            font-size: 12px;
+            color: var(--neutral-dark);
+            margin-top: 2px;
+        }
+
+        .portrait-metadata-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .portrait-metadata-tag {
+            background: var(--neutral-light);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            color: var(--neutral-dark);
+        }
     </style>
 </head>
 <body>
@@ -1036,7 +1286,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.4</span></h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.5</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -1335,48 +1585,34 @@
 
         <!-- ==================== PORTRAITS TAB ==================== -->
         <div class="tab-content" id="tab-portraits">
-            <!-- Prompt Section -->
+            <!-- Search Section -->
             <div class="prompt-section">
-                <label for="portraitPromptInput">Describe the person</label>
-                <textarea 
-                    id="portraitPromptInput" 
-                    class="prompt-textarea" 
-                    placeholder="A professional business woman with short brown hair, wearing a blue blazer..."
-                ></textarea>
-                
-                <label style="margin-top: 12px;">Style</label>
-                <div class="style-presets" id="portraitStyles">
-                    <button class="style-preset selected" data-style="professional corporate headshot, studio lighting">Corporate</button>
-                    <button class="style-preset" data-style="casual friendly portrait, natural lighting">Casual</button>
-                    <button class="style-preset" data-style="cartoon illustration style">Cartoon</button>
-                    <button class="style-preset" data-style="artistic painted portrait">Artistic</button>
-                    <button class="style-preset" data-style="minimalist avatar simple">Avatar</button>
-                </div>
-
-                <div class="options-row">
-                    <div class="option-group">
-                        <label>Background</label>
-                        <select id="portraitBgSelect">
-                            <option value="clean white studio background">White Studio</option>
-                            <option value="blurred office background">Office</option>
-                            <option value="gradient background">Gradient</option>
-                            <option value="outdoor natural background">Outdoor</option>
-                        </select>
-                    </div>
-                    <div class="option-group">
-                        <label>Quality</label>
-                        <select id="portraitQualitySelect">
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low (faster)</option>
-                        </select>
-                    </div>
+                <label for="portraitSearchInput">Search People</label>
+                <div class="search-input-wrapper">
+                    <input 
+                        type="text"
+                        id="portraitSearchInput" 
+                        class="cs-input search-input"
+                        placeholder="Search by name, role, department..."
+                        style="font-size: 14px; padding-right: 80px;"
+                    >
+                    <button class="search-btn" id="btnSearchPortrait">
+                        <i class="ms-Icon ms-Icon--Search"></i>
+                    </button>
+                    <button class="clear-btn" id="btnClearPortraitSearch" style="display: none;">
+                        <i class="ms-Icon ms-Icon--Cancel"></i>
+                    </button>
                 </div>
                 
-                <button class="btn-generate" id="btnGeneratePortrait" disabled>
-                    <i class="ms-Icon ms-Icon--Rocket"></i>
-                    <span>Generate Portrait</span>
-                </button>
+                <!-- Quick Tags -->
+                <div class="portrait-tags">
+                    <button class="portrait-tag" data-tag="business">Business</button>
+                    <button class="portrait-tag" data-tag="casual">Casual</button>
+                    <button class="portrait-tag" data-tag="executive">Executive</button>
+                    <button class="portrait-tag" data-tag="creative">Creative</button>
+                    <button class="portrait-tag" data-tag="diverse">Diverse</button>
+                    <button class="portrait-tag" data-tag="team">Team</button>
+                </div>
             </div>
 
             <!-- Status Message -->
@@ -1385,30 +1621,69 @@
                 <span></span>
             </div>
 
-            <!-- Preview Section -->
+            <!-- Results Section -->
+            <div id="portraitResultsSection" class="portrait-results-section">
+                <!-- Loading State -->
+                <div id="portraitResultsLoading" class="portrait-loading" style="display: none;">
+                    <div class="spinner-large"></div>
+                    <p>Searching people library...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="portraitEmptyState" class="portrait-empty-state">
+                    <i class="ms-Icon ms-Icon--Contact" style="font-size: 48px; color: var(--neutral-light);"></i>
+                    <h3>Search for People</h3>
+                    <p>Enter a search term or click a tag to find portraits from your library.</p>
+                </div>
+
+                <!-- No Results State -->
+                <div id="portraitNoResults" class="portrait-empty-state" style="display: none;">
+                    <i class="ms-Icon ms-Icon--SearchIssue" style="font-size: 48px; color: var(--neutral-light);"></i>
+                    <h3>No Results Found</h3>
+                    <p>Try a different search term or browse by tags.</p>
+                </div>
+
+                <!-- Results Grid -->
+                <div id="portraitResultsGrid" class="portrait-grid"></div>
+
+                <!-- Load More Button -->
+                <button class="btn-load-more" id="btnLoadMorePortraits" style="display: none;">
+                    <span>Load More</span>
+                    <div class="spinner-small" id="loadMoreSpinner" style="display: none;"></div>
+                </button>
+
+                <!-- Results Count -->
+                <div id="portraitResultsCount" class="results-count" style="display: none;"></div>
+            </div>
+
+            <!-- Selected Portrait Preview -->
             <div id="portraitPreviewSection" class="preview-section">
                 <div class="preview-header">
-                    <h2>Generated Portrait</h2>
+                    <h2>Selected Portrait</h2>
                 </div>
                 
                 <div class="preview-image-container">
-                    <div id="portraitPreviewLoading" class="preview-loading">
-                        <div class="spinner-large"></div>
-                        <p>Generating your portrait...</p>
-                    </div>
-                    <img id="portraitPreviewImage" class="preview-image" alt="Generated portrait preview">
+                    <img id="portraitPreviewImage" class="preview-image" alt="Selected portrait preview">
                 </div>
+
+                <div id="portraitMetadata" class="portrait-metadata"></div>
                 
                 <div class="action-buttons">
-                    <button class="btn-action btn-regenerate" id="btnRegeneratePortrait">
-                        <i class="ms-Icon ms-Icon--Refresh"></i>
-                        Regenerate
-                    </button>
                     <button class="btn-action btn-insert" id="btnInsertPortrait">
                         <i class="ms-Icon ms-Icon--CheckMark"></i>
                         Insert
                     </button>
                 </div>
+            </div>
+
+            <!-- API Configuration Notice -->
+            <div class="feedback-info" style="margin-top: 16px;">
+                <h3>📷 People Library</h3>
+                <p style="font-size: 12px; color: var(--neutral-dark);">
+                    <strong>Demo Mode:</strong> Currently showing sample data.<br><br>
+                    To connect your actual people library (Frontify, SharePoint, etc.), configure the API endpoint in settings.<br><br>
+                    <a href="#" onclick="alert('API configuration coming soon!'); return false;">→ Configure API</a>
+                </p>
             </div>
         </div>
 
@@ -1661,7 +1936,7 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.4<br><br>
+                    <strong>AI Image Generator</strong> v1.5<br><br>
                     Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
@@ -1686,8 +1961,15 @@
             // Icon tab state
             iconStyleNumber: 1,
             iconImageBase64: null,
-            // Portrait tab state
-            portraitStyle: 'professional corporate headshot, studio lighting',
+            // Portrait tab state (People Library Search)
+            portraitSearchQuery: '',
+            portraitSearchResults: [],
+            portraitCurrentPage: 1,
+            portraitHasMore: false,
+            portraitIsLoading: false,
+            portraitIsLoadingMore: false,
+            portraitHasSearched: false,
+            selectedPortrait: null,
             portraitImageBase64: null,
             // SlideWiki state
             sharepointConnected: false,
@@ -1737,16 +2019,22 @@
             btnInsertIcon: document.getElementById('btnInsertIcon'),
             
             // Portraits tab
-            portraitPromptInput: document.getElementById('portraitPromptInput'),
-            portraitStyles: document.querySelectorAll('#portraitStyles .style-preset'),
-            portraitBgSelect: document.getElementById('portraitBgSelect'),
-            portraitQualitySelect: document.getElementById('portraitQualitySelect'),
-            btnGeneratePortrait: document.getElementById('btnGeneratePortrait'),
+            portraitSearchInput: document.getElementById('portraitSearchInput'),
+            btnSearchPortrait: document.getElementById('btnSearchPortrait'),
+            btnClearPortraitSearch: document.getElementById('btnClearPortraitSearch'),
+            portraitTags: document.querySelectorAll('.portrait-tag'),
+            portraitResultsSection: document.getElementById('portraitResultsSection'),
+            portraitResultsLoading: document.getElementById('portraitResultsLoading'),
+            portraitEmptyState: document.getElementById('portraitEmptyState'),
+            portraitNoResults: document.getElementById('portraitNoResults'),
+            portraitResultsGrid: document.getElementById('portraitResultsGrid'),
+            btnLoadMorePortraits: document.getElementById('btnLoadMorePortraits'),
+            loadMoreSpinner: document.getElementById('loadMoreSpinner'),
+            portraitResultsCount: document.getElementById('portraitResultsCount'),
+            portraitMetadata: document.getElementById('portraitMetadata'),
             portraitStatusMessage: document.getElementById('portraitStatusMessage'),
             portraitPreviewSection: document.getElementById('portraitPreviewSection'),
-            portraitPreviewLoading: document.getElementById('portraitPreviewLoading'),
             portraitPreviewImage: document.getElementById('portraitPreviewImage'),
-            btnRegeneratePortrait: document.getElementById('btnRegeneratePortrait'),
             btnInsertPortrait: document.getElementById('btnInsertPortrait'),
             
             // SlideWiki tab
@@ -1883,16 +2171,20 @@
                 });
             });
 
-            // Portraits tab
-            elements.btnGeneratePortrait.addEventListener('click', () => generateImage('portraits'));
-            elements.portraitPromptInput.addEventListener('input', updateGenerateButtons);
-            elements.btnRegeneratePortrait.addEventListener('click', () => generateImage('portraits'));
-            elements.btnInsertPortrait.addEventListener('click', () => insertImage('portraits'));
-            elements.portraitStyles.forEach(preset => {
-                preset.addEventListener('click', () => {
-                    elements.portraitStyles.forEach(p => p.classList.remove('selected'));
-                    preset.classList.add('selected');
-                    state.portraitStyle = preset.dataset.style;
+            // Portraits tab (People Library Search)
+            elements.btnSearchPortrait.addEventListener('click', () => searchPortraits());
+            elements.portraitSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchPortraits();
+            });
+            elements.btnClearPortraitSearch.addEventListener('click', clearPortraitSearch);
+            elements.btnInsertPortrait.addEventListener('click', () => insertPortrait());
+            elements.btnLoadMorePortraits.addEventListener('click', loadMorePortraits);
+            elements.portraitTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    elements.portraitTags.forEach(t => t.classList.remove('active'));
+                    tag.classList.add('active');
+                    elements.portraitSearchInput.value = tag.dataset.tag;
+                    searchPortraits(tag.dataset.tag);
                 });
             });
 
@@ -2168,17 +2460,8 @@
                 previewSection = elements.iconPreviewSection;
                 previewLoading = elements.iconPreviewLoading;
                 previewImage = elements.iconPreviewImage;
-            } else if (tab === 'portraits') {
-                const basePrompt = elements.portraitPromptInput.value.trim();
-                const style = state.portraitStyle;
-                const bg = elements.portraitBgSelect.value;
-                prompt = `Portrait of ${basePrompt}, ${style}, ${bg}, high quality professional photography`;
-                quality = elements.portraitQualitySelect.value;
-                statusEl = elements.portraitStatusMessage;
-                previewSection = elements.portraitPreviewSection;
-                previewLoading = elements.portraitPreviewLoading;
-                previewImage = elements.portraitPreviewImage;
             }
+            // Note: Portraits tab now uses search-based approach, not AI generation
 
             // Get API key from state or global fallback
             const apiKey = state.apiKey || window._openaiApiKey;
@@ -2256,9 +2539,8 @@
                 base64Data = state.currentImageBase64;
             } else if (tab === 'icons') {
                 base64Data = state.iconImageBase64;
-            } else if (tab === 'portraits') {
-                base64Data = state.portraitImageBase64;
             }
+            // Note: Portraits use separate insertPortrait() function
 
             if (!base64Data) {
                 showStatus('No image to insert', 'error', tab);
@@ -2398,6 +2680,257 @@
             localStorage.removeItem('image_history');
             renderHistory();
             showStatus('History cleared', 'info', 'images');
+        }
+
+        // ======================
+        // Portrait/People Search Functions
+        // ======================
+        
+        // Demo data - Replace with actual API call
+        const DEMO_PORTRAITS = [
+            { id: '1', name: 'Sarah Johnson', role: 'CEO', department: 'Executive', tags: ['business', 'executive', 'leadership'], image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face' },
+            { id: '2', name: 'Michael Chen', role: 'CTO', department: 'Technology', tags: ['business', 'executive', 'tech'], image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face' },
+            { id: '3', name: 'Emily Davis', role: 'Marketing Director', department: 'Marketing', tags: ['business', 'creative', 'marketing'], image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face' },
+            { id: '4', name: 'James Wilson', role: 'Sales Manager', department: 'Sales', tags: ['business', 'sales', 'team'], image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face' },
+            { id: '5', name: 'Lisa Anderson', role: 'HR Director', department: 'Human Resources', tags: ['business', 'hr', 'team'], image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face' },
+            { id: '6', name: 'David Brown', role: 'Finance Manager', department: 'Finance', tags: ['business', 'finance', 'executive'], image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face' },
+            { id: '7', name: 'Jennifer Lee', role: 'Product Manager', department: 'Product', tags: ['business', 'creative', 'tech'], image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face' },
+            { id: '8', name: 'Robert Taylor', role: 'Engineer', department: 'Engineering', tags: ['tech', 'engineering', 'casual'], image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face' },
+            { id: '9', name: 'Amanda Martinez', role: 'Designer', department: 'Design', tags: ['creative', 'design', 'casual'], image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face' },
+            { id: '10', name: 'Christopher White', role: 'Consultant', department: 'Consulting', tags: ['business', 'consulting', 'executive'], image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=face' },
+            { id: '11', name: 'Michelle Thompson', role: 'Analyst', department: 'Analytics', tags: ['business', 'analytics', 'team'], image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face' },
+            { id: '12', name: 'Daniel Garcia', role: 'Developer', department: 'Engineering', tags: ['tech', 'engineering', 'casual'], image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&crop=face' },
+            { id: '13', name: 'Rachel Kim', role: 'UX Designer', department: 'Design', tags: ['creative', 'design', 'ux'], image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=400&fit=crop&crop=face' },
+            { id: '14', name: 'Kevin Johnson', role: 'Account Executive', department: 'Sales', tags: ['business', 'sales', 'diverse'], image: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=400&fit=crop&crop=face' },
+            { id: '15', name: 'Sophia Patel', role: 'Data Scientist', department: 'Data', tags: ['tech', 'data', 'diverse'], image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face' },
+            { id: '16', name: 'Marcus Williams', role: 'Project Manager', department: 'Operations', tags: ['business', 'team', 'diverse'], image: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=400&fit=crop&crop=face' },
+        ];
+
+        async function searchPortraits(query) {
+            const searchQuery = query || elements.portraitSearchInput.value.trim();
+            
+            if (!searchQuery) {
+                showPortraitStatus('Please enter a search term', 'error');
+                return;
+            }
+
+            state.portraitSearchQuery = searchQuery;
+            state.portraitIsLoading = true;
+            state.portraitHasSearched = true;
+            state.portraitCurrentPage = 1;
+
+            // Update UI
+            elements.portraitEmptyState.style.display = 'none';
+            elements.portraitNoResults.style.display = 'none';
+            elements.portraitResultsLoading.style.display = 'flex';
+            elements.portraitResultsGrid.innerHTML = '';
+            elements.btnLoadMorePortraits.style.display = 'none';
+            elements.portraitResultsCount.style.display = 'none';
+            elements.portraitPreviewSection.classList.remove('visible');
+            elements.btnClearPortraitSearch.style.display = 'flex';
+
+            try {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Demo: Filter demo data based on query
+                // In production, this would call your actual API
+                const results = DEMO_PORTRAITS.filter(p => 
+                    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    p.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    p.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    p.tags.some(t => t.includes(searchQuery.toLowerCase()))
+                );
+
+                state.portraitSearchResults = results;
+                state.portraitHasMore = results.length > 9; // Demo: limit to 9 initially
+
+                renderPortraitResults(results.slice(0, 9));
+                
+                if (results.length === 0) {
+                    elements.portraitNoResults.style.display = 'flex';
+                } else {
+                    showPortraitStatus(`Found ${results.length} result${results.length !== 1 ? 's' : ''}`, 'success');
+                    elements.portraitResultsCount.textContent = `Showing ${Math.min(9, results.length)} of ${results.length}`;
+                    elements.portraitResultsCount.style.display = 'block';
+                    
+                    if (results.length > 9) {
+                        elements.btnLoadMorePortraits.style.display = 'flex';
+                    }
+                }
+
+            } catch (error) {
+                console.error('Portrait search error:', error);
+                showPortraitStatus('Search failed. Please try again.', 'error');
+                elements.portraitNoResults.style.display = 'flex';
+            } finally {
+                state.portraitIsLoading = false;
+                elements.portraitResultsLoading.style.display = 'none';
+            }
+        }
+
+        async function loadMorePortraits() {
+            if (state.portraitIsLoadingMore || !state.portraitHasMore) return;
+
+            state.portraitIsLoadingMore = true;
+            elements.btnLoadMorePortraits.disabled = true;
+            elements.loadMoreSpinner.style.display = 'block';
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const startIndex = state.portraitCurrentPage * 9;
+                const nextResults = state.portraitSearchResults.slice(startIndex, startIndex + 9);
+                
+                state.portraitCurrentPage++;
+                state.portraitHasMore = startIndex + 9 < state.portraitSearchResults.length;
+
+                appendPortraitResults(nextResults);
+                
+                const shown = Math.min(startIndex + nextResults.length, state.portraitSearchResults.length);
+                elements.portraitResultsCount.textContent = `Showing ${shown} of ${state.portraitSearchResults.length}`;
+                
+                if (!state.portraitHasMore) {
+                    elements.btnLoadMorePortraits.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('Load more error:', error);
+                showPortraitStatus('Failed to load more results', 'error');
+            } finally {
+                state.portraitIsLoadingMore = false;
+                elements.btnLoadMorePortraits.disabled = false;
+                elements.loadMoreSpinner.style.display = 'none';
+            }
+        }
+
+        function renderPortraitResults(portraits) {
+            elements.portraitResultsGrid.innerHTML = '';
+            portraits.forEach(portrait => {
+                const card = createPortraitCard(portrait);
+                elements.portraitResultsGrid.appendChild(card);
+            });
+        }
+
+        function appendPortraitResults(portraits) {
+            portraits.forEach(portrait => {
+                const card = createPortraitCard(portrait);
+                elements.portraitResultsGrid.appendChild(card);
+            });
+        }
+
+        function createPortraitCard(portrait) {
+            const card = document.createElement('div');
+            card.className = 'portrait-card';
+            card.dataset.id = portrait.id;
+            card.innerHTML = `
+                <img src="${portrait.image}" alt="${portrait.name}" loading="lazy">
+                <div class="portrait-card-overlay">
+                    <div class="portrait-card-name">${portrait.name}</div>
+                    <div class="portrait-card-role">${portrait.role}</div>
+                </div>
+                <div class="selected-check"><i class="ms-Icon ms-Icon--CheckMark"></i></div>
+            `;
+            
+            card.addEventListener('click', () => selectPortrait(portrait, card));
+            return card;
+        }
+
+        function selectPortrait(portrait, cardElement) {
+            // Remove selection from other cards
+            document.querySelectorAll('.portrait-card').forEach(c => c.classList.remove('selected'));
+            
+            // Select this card
+            cardElement.classList.add('selected');
+            state.selectedPortrait = portrait;
+
+            // Show preview
+            elements.portraitPreviewImage.src = portrait.image;
+            elements.portraitMetadata.innerHTML = `
+                <div class="portrait-metadata-name">${portrait.name}</div>
+                <div class="portrait-metadata-role">${portrait.role} • ${portrait.department}</div>
+                <div class="portrait-metadata-tags">
+                    ${portrait.tags.map(t => `<span class="portrait-metadata-tag">${t}</span>`).join('')}
+                </div>
+            `;
+            elements.portraitPreviewSection.classList.add('visible');
+
+            // Store base64 for insertion (in production, fetch the actual image)
+            fetchPortraitBase64(portrait.image);
+        }
+
+        async function fetchPortraitBase64(imageUrl) {
+            try {
+                // Fetch image and convert to base64
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    state.portraitImageBase64 = reader.result.split(',')[1];
+                };
+                reader.readAsDataURL(blob);
+            } catch (error) {
+                console.error('Error fetching portrait:', error);
+                // Fallback: store URL for direct insertion
+                state.portraitImageBase64 = null;
+            }
+        }
+
+        async function insertPortrait() {
+            if (!state.selectedPortrait) {
+                showPortraitStatus('Please select a portrait first', 'error');
+                return;
+            }
+
+            try {
+                await PowerPoint.run(async (context) => {
+                    const slide = context.presentation.getSelectedSlides().getItemAt(0);
+                    
+                    if (state.portraitImageBase64) {
+                        // Insert from base64
+                        slide.shapes.addImage(state.portraitImageBase64);
+                    } else {
+                        // Insert from URL
+                        const image = slide.shapes.addImage(state.selectedPortrait.image);
+                    }
+                    
+                    await context.sync();
+                });
+
+                showPortraitStatus(`Inserted portrait of ${state.selectedPortrait.name}`, 'success');
+            } catch (error) {
+                console.error('Insert portrait error:', error);
+                showPortraitStatus('Failed to insert portrait. Please try again.', 'error');
+            }
+        }
+
+        function clearPortraitSearch() {
+            state.portraitSearchQuery = '';
+            state.portraitSearchResults = [];
+            state.portraitHasSearched = false;
+            state.selectedPortrait = null;
+            state.portraitImageBase64 = null;
+
+            elements.portraitSearchInput.value = '';
+            elements.portraitResultsGrid.innerHTML = '';
+            elements.portraitEmptyState.style.display = 'flex';
+            elements.portraitNoResults.style.display = 'none';
+            elements.btnLoadMorePortraits.style.display = 'none';
+            elements.portraitResultsCount.style.display = 'none';
+            elements.portraitPreviewSection.classList.remove('visible');
+            elements.btnClearPortraitSearch.style.display = 'none';
+            elements.portraitTags.forEach(t => t.classList.remove('active'));
+        }
+
+        function showPortraitStatus(message, type) {
+            const statusEl = elements.portraitStatusMessage;
+            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
+            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
+            statusEl.className = `status-message visible ${type}`;
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
         }
 
         // ======================
@@ -2682,17 +3215,15 @@
             
             elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
             elements.btnGenerateIcon.disabled = !elements.iconSubjectInput.value.trim() || !hasApiKey || state.isGenerating;
-            elements.btnGeneratePortrait.disabled = !elements.portraitPromptInput.value.trim() || !hasApiKey || state.isGenerating;
+            // Note: Portraits tab uses search, not AI generation
             
             const btnText = state.isGenerating ? '<div class="spinner"></div><span>Generating...</span>' : '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate</span>';
             if (state.isGenerating) {
                 elements.btnGenerate.innerHTML = btnText;
                 elements.btnGenerateIcon.innerHTML = btnText;
-                elements.btnGeneratePortrait.innerHTML = btnText;
             } else {
                 elements.btnGenerate.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Image</span>';
                 elements.btnGenerateIcon.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Icon</span>';
-                elements.btnGeneratePortrait.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Portrait</span>';
             }
         }
 
