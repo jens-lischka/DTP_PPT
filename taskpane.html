@@ -11,9 +11,6 @@
     <!-- Fluent UI Icons -->
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
     
-    <!-- Frontify Finder Widget -->
-    <script src="https://cdn.frontify.com/finder/v3/frontify-finder.js"></script>
-    
     <style>
         :root {
             --primary: #0078d4;
@@ -1030,7 +1027,7 @@
             color: var(--neutral-dark);
         }
 
-        /* Portrait Search Styles */
+        /* Search Input Styles */
         .search-input-wrapper {
             position: relative;
             display: flex;
@@ -1070,215 +1067,6 @@
             background: var(--neutral);
         }
 
-        .portrait-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 12px;
-        }
-
-        .portrait-tag {
-            background: var(--surface);
-            border: 1px solid var(--neutral-light);
-            border-radius: 16px;
-            padding: 6px 12px;
-            font-size: 12px;
-            color: var(--neutral-darker);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .portrait-tag:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .portrait-tag.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .portrait-results-section {
-            margin-top: 16px;
-        }
-
-        .portrait-loading, .portrait-empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--neutral-dark);
-        }
-
-        .portrait-empty-state h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 12px 0 4px;
-            color: var(--neutral-darker);
-        }
-
-        .portrait-empty-state p {
-            font-size: 13px;
-        }
-
-        .portrait-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-
-        .portrait-card {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: var(--radius);
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.15s;
-        }
-
-        .portrait-card:hover {
-            border-color: var(--primary);
-            transform: scale(1.02);
-        }
-
-        .portrait-card.selected {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
-        }
-
-        .portrait-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .portrait-card-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            padding: 8px 6px 6px;
-            opacity: 0;
-            transition: opacity 0.15s;
-        }
-
-        .portrait-card:hover .portrait-card-overlay {
-            opacity: 1;
-        }
-
-        .portrait-card-name {
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .portrait-card-role {
-            font-size: 10px;
-            color: rgba(255,255,255,0.8);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .portrait-card .selected-check {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-        }
-
-        .portrait-card.selected .selected-check {
-            display: flex;
-        }
-
-        .btn-load-more {
-            width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            background: var(--surface);
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--neutral-darker);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-load-more:hover {
-            background: var(--neutral-light);
-        }
-
-        .btn-load-more:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .spinner-small {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--neutral-light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .results-count {
-            text-align: center;
-            font-size: 12px;
-            color: var(--neutral-dark);
-            margin-top: 8px;
-        }
-
-        .portrait-metadata {
-            padding: 12px;
-            background: var(--surface);
-            border-radius: var(--radius);
-            margin-bottom: 12px;
-        }
-
-        .portrait-metadata-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--neutral-darker);
-        }
-
-        .portrait-metadata-role {
-            font-size: 12px;
-            color: var(--neutral-dark);
-            margin-top: 2px;
-        }
-
-        .portrait-metadata-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 8px;
-        }
-
-        .portrait-metadata-tag {
-            background: var(--neutral-light);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            color: var(--neutral-dark);
-        }
     </style>
 </head>
 <body>
@@ -1289,7 +1077,7 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v1.9</span></h1>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v2.0</span></h1>
                 <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
@@ -1303,10 +1091,6 @@
             <button class="tab" data-tab="icons">
                 <i class="ms-Icon ms-Icon--AppIconDefaultList"></i>
                 <span>Icons</span>
-            </button>
-            <button class="tab" data-tab="portraits">
-                <i class="ms-Icon ms-Icon--Contact"></i>
-                <span>Portraits</span>
             </button>
             <button class="tab" data-tab="slidewiki">
                 <i class="ms-Icon ms-Icon--Library"></i>
@@ -1586,145 +1370,6 @@
             </div>
         </div>
 
-        <!-- ==================== PORTRAITS TAB ==================== -->
-        <div class="tab-content" id="tab-portraits">
-            <!-- Frontify Configuration -->
-            <div class="api-key-section">
-                <div class="api-key-header">
-                    <label>Frontify Client ID</label>
-                    <span class="api-key-status" id="frontifyKeyStatus">Not configured</span>
-                </div>
-                <div class="api-key-input-row">
-                    <input 
-                        type="text" 
-                        id="frontifyApiKeyInput" 
-                        class="api-key-input" 
-                        placeholder="Enter your Frontify Client ID..."
-                    >
-                    <button class="btn-save-key" id="btnSaveFrontifyKey" style="background: var(--primary);">Save</button>
-                </div>
-                <p class="api-key-help">
-                    Get your Client ID from <a href="https://brand.oliverwyman.com/admin/applications" target="_blank">Frontify → Applications</a>
-                </p>
-            </div>
-
-            <!-- Browse Button - Primary Action -->
-            <div class="prompt-section">
-                <button class="btn-action btn-generate" id="btnBrowseFrontify" style="width: 100%; margin-bottom: 12px;">
-                    <i class="ms-Icon ms-Icon--PhotoCollection"></i>
-                    Browse Frontify Library
-                </button>
-                
-                <div style="text-align: center; color: var(--neutral-dark); font-size: 12px; margin-bottom: 12px;">
-                    — or search directly —
-                </div>
-                
-                <label for="portraitSearchInput">Search People</label>
-                <div class="search-input-wrapper">
-                    <input 
-                        type="text"
-                        id="portraitSearchInput" 
-                        class="cs-input search-input"
-                        placeholder="Search by name, role, or keyword..."
-                        style="font-size: 14px; padding-right: 80px;"
-                    >
-                    <button class="search-btn" id="btnSearchPortrait">
-                        <i class="ms-Icon ms-Icon--Search"></i>
-                    </button>
-                    <button class="clear-btn" id="btnClearPortraitSearch" style="display: none;">
-                        <i class="ms-Icon ms-Icon--Cancel"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Status Message -->
-            <div id="portraitStatusMessage" class="status-message">
-                <i class="ms-Icon"></i>
-                <span></span>
-            </div>
-
-            <!-- Results Section -->
-            <div id="portraitResultsSection" class="portrait-results-section">
-                <!-- Loading State -->
-                <div id="portraitResultsLoading" class="portrait-loading" style="display: none;">
-                    <div class="spinner-large"></div>
-                    <p>Searching people library...</p>
-                </div>
-
-                <!-- Empty State -->
-                <div id="portraitEmptyState" class="portrait-empty-state">
-                    <i class="ms-Icon ms-Icon--Contact" style="font-size: 48px; color: var(--neutral-light);"></i>
-                    <h3>Search for People</h3>
-                    <p>Enter a name or keyword to find portraits from your Frontify library.</p>
-                </div>
-
-                <!-- No Results State -->
-                <div id="portraitNoResults" class="portrait-empty-state" style="display: none;">
-                    <i class="ms-Icon ms-Icon--SearchIssue" style="font-size: 48px; color: var(--neutral-light);"></i>
-                    <h3>No Results Found</h3>
-                    <p>Try a different search term.</p>
-                </div>
-
-                <!-- Results Grid -->
-                <div id="portraitResultsGrid" class="portrait-grid"></div>
-
-                <!-- Load More Button -->
-                <button class="btn-load-more" id="btnLoadMorePortraits" style="display: none;">
-                    <span>Load More</span>
-                    <div class="spinner-small" id="loadMoreSpinner" style="display: none;"></div>
-                </button>
-
-                <!-- Results Count -->
-                <div id="portraitResultsCount" class="results-count" style="display: none;"></div>
-            </div>
-
-            <!-- Selected Portrait Preview -->
-            <div id="portraitPreviewSection" class="preview-section">
-                <div class="preview-header">
-                    <h2>Selected Portrait</h2>
-                </div>
-                
-                <div class="preview-image-container">
-                    <img id="portraitPreviewImage" class="preview-image" alt="Selected portrait preview">
-                </div>
-
-                <div id="portraitMetadata" class="portrait-metadata"></div>
-                
-                <div class="action-buttons">
-                    <button class="btn-action btn-insert" id="btnInsertPortrait">
-                        <i class="ms-Icon ms-Icon--CheckMark"></i>
-                        Insert
-                    </button>
-                </div>
-            </div>
-
-            <!-- Frontify Setup Info -->
-            <div class="feedback-info" style="margin-top: 16px;">
-                <h3>🔐 Frontify Integration</h3>
-                <p style="font-size: 12px; color: var(--neutral-dark);">
-                    Your Client ID is stored locally. Click "Browse Frontify Library" to open the Frontify asset picker.<br><br>
-                    <a href="#" id="linkProxySetup" style="color: var(--primary);">Setup instructions →</a>
-                </p>
-            </div>
-
-            <!-- Setup Instructions (hidden by default) -->
-            <div id="proxySetupInstructions" class="feedback-info" style="margin-top: 8px; display: none;">
-                <h3>🛠️ Frontify Application Setup</h3>
-                <p style="font-size: 11px; color: var(--neutral-dark); line-height: 1.5;">
-                    <strong>1.</strong> Go to <a href="https://brand.oliverwyman.com/admin/applications" target="_blank">Frontify → Applications</a><br>
-                    <strong>2.</strong> Click "Create Application"<br>
-                    <strong>3.</strong> Name: "PowerPoint Add-in"<br>
-                    <strong>4.</strong> Enable "Support Authenticator"<br>
-                    <strong>5.</strong> Disable "Confidential"<br>
-                    <strong>6.</strong> Scopes: <code>basic:read</code>, <code>finder:read</code><br>
-                    <strong>7.</strong> Copy the Client ID and paste above
-                </p>
-                <button class="btn-secondary" id="btnHideProxyInstructions" style="margin-top: 8px; width: 100%; font-size: 12px;">
-                    Hide instructions
-                </button>
-            </div>
-        </div>
-
         <!-- ==================== SLIDEWIKI TAB ==================== -->
         <div class="tab-content" id="tab-slidewiki">
             <!-- SharePoint Connection -->
@@ -1974,8 +1619,8 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v1.9<br><br>
-                    Generate AI images, icons, and portraits using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
+                    <strong>AI Image Generator</strong> v2.0<br><br>
+                    Generate AI images and icons using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
             </div>
@@ -1999,17 +1644,6 @@
             // Icon tab state
             iconStyleNumber: 1,
             iconImageBase64: null,
-            // Portrait tab state (Frontify Search)
-            frontifyApiKey: localStorage.getItem('frontify_api_key') || '',
-            portraitSearchQuery: '',
-            portraitSearchResults: [],
-            portraitCurrentPage: 1,
-            portraitHasMore: false,
-            portraitIsLoading: false,
-            portraitIsLoadingMore: false,
-            portraitTotalResults: 0,
-            selectedPortrait: null,
-            portraitImageBase64: null,
             // SlideWiki state
             sharepointConnected: false,
             sharepointFiles: [],
@@ -2056,31 +1690,6 @@
             iconPreviewImage: document.getElementById('iconPreviewImage'),
             btnRegenerateIcon: document.getElementById('btnRegenerateIcon'),
             btnInsertIcon: document.getElementById('btnInsertIcon'),
-            
-            // Portraits tab - Frontify Search
-            frontifyApiKeyInput: document.getElementById('frontifyApiKeyInput'),
-            btnSaveFrontifyKey: document.getElementById('btnSaveFrontifyKey'),
-            frontifyKeyStatus: document.getElementById('frontifyKeyStatus'),
-            portraitSearchInput: document.getElementById('portraitSearchInput'),
-            btnSearchPortrait: document.getElementById('btnSearchPortrait'),
-            btnClearPortraitSearch: document.getElementById('btnClearPortraitSearch'),
-            portraitResultsSection: document.getElementById('portraitResultsSection'),
-            portraitResultsLoading: document.getElementById('portraitResultsLoading'),
-            portraitEmptyState: document.getElementById('portraitEmptyState'),
-            portraitNoResults: document.getElementById('portraitNoResults'),
-            portraitResultsGrid: document.getElementById('portraitResultsGrid'),
-            btnLoadMorePortraits: document.getElementById('btnLoadMorePortraits'),
-            loadMoreSpinner: document.getElementById('loadMoreSpinner'),
-            portraitResultsCount: document.getElementById('portraitResultsCount'),
-            portraitMetadata: document.getElementById('portraitMetadata'),
-            portraitStatusMessage: document.getElementById('portraitStatusMessage'),
-            portraitPreviewSection: document.getElementById('portraitPreviewSection'),
-            portraitPreviewImage: document.getElementById('portraitPreviewImage'),
-            btnInsertPortrait: document.getElementById('btnInsertPortrait'),
-            btnBrowseFrontify: document.getElementById('btnBrowseFrontify'),
-            linkProxySetup: document.getElementById('linkProxySetup'),
-            proxySetupInstructions: document.getElementById('proxySetupInstructions'),
-            btnHideProxyInstructions: document.getElementById('btnHideProxyInstructions'),
             
             // SlideWiki tab
             sharepointStatus: document.getElementById('sharepointStatus'),
@@ -2215,29 +1824,6 @@
                     state.iconStyleNumber = styleNum;
                 });
             });
-
-            // Portraits tab - Frontify Search
-            elements.btnSaveFrontifyKey.addEventListener('click', saveFrontifyApiKey);
-            elements.frontifyApiKeyInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') saveFrontifyApiKey();
-            });
-            elements.btnBrowseFrontify.addEventListener('click', openFrontifyFinder);
-            elements.btnSearchPortrait.addEventListener('click', () => searchPortraits());
-            elements.portraitSearchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') searchPortraits();
-            });
-            elements.btnClearPortraitSearch.addEventListener('click', clearPortraitSearch);
-            elements.btnInsertPortrait.addEventListener('click', insertPortrait);
-            elements.btnLoadMorePortraits.addEventListener('click', loadMorePortraits);
-            elements.linkProxySetup.addEventListener('click', (e) => {
-                e.preventDefault();
-                elements.proxySetupInstructions.style.display = 'block';
-            });
-            elements.btnHideProxyInstructions.addEventListener('click', () => {
-                elements.proxySetupInstructions.style.display = 'none';
-            });
-            // Initialize Frontify Client ID
-            initializeFrontifyApiKey();
 
             // SlideWiki tab
             elements.btnConnectSharePoint.addEventListener('click', connectToSharePoint);
@@ -2512,7 +2098,6 @@
                 previewLoading = elements.iconPreviewLoading;
                 previewImage = elements.iconPreviewImage;
             }
-            // Note: Portraits tab now uses search-based approach, not AI generation
 
             // Get API key from state or global fallback
             const apiKey = state.apiKey || window._openaiApiKey;
@@ -2561,8 +2146,6 @@
                     addToHistory(imageUrl, elements.promptInput.value.trim(), size);
                 } else if (tab === 'icons') {
                     state.iconImageBase64 = base64Data;
-                } else if (tab === 'portraits') {
-                    state.portraitImageBase64 = base64Data;
                 }
 
                 previewImage.src = imageUrl;
@@ -2591,7 +2174,6 @@
             } else if (tab === 'icons') {
                 base64Data = state.iconImageBase64;
             }
-            // Note: Portraits use separate insertPortrait() function
 
             if (!base64Data) {
                 showStatus('No image to insert', 'error', tab);
@@ -2600,7 +2182,7 @@
 
             showStatus('Inserting image...', 'info', tab);
 
-            // For icons and portraits, always insert at fixed size
+            // For icons, always insert at fixed size
             const imgWidth = tab === 'images' && state.selectedShape ? state.selectedShape.width : 300;
             const imgHeight = tab === 'images' && state.selectedShape ? state.selectedShape.height : 300;
 
@@ -2731,531 +2313,6 @@
             localStorage.removeItem('image_history');
             renderHistory();
             showStatus('History cleared', 'info', 'images');
-        }
-
-        // ======================
-        // Portrait Functions (Frontify API with Proxy)
-        // ======================
-        
-        // Frontify Configuration
-        const FRONTIFY_CONFIG = {
-            DOMAIN: 'brand.oliverwyman.com',
-            API_ENDPOINT: 'https://brand.oliverwyman.com/graphql',
-            // CORS Proxy URL - Update this with your Cloudflare Worker URL
-            // Set to null to try direct API (will fail due to CORS in browser)
-            PROXY_URL: null, // e.g., 'https://frontify-proxy.yourname.workers.dev'
-            // Library ID for People
-            PEOPLE_LIBRARY_ID: 'eyJpZGVudGlmaWVyIjoxMTYsInR5cGUiOiJwcm9qZWN0In0='
-        };
-
-        // GraphQL query for searching assets
-        const SEARCH_ASSETS_QUERY = `
-            query SearchAssets($projectId: ID!, $query: String, $page: Int, $limit: Int) {
-                library(id: $projectId) {
-                    assets(query: $query, page: $page, limit: $limit) {
-                        total
-                        hasNextPage
-                        items {
-                            id
-                            title
-                            description
-                            tags { value }
-                            previewUrl
-                            ... on Image {
-                                downloadUrl
-                                width
-                                height
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-
-        // Initialize Frontify Client ID from localStorage
-        function initializeFrontifyApiKey() {
-            try {
-                const savedKey = localStorage.getItem('frontify_client_id');
-                if (savedKey) {
-                    state.frontifyApiKey = savedKey;
-                    elements.frontifyApiKeyInput.value = savedKey;
-                    elements.frontifyKeyStatus.textContent = 'Configured';
-                    elements.frontifyKeyStatus.className = 'api-key-status connected';
-                }
-            } catch (e) {
-                console.error('Error loading Frontify Client ID:', e);
-            }
-        }
-
-        // Save Frontify Client ID
-        function saveFrontifyApiKey() {
-            const key = elements.frontifyApiKeyInput.value.trim();
-            
-            if (!key) {
-                showPortraitStatus('Please enter a Client ID', 'error');
-                return;
-            }
-
-            state.frontifyApiKey = key;
-
-            try {
-                localStorage.setItem('frontify_client_id', key);
-            } catch (e) {
-                console.warn('Could not save to localStorage:', e);
-            }
-
-            elements.frontifyKeyStatus.textContent = 'Configured';
-            elements.frontifyKeyStatus.className = 'api-key-status connected';
-            
-            showPortraitStatus('Client ID saved!', 'success');
-        }
-
-        // Fetch assets from Frontify (via proxy if configured)
-        async function searchFrontifyAssets(query, page = 1, limit = 20) {
-            const apiKey = state.frontifyApiKey;
-            
-            if (!apiKey) {
-                throw new Error('API key not configured');
-            }
-
-            const endpoint = FRONTIFY_CONFIG.PROXY_URL 
-                ? `${FRONTIFY_CONFIG.PROXY_URL}/graphql`
-                : FRONTIFY_CONFIG.API_ENDPOINT;
-
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    query: SEARCH_ASSETS_QUERY,
-                    variables: {
-                        projectId: FRONTIFY_CONFIG.PEOPLE_LIBRARY_ID,
-                        query: query,
-                        page: page,
-                        limit: limit
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error('Invalid API key');
-                }
-                throw new Error(`HTTP error: ${response.status}`);
-            }
-
-            return await response.json();
-        }
-
-        async function searchPortraits() {
-            const apiKey = state.frontifyApiKey;
-            if (!apiKey) {
-                showPortraitStatus('Please configure your Frontify Client ID first', 'error');
-                return;
-            }
-
-            const searchQuery = elements.portraitSearchInput.value.trim();
-            
-            if (!searchQuery) {
-                showPortraitStatus('Please enter a search term', 'error');
-                return;
-            }
-
-            state.portraitSearchQuery = searchQuery;
-            state.portraitIsLoading = true;
-            state.portraitCurrentPage = 1;
-
-            // Update UI
-            elements.portraitEmptyState.style.display = 'none';
-            elements.portraitNoResults.style.display = 'none';
-            elements.portraitResultsLoading.style.display = 'flex';
-            elements.portraitResultsGrid.innerHTML = '';
-            elements.btnLoadMorePortraits.style.display = 'none';
-            elements.portraitResultsCount.style.display = 'none';
-            elements.portraitPreviewSection.classList.remove('visible');
-            elements.btnClearPortraitSearch.style.display = 'flex';
-
-            try {
-                const data = await searchFrontifyAssets(searchQuery, 1, 20);
-
-                if (data.errors) {
-                    console.error('GraphQL errors:', data.errors);
-                    throw new Error(data.errors[0]?.message || 'Search failed');
-                }
-
-                const items = data.data?.library?.assets?.items || [];
-                const hasNext = data.data?.library?.assets?.hasNextPage || false;
-                const total = data.data?.library?.assets?.total || items.length;
-
-                state.portraitSearchResults = items;
-                state.portraitHasMore = hasNext;
-                state.portraitTotalResults = total;
-
-                renderPortraitResults(items);
-                
-                if (items.length === 0) {
-                    elements.portraitNoResults.style.display = 'flex';
-                } else {
-                    showPortraitStatus(`Found ${total} result${total !== 1 ? 's' : ''}`, 'success');
-                    elements.portraitResultsCount.textContent = `Showing ${items.length} of ${total}`;
-                    elements.portraitResultsCount.style.display = 'block';
-                    
-                    if (hasNext) {
-                        elements.btnLoadMorePortraits.style.display = 'flex';
-                    }
-                }
-
-            } catch (error) {
-                console.error('Portrait search error:', error);
-                
-                // Check if it's a CORS error
-                if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-                    showPortraitStatus('CORS error - try "Browse Frontify Library" button instead', 'error');
-                } else {
-                    showPortraitStatus(`Search failed: ${error.message}`, 'error');
-                }
-                elements.portraitNoResults.style.display = 'flex';
-            } finally {
-                state.portraitIsLoading = false;
-                elements.portraitResultsLoading.style.display = 'none';
-            }
-        }
-
-        async function loadMorePortraits() {
-            if (state.portraitIsLoadingMore || !state.portraitHasMore) return;
-
-            state.portraitIsLoadingMore = true;
-            elements.btnLoadMorePortraits.disabled = true;
-            elements.loadMoreSpinner.style.display = 'block';
-
-            try {
-                const nextPage = state.portraitCurrentPage + 1;
-                const data = await searchFrontifyAssets(state.portraitSearchQuery, nextPage, 20);
-
-                if (data.errors) {
-                    throw new Error(data.errors[0]?.message || 'Failed to load more');
-                }
-
-                const items = data.data?.library?.assets?.items || [];
-                const hasNext = data.data?.library?.assets?.hasNextPage || false;
-
-                state.portraitSearchResults = [...state.portraitSearchResults, ...items];
-                state.portraitCurrentPage = nextPage;
-                state.portraitHasMore = hasNext;
-
-                appendPortraitResults(items);
-                
-                elements.portraitResultsCount.textContent = `Showing ${state.portraitSearchResults.length} of ${state.portraitTotalResults}`;
-                
-                if (!hasNext) {
-                    elements.btnLoadMorePortraits.style.display = 'none';
-                }
-
-            } catch (error) {
-                console.error('Load more error:', error);
-                showPortraitStatus('Failed to load more results', 'error');
-            } finally {
-                state.portraitIsLoadingMore = false;
-                elements.btnLoadMorePortraits.disabled = false;
-                elements.loadMoreSpinner.style.display = 'none';
-            }
-        }
-
-        function renderPortraitResults(portraits) {
-            elements.portraitResultsGrid.innerHTML = '';
-            portraits.forEach(portrait => {
-                const card = createPortraitCard(portrait);
-                elements.portraitResultsGrid.appendChild(card);
-            });
-        }
-
-        function appendPortraitResults(portraits) {
-            portraits.forEach(portrait => {
-                const card = createPortraitCard(portrait);
-                elements.portraitResultsGrid.appendChild(card);
-            });
-        }
-
-        function createPortraitCard(asset) {
-            const card = document.createElement('div');
-            card.className = 'portrait-card';
-            card.dataset.id = asset.id;
-            
-            // Parse name and role from title
-            let displayName = asset.title || 'Unknown';
-            let displayRole = asset.description || '';
-            
-            if (displayName.includes(' - ')) {
-                const parts = displayName.split(' - ');
-                displayName = parts[0].trim();
-                displayRole = parts[1]?.trim() || displayRole;
-            }
-            
-            const imageUrl = asset.previewUrl || asset.downloadUrl || '';
-            
-            card.innerHTML = `
-                <img src="${imageUrl}" alt="${displayName}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2240%22>👤</text></svg>'">
-                <div class="portrait-card-overlay">
-                    <div class="portrait-card-name">${displayName}</div>
-                    ${displayRole ? `<div class="portrait-card-role">${displayRole}</div>` : ''}
-                </div>
-                <div class="selected-check"><i class="ms-Icon ms-Icon--CheckMark"></i></div>
-            `;
-            
-            card.addEventListener('click', () => selectPortrait({
-                ...asset,
-                displayName,
-                displayRole,
-                image: imageUrl
-            }, card));
-            
-            return card;
-        }
-
-        function selectPortrait(portrait, cardElement) {
-            // Remove selection from other cards
-            document.querySelectorAll('.portrait-card').forEach(c => c.classList.remove('selected'));
-            
-            // Select this card
-            cardElement.classList.add('selected');
-            state.selectedPortrait = portrait;
-
-            // Show preview
-            elements.portraitPreviewImage.src = portrait.image || portrait.previewUrl;
-            elements.portraitMetadata.innerHTML = `
-                <div class="portrait-metadata-name">${portrait.displayName}</div>
-                ${portrait.displayRole ? `<div class="portrait-metadata-role">${portrait.displayRole}</div>` : ''}
-                ${portrait.tags && portrait.tags.length > 0 ? `
-                    <div class="portrait-metadata-tags">
-                        ${portrait.tags.map(t => `<span class="portrait-metadata-tag">${t.value || t}</span>`).join('')}
-                    </div>
-                ` : ''}
-            `;
-            elements.portraitPreviewSection.classList.add('visible');
-
-            // Fetch base64 for insertion
-            fetchPortraitBase64(portrait.downloadUrl || portrait.image);
-        }
-
-        async function fetchPortraitBase64(imageUrl) {
-            if (!imageUrl) {
-                state.portraitImageBase64 = null;
-                return;
-            }
-            
-            try {
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    state.portraitImageBase64 = reader.result.split(',')[1];
-                };
-                reader.readAsDataURL(blob);
-            } catch (error) {
-                console.error('Error fetching portrait:', error);
-                state.portraitImageBase64 = null;
-            }
-        }
-
-        async function insertPortrait() {
-            if (!state.selectedPortrait) {
-                showPortraitStatus('Please select a portrait first', 'error');
-                return;
-            }
-
-            showPortraitStatus('Inserting image...', 'info');
-
-            try {
-                await PowerPoint.run(async (context) => {
-                    const slide = context.presentation.getSelectedSlides().getItemAt(0);
-                    
-                    if (state.portraitImageBase64) {
-                        slide.shapes.addImage(state.portraitImageBase64);
-                    } else if (state.selectedPortrait.downloadUrl) {
-                        slide.shapes.addImage(state.selectedPortrait.downloadUrl);
-                    } else {
-                        throw new Error('No image data available');
-                    }
-                    
-                    await context.sync();
-                });
-
-                showPortraitStatus(`Inserted: ${state.selectedPortrait.displayName}`, 'success');
-            } catch (error) {
-                console.error('Insert portrait error:', error);
-                showPortraitStatus('Failed to insert portrait. Please try again.', 'error');
-            }
-        }
-
-        function clearPortraitSearch() {
-            state.portraitSearchQuery = '';
-            state.portraitSearchResults = [];
-            state.selectedPortrait = null;
-            state.portraitImageBase64 = null;
-            state.portraitTotalResults = 0;
-
-            elements.portraitSearchInput.value = '';
-            elements.portraitResultsGrid.innerHTML = '';
-            elements.portraitEmptyState.style.display = 'flex';
-            elements.portraitNoResults.style.display = 'none';
-            elements.btnLoadMorePortraits.style.display = 'none';
-            elements.portraitResultsCount.style.display = 'none';
-            elements.portraitPreviewSection.classList.remove('visible');
-            elements.btnClearPortraitSearch.style.display = 'none';
-        }
-
-        function showPortraitStatus(message, type) {
-            const statusEl = elements.portraitStatusMessage;
-            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
-            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.className = `status-message visible ${type}`;
-            
-            if (type === 'success' || type === 'info') {
-                setTimeout(() => statusEl.classList.remove('visible'), 3000);
-            }
-        }
-
-        // Frontify Finder Integration
-        async function openFrontifyFinder() {
-            const clientId = state.frontifyApiKey;
-            
-            if (!clientId) {
-                showPortraitStatus('Please configure your Frontify Client ID first', 'error');
-                return;
-            }
-
-            showPortraitStatus('Opening Frontify...', 'info');
-            
-            try {
-                // Check if FrontifyFinder is available
-                if (typeof FrontifyFinder === 'undefined') {
-                    throw new Error('Frontify Finder script not loaded');
-                }
-
-                console.log('FrontifyFinder available:', typeof FrontifyFinder);
-                console.log('FrontifyFinder methods:', Object.keys(FrontifyFinder));
-                
-                // Configuration for Frontify Finder
-                const config = {
-                    domain: FRONTIFY_CONFIG.DOMAIN,
-                    clientId: clientId,
-                    options: {
-                        allowMultiSelect: false,
-                        permanentDownloadUrls: true,
-                        filters: [
-                            { key: 'project', values: [116] } // People library
-                        ]
-                    }
-                };
-
-                console.log('Opening Finder with config:', config);
-
-                // Try the create() method (returns a Promise)
-                if (typeof FrontifyFinder.create === 'function') {
-                    const result = await FrontifyFinder.create(config);
-                    console.log('Finder result:', result);
-                    handleFrontifyFinderResult(result);
-                } 
-                // Fallback to open() method with callbacks
-                else if (typeof FrontifyFinder.open === 'function') {
-                    FrontifyFinder.open({
-                        ...config,
-                        success: (assets) => {
-                            console.log('Finder success:', assets);
-                            handleFrontifyFinderResult(assets);
-                        },
-                        cancel: () => {
-                            console.log('Finder cancelled');
-                            showPortraitStatus('Selection cancelled', 'info');
-                        }
-                    });
-                }
-                // Try default export
-                else if (typeof FrontifyFinder.default === 'function') {
-                    const result = await FrontifyFinder.default(config);
-                    console.log('Finder default result:', result);
-                    handleFrontifyFinderResult(result);
-                }
-                // Nothing worked
-                else {
-                    console.log('FrontifyFinder object:', FrontifyFinder);
-                    throw new Error('No compatible method found on FrontifyFinder. Available: ' + Object.keys(FrontifyFinder).join(', '));
-                }
-
-            } catch (error) {
-                console.error('Frontify Finder error:', error);
-                showPortraitStatus(`Failed to open Frontify: ${error.message}`, 'error');
-            }
-        }
-
-        function handleFrontifyFinderResult(assets) {
-            if (!assets || assets.length === 0) {
-                showPortraitStatus('No asset selected', 'info');
-                return;
-            }
-
-            showPortraitStatus(`Selected ${assets.length} asset(s)`, 'success');
-
-            // Process the selected assets
-            const processedAssets = assets.map(asset => ({
-                id: asset.id,
-                title: asset.title || asset.name || 'Unknown',
-                description: asset.description || '',
-                previewUrl: asset.preview_url || asset.previewUrl || asset.generic_url,
-                downloadUrl: asset.download_url || asset.downloadUrl || asset.preview_url || asset.previewUrl,
-                tags: asset.tags || [],
-                width: asset.width,
-                height: asset.height
-            }));
-
-            // Update state
-            state.portraitSearchResults = processedAssets;
-            state.portraitTotalResults = processedAssets.length;
-            state.portraitHasMore = false;
-
-            // Clear UI and show results
-            elements.portraitEmptyState.style.display = 'none';
-            elements.portraitNoResults.style.display = 'none';
-            elements.portraitResultsLoading.style.display = 'none';
-            elements.btnLoadMorePortraits.style.display = 'none';
-            elements.btnClearPortraitSearch.style.display = 'flex';
-
-            // Render results
-            renderPortraitResults(processedAssets);
-            
-            elements.portraitResultsCount.textContent = `${processedAssets.length} asset(s) from Frontify`;
-            elements.portraitResultsCount.style.display = 'block';
-
-            // Auto-select if only one result
-            if (processedAssets.length === 1) {
-                const firstCard = elements.portraitResultsGrid.querySelector('.portrait-card');
-                if (firstCard) {
-                    const asset = processedAssets[0];
-                    selectPortrait({
-                        ...asset,
-                        displayName: parseDisplayName(asset.title),
-                        displayRole: parseDisplayRole(asset.title, asset.description),
-                        image: asset.previewUrl || asset.downloadUrl
-                    }, firstCard);
-                }
-            }
-        }
-
-        function parseDisplayName(title) {
-            if (!title) return 'Unknown';
-            if (title.includes(' - ')) {
-                return title.split(' - ')[0].trim();
-            }
-            return title;
-        }
-
-        function parseDisplayRole(title, description) {
-            if (title && title.includes(' - ')) {
-                return title.split(' - ')[1]?.trim() || '';
-            }
-            return description || '';
         }
 
         // ======================
@@ -3540,7 +2597,6 @@
             
             elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
             elements.btnGenerateIcon.disabled = !elements.iconSubjectInput.value.trim() || !hasApiKey || state.isGenerating;
-            // Note: Portraits tab uses search, not AI generation
             
             const btnText = state.isGenerating ? '<div class="spinner"></div><span>Generating...</span>' : '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate</span>';
             if (state.isGenerating) {
@@ -3556,7 +2612,6 @@
             let statusEl;
             if (tab === 'images') statusEl = elements.statusMessage;
             else if (tab === 'icons') statusEl = elements.iconStatusMessage;
-            else if (tab === 'portraits') statusEl = elements.portraitStatusMessage;
             else return;
 
             const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
