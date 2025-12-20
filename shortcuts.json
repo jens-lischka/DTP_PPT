@@ -1,0 +1,94 @@
+{
+  "actions": [
+    {
+      "id": "AlignLeftToFirst",
+      "type": "ExecuteFunction",
+      "name": "Align Left to First Selected"
+    },
+    {
+      "id": "AlignRightToFirst",
+      "type": "ExecuteFunction",
+      "name": "Align Right to First Selected"
+    },
+    {
+      "id": "AlignTopToFirst",
+      "type": "ExecuteFunction",
+      "name": "Align Top to First Selected"
+    },
+    {
+      "id": "AlignBottomToFirst",
+      "type": "ExecuteFunction",
+      "name": "Align Bottom to First Selected"
+    },
+    {
+      "id": "AlignLeftToPlaceholder",
+      "type": "ExecuteFunction",
+      "name": "Align Left to Content Placeholder"
+    },
+    {
+      "id": "AlignRightToPlaceholder",
+      "type": "ExecuteFunction",
+      "name": "Align Right to Content Placeholder"
+    },
+    {
+      "id": "AlignTopToPlaceholder",
+      "type": "ExecuteFunction",
+      "name": "Align Top to Content Placeholder"
+    },
+    {
+      "id": "AlignBottomToPlaceholder",
+      "type": "ExecuteFunction",
+      "name": "Align Bottom to Content Placeholder"
+    }
+  ],
+  "shortcuts": [
+    {
+      "action": "AlignLeftToFirst",
+      "key": {
+        "default": "Ctrl+Alt+Left"
+      }
+    },
+    {
+      "action": "AlignRightToFirst",
+      "key": {
+        "default": "Ctrl+Alt+Right"
+      }
+    },
+    {
+      "action": "AlignTopToFirst",
+      "key": {
+        "default": "Ctrl+Alt+Up"
+      }
+    },
+    {
+      "action": "AlignBottomToFirst",
+      "key": {
+        "default": "Ctrl+Alt+Down"
+      }
+    },
+    {
+      "action": "AlignLeftToPlaceholder",
+      "key": {
+        "default": "Ctrl+Alt+Shift+Left"
+      }
+    },
+    {
+      "action": "AlignRightToPlaceholder",
+      "key": {
+        "default": "Ctrl+Alt+Shift+Right"
+      }
+    },
+    {
+      "action": "AlignTopToPlaceholder",
+      "key": {
+        "default": "Ctrl+Alt+Shift+Up"
+      }
+    },
+    {
+      "action": "AlignBottomToPlaceholder",
+      "key": {
+        "default": "Ctrl+Alt+Shift+Down"
+      }
+    }
+  ]
+}
