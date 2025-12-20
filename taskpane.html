@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerPoint Tools</title>
+    <title>AI Image Generator</title>
     
     <!-- Office.js -->
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
@@ -90,7 +90,7 @@
             display: flex;
             background: var(--white);
             border-bottom: 1px solid var(--neutral-light);
-            padding: 0 4px;
+            padding: 0 8px;
         }
 
         .tab {
@@ -253,6 +253,34 @@
 
         .prompt-textarea::placeholder {
             color: var(--neutral-dark);
+        }
+
+        /* Style Presets */
+        .style-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .style-preset {
+            padding: 6px 12px;
+            background: var(--neutral-lighter);
+            border: 1px solid var(--neutral-light);
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .style-preset:hover {
+            background: var(--neutral-light);
+        }
+
+        .style-preset.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* Options */
@@ -737,164 +765,46 @@
             color: var(--neutral-dark);
         }
 
-        /* ==================== ALIGN TAB STYLES ==================== */
-        .align-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .align-section-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--neutral-dark);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
+        /* Search Input Styles */
+        .search-input-wrapper {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
         }
 
-        .align-section-title .icon {
-            font-size: 14px;
+        .search-input-wrapper .search-input {
+            padding-right: 80px;
         }
 
-        .align-button-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .align-btn {
+        .search-btn, .clear-btn {
+            position: absolute;
+            right: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 12px 8px;
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            background: var(--white);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            min-height: 70px;
         }
 
-        .align-btn:hover {
-            background: var(--neutral-lighter);
-            border-color: var(--primary);
+        .search-btn:hover {
+            background: var(--primary-dark);
         }
 
-        .align-btn:active {
+        .clear-btn {
+            right: 44px;
             background: var(--neutral-light);
-            transform: scale(0.98);
-        }
-
-        .align-btn .arrow-icon {
-            font-size: 20px;
-            margin-bottom: 6px;
-            color: var(--primary);
-        }
-
-        .align-btn .label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--neutral-darker);
-            text-align: center;
-        }
-
-        .align-btn .shortcut {
-            font-size: 10px;
             color: var(--neutral-dark);
-            margin-top: 4px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            background: var(--neutral-lighter);
-            padding: 2px 6px;
-            border-radius: 3px;
         }
 
-        .placeholder-info-box {
-            background: #FFF4CE;
-            border: 1px solid #FFB900;
-            border-radius: var(--radius);
-            padding: 12px;
-            font-size: 12px;
+        .clear-btn:hover {
+            background: var(--neutral);
         }
 
-        .placeholder-info-box strong {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .align-help-text {
-            font-size: 11px;
-            color: var(--neutral-dark);
-            margin-top: 8px;
-            line-height: 1.6;
-        }
-
-        .align-status-bar {
-            background: var(--white);
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            padding: 12px;
-        }
-
-        .align-status-bar .status-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--neutral-dark);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .align-status-bar .status-text {
-            font-size: 13px;
-            color: var(--neutral-darker);
-        }
-
-        .align-status-bar.success .status-text {
-            color: var(--success);
-        }
-
-        .align-status-bar.error .status-text {
-            color: var(--danger);
-        }
-
-        .shortcuts-info {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .shortcut-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--neutral-light);
-        }
-
-        .shortcut-row:last-child {
-            border-bottom: none;
-        }
-
-        .shortcut-label {
-            font-size: 13px;
-            color: var(--neutral-darker);
-        }
-
-        .shortcut-key {
-            font-size: 12px;
-            color: var(--neutral-dark);
-            font-family: 'Consolas', 'Monaco', monospace;
-            background: var(--neutral-lighter);
-            padding: 4px 8px;
-            border-radius: var(--radius);
-        }
     </style>
 </head>
 <body>
@@ -905,8 +815,8 @@
                 <i class="ms-Icon ms-Icon--ImagePixel"></i>
             </div>
             <div class="header-text">
-                <h1>PowerPoint Tools <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v2.1</span></h1>
-                <p>AI Images & Smart Alignment</p>
+                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v2.0</span></h1>
+                <p>Powered by OpenAI gpt-image-1</p>
             </div>
         </div>
 
@@ -919,10 +829,6 @@
             <button class="tab" data-tab="icons">
                 <i class="ms-Icon ms-Icon--AppIconDefaultList"></i>
                 <span>Icons</span>
-            </button>
-            <button class="tab" data-tab="align">
-                <i class="ms-Icon ms-Icon--AlignCenter"></i>
-                <span>Align</span>
             </button>
             <button class="tab" data-tab="feedback">
                 <i class="ms-Icon ms-Icon--Feedback"></i>
@@ -942,6 +848,56 @@
                     <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
                     <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
                 </div>
+                <script>
+                    // Immediate binding for Save button (runs as soon as button exists)
+                    (function() {
+                        var btn = document.getElementById('btnSaveKey');
+                        var input = document.getElementById('apiKeyInput');
+                        var statusEl = document.getElementById('apiKeyStatus');
+                        
+                        btn.onclick = function() {
+                            console.log('Save button clicked');
+                            var key = input.value.trim();
+                            if (!key || key === '••••••••••••••••') {
+                                alert('Please enter your API key first');
+                                return;
+                            }
+                            
+                            // Store in window for global access
+                            window._openaiApiKey = key;
+                            
+                            // Also store in state if it exists
+                            if (typeof state !== 'undefined') {
+                                state.apiKey = key;
+                            }
+                            
+                            // Try localStorage (clear history first to make room)
+                            try {
+                                localStorage.removeItem('image_history');
+                                localStorage.setItem('openai_api_key', key);
+                                console.log('Key saved to localStorage');
+                            } catch(e) {
+                                console.log('localStorage failed, key only in memory');
+                            }
+                            
+                            // Update UI
+                            input.value = '••••••••••••••••';
+                            statusEl.textContent = 'Connected';
+                            statusEl.className = 'api-key-status connected';
+                            
+                            // Enable generate buttons
+                            var btns = document.querySelectorAll('.btn-generate');
+                            btns.forEach(function(b) { b.disabled = false; });
+                            
+                            // Update generate buttons if function exists
+                            if (typeof updateGenerateButtons === 'function') {
+                                updateGenerateButtons();
+                            }
+                            
+                            alert('API key saved!');
+                        };
+                    })();
+                </script>
             </div>
 
             <!-- Prompt Section -->
@@ -1086,9 +1042,9 @@
                 <input 
                     type="text"
                     id="iconSubjectInput" 
-                    class="prompt-textarea"
+                    class="cs-input"
                     placeholder="play button, house, car, lightbulb..."
-                    style="min-height: auto; padding: 12px;"
+                    style="font-size: 14px;"
                 >
                 <p style="font-size: 11px; color: var(--neutral-dark); margin-top: 6px;">
                     Enter a simple object or symbol. The selected style will be applied automatically.
@@ -1144,103 +1100,6 @@
             </div>
         </div>
 
-        <!-- ==================== ALIGN TAB ==================== -->
-        <div class="tab-content" id="tab-align">
-            
-            <!-- Placeholder Info -->
-            <div class="placeholder-info-box" id="placeholderInfoBox">
-                <strong>📐 Content Placeholder Bounds</strong>
-                <span id="placeholderBoundsText">Select a slide to detect placeholder...</span>
-            </div>
-
-            <!-- Align to First Selected -->
-            <div class="align-section">
-                <div class="align-section-title">
-                    <span class="icon">🎯</span>
-                    Align to First Selected Shape
-                </div>
-                <div class="align-button-grid">
-                    <button class="align-btn" onclick="alignToFirst('left')" title="Align left edges to first selected shape">
-                        <span class="arrow-icon">←</span>
-                        <span class="label">Left</span>
-                        <span class="shortcut">Ctrl+Alt+←</span>
-                    </button>
-                    <button class="align-btn" onclick="alignToFirst('right')" title="Align right edges to first selected shape">
-                        <span class="arrow-icon">→</span>
-                        <span class="label">Right</span>
-                        <span class="shortcut">Ctrl+Alt+→</span>
-                    </button>
-                    <button class="align-btn" onclick="alignToFirst('top')" title="Align top edges to first selected shape">
-                        <span class="arrow-icon">↑</span>
-                        <span class="label">Top</span>
-                        <span class="shortcut">Ctrl+Alt+↑</span>
-                    </button>
-                    <button class="align-btn" onclick="alignToFirst('bottom')" title="Align bottom edges to first selected shape">
-                        <span class="arrow-icon">↓</span>
-                        <span class="label">Bottom</span>
-                        <span class="shortcut">Ctrl+Alt+↓</span>
-                    </button>
-                </div>
-                <p class="align-help-text">
-                    Select multiple shapes. The first shape you selected becomes the reference point.
-                </p>
-            </div>
-
-            <!-- Align to Content Placeholder -->
-            <div class="align-section">
-                <div class="align-section-title">
-                    <span class="icon">📐</span>
-                    Align to Content Placeholder
-                </div>
-                <div class="align-button-grid">
-                    <button class="align-btn" onclick="alignToPlaceholder('left')" title="Align to left edge of content placeholder">
-                        <span class="arrow-icon">←</span>
-                        <span class="label">Left</span>
-                        <span class="shortcut">Ctrl+Alt+Shift+←</span>
-                    </button>
-                    <button class="align-btn" onclick="alignToPlaceholder('right')" title="Align to right edge of content placeholder">
-                        <span class="arrow-icon">→</span>
-                        <span class="label">Right</span>
-                        <span class="shortcut">Ctrl+Alt+Shift+→</span>
-                    </button>
-                    <button class="align-btn" onclick="alignToPlaceholder('top')" title="Align to top edge of content placeholder">
-                        <span class="arrow-icon">↑</span>
-                        <span class="label">Top</span>
-                        <span class="shortcut">Ctrl+Alt+Shift+↑</span>
-                    </button>
-                    <button class="align-btn" onclick="alignToPlaceholder('bottom')" title="Align to bottom edge of content placeholder">
-                        <span class="arrow-icon">↓</span>
-                        <span class="label">Bottom</span>
-                        <span class="shortcut">Ctrl+Alt+Shift+↓</span>
-                    </button>
-                </div>
-                <p class="align-help-text">
-                    Aligns selected shapes to the content placeholder boundaries defined in the master layout.
-                </p>
-            </div>
-
-            <!-- Align Status -->
-            <div class="align-status-bar" id="alignStatusBar">
-                <div class="status-label">Status</div>
-                <div class="status-text" id="alignStatusText">Ready. Select shapes to align.</div>
-            </div>
-
-            <!-- Keyboard Shortcuts Reference -->
-            <div class="shortcuts-info">
-                <div class="align-section-title">
-                    <span class="icon">⌨️</span>
-                    Keyboard Shortcuts
-                </div>
-                <div class="shortcut-row">
-                    <span class="shortcut-label">Align to First</span>
-                    <span class="shortcut-key">Ctrl+Alt+Arrow</span>
-                </div>
-                <div class="shortcut-row">
-                    <span class="shortcut-label">Align to Placeholder</span>
-                    <span class="shortcut-key">Ctrl+Alt+Shift+Arrow</span>
-                </div>
-            </div>
-        </div>
 
         <!-- ==================== FEEDBACK TAB ==================== -->
         <div class="tab-content" id="tab-feedback">
@@ -1273,7 +1132,7 @@
             <div class="feedback-info">
                 <h3>Contact</h3>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    📧 Email: <a href="mailto:feedback@example.com">feedback@example.com</a><br>
+                    📧 Email: <a href="/cdn-cgi/l/email-protection#4b2d2e2e2f292a28200b2e332a263b272e65282426"><span class="__cf_email__" data-cfemail="b3d5d6d6d7d1d2d0d8f3d6cbd2dec3dfd69dd0dcde">[email&#160;protected]</span></a><br>
                     🐙 GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a>
                 </p>
             </div>
@@ -1281,29 +1140,15 @@
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
                 <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>PowerPoint Tools</strong> v2.1<br><br>
-                    Generate AI images using OpenAI's gpt-image-1 and align shapes like a pro. Built for strategy consultants.<br><br>
+                    <strong>AI Image Generator</strong> v2.0<br><br>
+                    Generate AI images and icons using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
                     Made with ❤️
                 </p>
             </div>
         </div>
     </div>
 
-    <script>
-        // ======================
-        // ALIGNMENT CONFIGURATION
-        // ======================
-        
-        // Default content placeholder bounds (standard PowerPoint slide)
-        let placeholderBounds = {
-            left: 36,      // 0.5 inch from left
-            top: 90,       // 1.25 inch from top (below title)
-            right: 684,    // slide width - 0.5 inch
-            bottom: 504,   // slide height - 0.5 inch
-            width: 648,
-            height: 414
-        };
-
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ======================
         // State Management
         // ======================
@@ -1362,11 +1207,6 @@
             btnRegenerateIcon: document.getElementById('btnRegenerateIcon'),
             btnInsertIcon: document.getElementById('btnInsertIcon'),
             
-            // Align tab
-            placeholderBoundsText: document.getElementById('placeholderBoundsText'),
-            alignStatusBar: document.getElementById('alignStatusBar'),
-            alignStatusText: document.getElementById('alignStatusText'),
-            
             // Feedback tab
             feedbackText: document.getElementById('feedbackText'),
             feedbackType: document.getElementById('feedbackType'),
@@ -1379,12 +1219,11 @@
         Office.onReady((info) => {
             console.log('Office ready:', info.host);
             initializeApp();
-            registerKeyboardShortcuts();
-            detectPlaceholderBounds();
         });
 
-        // Fallback initialization
+        // Also initialize after DOM is ready (fallback)
         document.addEventListener('DOMContentLoaded', () => {
+            // Give Office.js a moment, then init anyway
             setTimeout(() => {
                 if (!state.apiKey && !elements.btnSaveKey._listenerAdded) {
                     console.log('Fallback initialization');
@@ -1394,14 +1233,16 @@
         });
 
         function initializeApp() {
+            // Prevent double initialization
             if (elements.btnSaveKey._listenerAdded) return;
             elements.btnSaveKey._listenerAdded = true;
             
-            // Clear oversized data
+            // Clear oversized data from localStorage
             try {
                 const historySize = (localStorage.getItem('image_history') || '').length;
-                if (historySize > 50000) {
+                if (historySize > 50000) { // If history > 50KB, clear it
                     localStorage.removeItem('image_history');
+                    console.log('Cleared oversized history');
                 }
             } catch (e) {
                 try { localStorage.clear(); } catch(e2) {}
@@ -1432,53 +1273,6 @@
 
             setupEventListeners();
             updateGenerateButtons();
-        }
-
-        // ======================
-        // Keyboard Shortcuts Registration
-        // ======================
-        function registerKeyboardShortcuts() {
-            try {
-                // Align to First Selected
-                Office.actions.associate("AlignLeftToFirst", () => {
-                    alignToFirst('left');
-                    return Promise.resolve();
-                });
-                Office.actions.associate("AlignRightToFirst", () => {
-                    alignToFirst('right');
-                    return Promise.resolve();
-                });
-                Office.actions.associate("AlignTopToFirst", () => {
-                    alignToFirst('top');
-                    return Promise.resolve();
-                });
-                Office.actions.associate("AlignBottomToFirst", () => {
-                    alignToFirst('bottom');
-                    return Promise.resolve();
-                });
-                
-                // Align to Placeholder
-                Office.actions.associate("AlignLeftToPlaceholder", () => {
-                    alignToPlaceholder('left');
-                    return Promise.resolve();
-                });
-                Office.actions.associate("AlignRightToPlaceholder", () => {
-                    alignToPlaceholder('right');
-                    return Promise.resolve();
-                });
-                Office.actions.associate("AlignTopToPlaceholder", () => {
-                    alignToPlaceholder('top');
-                    return Promise.resolve();
-                });
-                Office.actions.associate("AlignBottomToPlaceholder", () => {
-                    alignToPlaceholder('bottom');
-                    return Promise.resolve();
-                });
-                
-                console.log('Keyboard shortcuts registered successfully');
-            } catch (error) {
-                console.warn('Keyboard shortcuts not available:', error.message);
-            }
         }
 
         function setupEventListeners() {
@@ -1515,6 +1309,7 @@
             elements.iconStyleGrid.forEach(card => {
                 card.addEventListener('click', () => {
                     const styleNum = parseInt(card.dataset.style);
+                    // Only allow Style 1 and 2 for now
                     if (styleNum > 2) {
                         alert('This style is coming soon! Please use Style 1 or 2 for now.');
                         return;
@@ -1546,252 +1341,6 @@
             elements.tabContents.forEach(content => {
                 content.classList.toggle('active', content.id === `tab-${tabName}`);
             });
-            
-            // Refresh placeholder bounds when switching to align tab
-            if (tabName === 'align') {
-                detectPlaceholderBounds();
-            }
-        }
-
-        // ======================
-        // ALIGNMENT FUNCTIONS
-        // ======================
-
-        /**
-         * Align all selected shapes to the first selected shape
-         */
-        async function alignToFirst(direction) {
-            try {
-                await PowerPoint.run(async (context) => {
-                    const shapes = context.presentation.getSelectedShapes();
-                    shapes.load("items");
-                    await context.sync();
-                    
-                    const shapeCount = shapes.items.length;
-                    
-                    if (shapeCount < 2) {
-                        updateAlignStatus('Select at least 2 shapes to align.', 'error');
-                        return;
-                    }
-                    
-                    shapes.items.forEach(shape => {
-                        shape.load("id,left,top,width,height,name");
-                    });
-                    await context.sync();
-                    
-                    const referenceShape = shapes.items[0];
-                    let refValue;
-                    
-                    switch (direction) {
-                        case 'left':
-                            refValue = referenceShape.left;
-                            break;
-                        case 'right':
-                            refValue = referenceShape.left + referenceShape.width;
-                            break;
-                        case 'top':
-                            refValue = referenceShape.top;
-                            break;
-                        case 'bottom':
-                            refValue = referenceShape.top + referenceShape.height;
-                            break;
-                    }
-                    
-                    let alignedCount = 0;
-                    for (let i = 1; i < shapes.items.length; i++) {
-                        const shape = shapes.items[i];
-                        
-                        switch (direction) {
-                            case 'left':
-                                shape.left = refValue;
-                                break;
-                            case 'right':
-                                shape.left = refValue - shape.width;
-                                break;
-                            case 'top':
-                                shape.top = refValue;
-                                break;
-                            case 'bottom':
-                                shape.top = refValue - shape.height;
-                                break;
-                        }
-                        alignedCount++;
-                    }
-                    
-                    await context.sync();
-                    updateAlignStatus(`Aligned ${alignedCount} shape(s) ${direction} to first selected.`, 'success');
-                });
-            } catch (error) {
-                console.error('Align to first error:', error);
-                updateAlignStatus(`Error: ${error.message}`, 'error');
-            }
-        }
-
-        /**
-         * Align selected shapes to the content placeholder boundary
-         */
-        async function alignToPlaceholder(direction) {
-            try {
-                await PowerPoint.run(async (context) => {
-                    const shapes = context.presentation.getSelectedShapes();
-                    shapes.load("items");
-                    await context.sync();
-                    
-                    const shapeCount = shapes.items.length;
-                    
-                    if (shapeCount < 1) {
-                        updateAlignStatus('Select at least 1 shape to align.', 'error');
-                        return;
-                    }
-                    
-                    shapes.items.forEach(shape => {
-                        shape.load("id,left,top,width,height,name");
-                    });
-                    await context.sync();
-                    
-                    let targetValue;
-                    switch (direction) {
-                        case 'left':
-                            targetValue = placeholderBounds.left;
-                            break;
-                        case 'right':
-                            targetValue = placeholderBounds.right;
-                            break;
-                        case 'top':
-                            targetValue = placeholderBounds.top;
-                            break;
-                        case 'bottom':
-                            targetValue = placeholderBounds.bottom;
-                            break;
-                    }
-                    
-                    for (const shape of shapes.items) {
-                        switch (direction) {
-                            case 'left':
-                                shape.left = targetValue;
-                                break;
-                            case 'right':
-                                shape.left = targetValue - shape.width;
-                                break;
-                            case 'top':
-                                shape.top = targetValue;
-                                break;
-                            case 'bottom':
-                                shape.top = targetValue - shape.height;
-                                break;
-                        }
-                    }
-                    
-                    await context.sync();
-                    updateAlignStatus(`Aligned ${shapeCount} shape(s) to placeholder ${direction} edge.`, 'success');
-                });
-            } catch (error) {
-                console.error('Align to placeholder error:', error);
-                updateAlignStatus(`Error: ${error.message}`, 'error');
-            }
-        }
-
-        /**
-         * Detect content placeholder bounds from the current slide's layout
-         */
-        async function detectPlaceholderBounds() {
-            try {
-                await PowerPoint.run(async (context) => {
-                    const slides = context.presentation.getSelectedSlides();
-                    slides.load("items");
-                    await context.sync();
-                    
-                    if (slides.items.length === 0) {
-                        updatePlaceholderInfo('No slide selected. Using default bounds.');
-                        return;
-                    }
-                    
-                    const currentSlide = slides.items[0];
-                    const shapes = currentSlide.shapes;
-                    shapes.load("items");
-                    await context.sync();
-                    
-                    for (const shape of shapes.items) {
-                        shape.load("left,top,width,height,name,type");
-                    }
-                    await context.sync();
-                    
-                    let contentPlaceholder = null;
-                    let maxArea = 0;
-                    
-                    for (const shape of shapes.items) {
-                        const name = (shape.name || '').toLowerCase();
-                        
-                        if (name.includes('content') || 
-                            name.includes('text') || 
-                            name.includes('placeholder') ||
-                            name.includes('body')) {
-                            
-                            const area = shape.width * shape.height;
-                            if (area > maxArea) {
-                                maxArea = area;
-                                contentPlaceholder = shape;
-                            }
-                        }
-                    }
-                    
-                    if (contentPlaceholder) {
-                        placeholderBounds = {
-                            left: contentPlaceholder.left,
-                            top: contentPlaceholder.top,
-                            right: contentPlaceholder.left + contentPlaceholder.width,
-                            bottom: contentPlaceholder.top + contentPlaceholder.height,
-                            width: contentPlaceholder.width,
-                            height: contentPlaceholder.height
-                        };
-                        
-                        updatePlaceholderInfo(
-                            `L: ${Math.round(placeholderBounds.left)}pt | ` +
-                            `T: ${Math.round(placeholderBounds.top)}pt | ` +
-                            `R: ${Math.round(placeholderBounds.right)}pt | ` +
-                            `B: ${Math.round(placeholderBounds.bottom)}pt`
-                        );
-                    } else {
-                        placeholderBounds = {
-                            left: 36,
-                            top: 90,
-                            right: 684,
-                            bottom: 504,
-                            width: 648,
-                            height: 414
-                        };
-                        
-                        updatePlaceholderInfo(
-                            `Defaults: L: ${placeholderBounds.left}pt | ` +
-                            `T: ${placeholderBounds.top}pt | ` +
-                            `R: ${placeholderBounds.right}pt | ` +
-                            `B: ${placeholderBounds.bottom}pt`
-                        );
-                    }
-                });
-            } catch (error) {
-                console.warn('Could not detect placeholder bounds:', error.message);
-                updatePlaceholderInfo('Using default placeholder bounds.');
-            }
-        }
-
-        function updatePlaceholderInfo(info) {
-            if (elements.placeholderBoundsText) {
-                elements.placeholderBoundsText.textContent = info;
-            }
-        }
-
-        function updateAlignStatus(message, type = 'info') {
-            if (elements.alignStatusBar && elements.alignStatusText) {
-                elements.alignStatusText.textContent = message;
-                elements.alignStatusBar.classList.remove('success', 'error');
-                if (type === 'success') {
-                    elements.alignStatusBar.classList.add('success');
-                } else if (type === 'error') {
-                    elements.alignStatusBar.classList.add('error');
-                }
-            }
-            console.log(`[ALIGN ${type.toUpperCase()}] ${message}`);
         }
 
         // ======================
@@ -1800,18 +1349,22 @@
         function saveApiKey() {
             const key = elements.apiKeyInput.value.trim();
             if (key && key !== '••••••••••••••••') {
+                // Always set in memory first - this makes the add-in work
                 state.apiKey = key;
-                window._openaiApiKey = key;
                 elements.apiKeyInput.value = '••••••••••••••••';
                 updateApiKeyStatus(true);
                 
+                // Try to persist to localStorage (optional, may fail)
                 try {
+                    // Clear everything first to make room
                     localStorage.removeItem('image_history');
                     state.history = [];
                     renderHistory();
                     localStorage.setItem('openai_api_key', key);
                     showStatus('API key saved!', 'success', 'images');
                 } catch (e) {
+                    console.warn('Could not persist API key to localStorage:', e);
+                    // Still works for this session
                     showStatus('API key set for this session', 'info', 'images');
                 }
             }
@@ -1895,7 +1448,9 @@
                 const subject = elements.iconSubjectInput.value.trim();
                 const styleNum = state.iconStyleNumber;
                 
+                // Build prompt based on style
                 if (styleNum === 1) {
+                    // Style 1: Banana style - use JSON prompt
                     const jsonPrompt = {
                         "object": subject,
                         "task_type": "generation",
@@ -1907,41 +1462,117 @@
                             "banana_integration": {
                                 "style": "organic and seamless",
                                 "features": ["curved banana form", "peel textures", "yellow coloration", "subtle spotting"]
+                            },
+                            "object_design": {
+                                "reference_object_key": "object",
+                                "maintain_functionality": true
+                            }
+                        },
+                        "subject": {
+                            "main": "banana-inspired version of the object",
+                            "attributes": {
+                                "physical": "smooth yellow banana texture shaped to match the object's silhouette",
+                                "pose": "studio product angle",
+                                "expression": "none"
+                            }
+                        },
+                        "environment": {
+                            "setting": "clean product studio backdrop",
+                            "lighting": {
+                                "type": "soft",
+                                "direction": "front",
+                                "quality": "diffused"
                             }
                         },
                         "style": {
                             "artistic": "photorealistic",
+                            "camera": {
+                                "angle": "eye_level",
+                                "lens": "normal",
+                                "aperture": "shallow_depth_of_field"
+                            },
                             "mood": "modern and playful",
                             "color_palette": "banana yellow with natural peel browns"
                         },
+                        "technical": {
+                            "resolution": "high",
+                            "aspect_ratio": "1:1",
+                            "quality": "maximum"
+                        },
+                        "constraints": {
+                            "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
+                            "ensure": ["clear banana identity", "clear object identity"]
+                        },
                         "output_specs": {
+                            "include_synthid": true,
+                            "file_type": "high_resolution_image",
                             "transparent_background": true
                         }
                     };
                     prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
                 } else if (styleNum === 2) {
+                    // Style 2: Origami style - midnight blue paper
                     const jsonPrompt = {
                         "object": subject,
                         "task_type": "generation",
                         "priority": {
-                            "primary": "create an origami-style rendition of the object"
+                            "primary": "create an origami-style rendition of the object",
+                            "secondary": "merge origami characteristics with the object's functional design"
                         },
                         "parameters": {
                             "origami_integration": {
                                 "style": "organic and seamless",
                                 "features": ["precise fold geometry", "paper creases", "midnight blue paper grain", "clean edges"]
+                            },
+                            "object_design": {
+                                "reference_object_key": "object",
+                                "maintain_functionality": true
+                            }
+                        },
+                        "subject": {
+                            "main": "origami-inspired version of the object",
+                            "attributes": {
+                                "physical": "folded midnight blue paper with visible creases, slight paper grain, shaped to match the object's silhouette",
+                                "pose": "studio product angle",
+                                "expression": "none"
+                            }
+                        },
+                        "environment": {
+                            "setting": "clean product studio backdrop",
+                            "lighting": {
+                                "type": "soft",
+                                "direction": "front",
+                                "quality": "diffused"
                             }
                         },
                         "style": {
                             "artistic": "photorealistic",
-                            "color_palette": "midnight blue with natural fold shadows"
+                            "camera": {
+                                "angle": "eye_level",
+                                "lens": "normal",
+                                "aperture": "shallow_depth_of_field"
+                            },
+                            "mood": "modern and playful",
+                            "color_palette": "midnight blue with natural fold shadows and subtle highlights"
+                        },
+                        "technical": {
+                            "resolution": "high",
+                            "aspect_ratio": "1:1",
+                            "quality": "maximum"
+                        },
+                        "constraints": {
+                            "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
+                            "ensure": ["clear origami identity", "clear object identity"]
                         },
                         "output_specs": {
+                            "include_synthid": true,
+                            "file_type": "high_resolution_image",
                             "transparent_background": true
                         }
                     };
                     prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
                 } else {
+                    // Placeholder for other styles
                     prompt = `Icon of ${subject}, clean simple design, centered, high quality`;
                 }
                 
@@ -1952,6 +1583,7 @@
                 previewImage = elements.iconPreviewImage;
             }
 
+            // Get API key from state or global fallback
             const apiKey = state.apiKey || window._openaiApiKey;
             if (!prompt || !apiKey || state.isGenerating) return;
 
@@ -1990,6 +1622,7 @@
                 const base64Data = data.data[0].b64_json;
                 const imageUrl = `data:image/png;base64,${base64Data}`;
 
+                // Store in appropriate state
                 if (tab === 'images') {
                     state.currentImageUrl = imageUrl;
                     state.currentImageBase64 = base64Data;
@@ -2033,6 +1666,7 @@
 
             showStatus('Inserting image...', 'info', tab);
 
+            // For icons, always insert at fixed size
             const imgWidth = tab === 'images' && state.selectedShape ? state.selectedShape.width : 300;
             const imgHeight = tab === 'images' && state.selectedShape ? state.selectedShape.height : 300;
 
@@ -2054,10 +1688,11 @@
         }
 
         // ======================
-        // History Management
+        // History Management (completely optional, errors won't break anything)
         // ======================
         function addToHistory(imageUrl, prompt, size = '1024x1024') {
             try {
+                // Create a small thumbnail to save storage space
                 createThumbnail(imageUrl, 80, (thumbnailUrl) => {
                     state.history.unshift({ 
                         url: thumbnailUrl,
@@ -2067,10 +1702,12 @@
                         timestamp: Date.now() 
                     });
                     
+                    // Keep only 4 items
                     if (state.history.length > 4) {
                         state.history = state.history.slice(0, 4);
                     }
                     
+                    // Try to save (silently fail if quota exceeded)
                     try {
                         const historyToSave = state.history.map(item => ({
                             url: item.url,
@@ -2078,18 +1715,24 @@
                             size: item.size
                         }));
                         localStorage.setItem('image_history', JSON.stringify(historyToSave));
-                    } catch (e) {}
+                    } catch (e) {
+                        // Silently ignore storage errors
+                    }
                     renderHistory();
                 });
-            } catch (e) {}
+            } catch (e) {
+                // Silently ignore any errors in history
+            }
         }
 
+        // Create a small thumbnail from a base64 image
         function createThumbnail(dataUrl, maxSize, callback) {
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
+                // Calculate thumbnail size
                 let width = img.width;
                 let height = img.height;
                 if (width > height) {
@@ -2107,10 +1750,12 @@
                 canvas.width = width;
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
+                
+                // Use JPEG for smaller file size
                 callback(canvas.toDataURL('image/jpeg', 0.6));
             };
             img.onerror = function() {
-                callback(dataUrl);
+                callback(dataUrl); // Fallback to original
             };
             img.src = dataUrl;
         }
@@ -2133,6 +1778,7 @@
         function loadFromHistory(index) {
             const item = state.history[index];
             if (item) {
+                // If we have the full URL in memory, use it; otherwise use the thumbnail
                 const imageUrl = item.fullUrl || item.url;
                 state.currentImageUrl = imageUrl;
                 state.currentImageBase64 = imageUrl.split(',')[1];
@@ -2153,6 +1799,7 @@
             showStatus('History cleared', 'info', 'images');
         }
 
+
         // ======================
         // Feedback
         // ======================
@@ -2165,6 +1812,7 @@
                 return;
             }
             
+            // For now, just show confirmation. You could integrate with a backend or email service.
             console.log('Feedback submitted:', { type, feedback });
             alert('Thank you for your feedback! 🎉');
             elements.feedbackText.value = '';
@@ -2179,9 +1827,10 @@
             elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
             elements.btnGenerateIcon.disabled = !elements.iconSubjectInput.value.trim() || !hasApiKey || state.isGenerating;
             
+            const btnText = state.isGenerating ? '<div class="spinner"></div><span>Generating...</span>' : '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate</span>';
             if (state.isGenerating) {
-                elements.btnGenerate.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
-                elements.btnGenerateIcon.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
+                elements.btnGenerate.innerHTML = btnText;
+                elements.btnGenerateIcon.innerHTML = btnText;
             } else {
                 elements.btnGenerate.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Image</span>';
                 elements.btnGenerateIcon.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Icon</span>';
@@ -2202,10 +1851,6 @@
                 setTimeout(() => statusEl.classList.remove('visible'), 3000);
             }
         }
-
-        // Expose alignment functions globally for button onclick
-        window.alignToFirst = alignToFirst;
-        window.alignToPlaceholder = alignToPlaceholder;
     </script>
 </body>
 </html>
