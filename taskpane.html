@@ -897,6 +897,15 @@
             transform: none;
         }
 
+        .feedback-info code {
+            background: var(--neutral-lighter);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            border: 1px solid var(--neutral-light);
+        }
+
     </style>
 </head>
 <body>
@@ -1298,8 +1307,23 @@
                 <span></span>
             </div>
 
-            <!-- Help Info -->
+            <!-- Keyboard Shortcuts -->
             <div class="feedback-info" style="margin-top: 16px;">
+                <h3>⌨️ Keyboard Shortcuts</h3>
+                <p style="font-size: 11px; color: var(--neutral-dark); line-height: 1.8;">
+                    <strong>Align to first selected shape:</strong><br>
+                    <code>Alt + ←</code> Left &nbsp;|&nbsp; <code>Alt + →</code> Right<br>
+                    <code>Alt + ↑</code> Top &nbsp;|&nbsp; <code>Alt + ↓</code> Bottom<br><br>
+                    <strong>Align to content placeholder:</strong><br>
+                    <code>Alt + Shift + ←</code> Left edge<br>
+                    <code>Alt + Shift + →</code> Right edge<br>
+                    <code>Alt + Shift + ↑</code> Top edge<br>
+                    <code>Alt + Shift + ↓</code> Bottom edge
+                </p>
+            </div>
+
+            <!-- Help Info -->
+            <div class="feedback-info" style="margin-top: 12px;">
                 <h3>💡 Tips</h3>
                 <p style="font-size: 12px; color: var(--neutral-dark); line-height: 1.6;">
                     • <strong>Align:</strong> Uses the first selected shape as reference<br>
@@ -1374,7 +1398,14 @@
             activeTab: 'images',
             // Icon tab state
             iconStyleNumber: 1,
-            iconImageBase64: null
+            iconImageBase64: null,
+            // Content placeholder bounds (default for standard 16:9 slide)
+            contentPlaceholder: {
+                left: 50,      // ~0.7 inches from left
+                top: 100,      // ~1.4 inches from top  
+                right: 910,    // ~0.7 inches from right edge (960 - 50)
+                bottom: 490    // ~0.7 inches from bottom (540 - 50)
+            }
         };
 
         // ======================
@@ -1568,6 +1599,12 @@
             // Shape detection
             detectSelectedShape();
             setInterval(detectSelectedShape, 1000);
+            
+            // Keyboard shortcuts for alignment
+            document.addEventListener('keydown', handleAlignmentShortcuts);
+            
+            // Try to get content placeholder bounds from current slide
+            updateContentPlaceholderBounds();
         }
 
         // ======================
@@ -2054,6 +2091,155 @@
             
             if (type === 'success' || type === 'info') {
                 setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
+        }
+
+        // Keyboard shortcut handler for alignment
+        function handleAlignmentShortcuts(e) {
+            // Only handle Alt + Arrow keys
+            if (!e.altKey) return;
+            
+            const arrowKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+            if (!arrowKeys.includes(e.key)) return;
+            
+            // Prevent default browser behavior
+            e.preventDefault();
+            
+            // Determine alignment mode: with Shift = to placeholder, without = to first shape
+            const toPlaceholder = e.shiftKey;
+            
+            switch (e.key) {
+                case 'ArrowLeft':
+                    if (toPlaceholder) {
+                        alignToPlaceholder('left');
+                    } else {
+                        alignShapes('left');
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (toPlaceholder) {
+                        alignToPlaceholder('right');
+                    } else {
+                        alignShapes('right');
+                    }
+                    break;
+                case 'ArrowUp':
+                    if (toPlaceholder) {
+                        alignToPlaceholder('top');
+                    } else {
+                        alignShapes('top');
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (toPlaceholder) {
+                        alignToPlaceholder('bottom');
+                    } else {
+                        alignShapes('bottom');
+                    }
+                    break;
+            }
+        }
+
+        // Update content placeholder bounds from current slide layout
+        async function updateContentPlaceholderBounds() {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const slide = context.presentation.getSelectedSlides().getItemAt(0);
+                    slide.load('layout');
+                    await context.sync();
+                    
+                    // Try to get the layout's shapes to find content placeholder
+                    const layout = slide.layout;
+                    layout.load('shapes');
+                    await context.sync();
+                    
+                    const shapes = layout.shapes;
+                    shapes.load('items');
+                    await context.sync();
+                    
+                    // Look for content placeholder
+                    for (let i = 0; i < shapes.items.length; i++) {
+                        const shape = shapes.items[i];
+                        shape.load(['left', 'top', 'width', 'height', 'name', 'type']);
+                    }
+                    await context.sync();
+                    
+                    // Find the largest placeholder (usually the content area)
+                    let contentPlaceholder = null;
+                    let maxArea = 0;
+                    
+                    for (let i = 0; i < shapes.items.length; i++) {
+                        const shape = shapes.items[i];
+                        const area = shape.width * shape.height;
+                        // Look for content-like placeholders
+                        if (area > maxArea && shape.top > 50) { // Skip title placeholders at top
+                            maxArea = area;
+                            contentPlaceholder = {
+                                left: shape.left,
+                                top: shape.top,
+                                right: shape.left + shape.width,
+                                bottom: shape.top + shape.height
+                            };
+                        }
+                    }
+                    
+                    if (contentPlaceholder) {
+                        state.contentPlaceholder = contentPlaceholder;
+                        console.log('Content placeholder bounds:', contentPlaceholder);
+                    }
+                });
+            } catch (error) {
+                console.log('Could not get placeholder bounds, using defaults:', error.message);
+                // Keep default values - they work for most standard layouts
+            }
+        }
+
+        // Align shapes to content placeholder edge
+        async function alignToPlaceholder(edge) {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    if (selection.items.length === 0) {
+                        showAlignStatus('Select at least 1 shape to align', 'error');
+                        return;
+                    }
+                    
+                    // Load shape properties
+                    for (let i = 0; i < selection.items.length; i++) {
+                        selection.items[i].load(['left', 'top', 'width', 'height']);
+                    }
+                    await context.sync();
+                    
+                    const ph = state.contentPlaceholder;
+                    
+                    for (let i = 0; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        
+                        switch (edge) {
+                            case 'left':
+                                shape.left = ph.left;
+                                break;
+                            case 'right':
+                                shape.left = ph.right - shape.width;
+                                break;
+                            case 'top':
+                                shape.top = ph.top;
+                                break;
+                            case 'bottom':
+                                shape.top = ph.bottom - shape.height;
+                                break;
+                        }
+                    }
+                    
+                    await context.sync();
+                    showAlignStatus(`Aligned ${selection.items.length} shape(s) to placeholder ${edge}`, 'success');
+                });
+            } catch (error) {
+                console.error('Align to placeholder error:', error);
+                showAlignStatus('Failed to align: ' + error.message, 'error');
             }
         }
 
