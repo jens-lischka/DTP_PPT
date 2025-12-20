@@ -805,6 +805,98 @@
             background: var(--neutral);
         }
 
+        /* Alignment Tab Styles */
+        .align-selection-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #fff4ce;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #7a6200;
+        }
+
+        .align-selection-info.success {
+            background: #dff6dd;
+            color: #107c10;
+        }
+
+        .align-selection-info i {
+            font-size: 16px;
+        }
+
+        .align-section {
+            margin-bottom: 20px;
+        }
+
+        .align-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--neutral-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .align-button-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .align-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 8px;
+            background: var(--white);
+            border: 1px solid var(--neutral-light);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s;
+            min-height: 60px;
+        }
+
+        .align-btn:hover {
+            background: var(--neutral-lighter);
+            border-color: var(--neutral-dark);
+        }
+
+        .align-btn:active {
+            background: var(--neutral-light);
+            transform: scale(0.98);
+        }
+
+        .align-btn i {
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .align-btn span {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--neutral-darker);
+        }
+
+        .align-btn.wide {
+            flex: 1;
+        }
+
+        .align-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .align-btn:disabled:hover {
+            background: var(--white);
+            border-color: var(--neutral-light);
+            transform: none;
+        }
+
     </style>
 </head>
 <body>
@@ -829,6 +921,10 @@
             <button class="tab" data-tab="icons">
                 <i class="ms-Icon ms-Icon--AppIconDefaultList"></i>
                 <span>Icons</span>
+            </button>
+            <button class="tab" data-tab="align">
+                <i class="ms-Icon ms-Icon--AlignCenter"></i>
+                <span>Align</span>
             </button>
             <button class="tab" data-tab="feedback">
                 <i class="ms-Icon ms-Icon--Feedback"></i>
@@ -1101,6 +1197,120 @@
         </div>
 
 
+        <!-- ==================== ALIGN TAB ==================== -->
+        <div class="tab-content" id="tab-align">
+            <!-- Selection Info -->
+            <div class="align-selection-info" id="alignSelectionInfo">
+                <i class="ms-Icon ms-Icon--Info"></i>
+                <span>Select 2 or more shapes to use alignment tools</span>
+            </div>
+
+            <!-- Horizontal Alignment -->
+            <div class="align-section">
+                <h3 class="align-section-title">Horizontal Alignment</h3>
+                <div class="align-button-row">
+                    <button class="align-btn" id="btnAlignLeft" title="Align Left">
+                        <i class="ms-Icon ms-Icon--AlignLeft"></i>
+                        <span>Left</span>
+                    </button>
+                    <button class="align-btn" id="btnAlignCenter" title="Align Center">
+                        <i class="ms-Icon ms-Icon--AlignCenter"></i>
+                        <span>Center</span>
+                    </button>
+                    <button class="align-btn" id="btnAlignRight" title="Align Right">
+                        <i class="ms-Icon ms-Icon--AlignRight"></i>
+                        <span>Right</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vertical Alignment -->
+            <div class="align-section">
+                <h3 class="align-section-title">Vertical Alignment</h3>
+                <div class="align-button-row">
+                    <button class="align-btn" id="btnAlignTop" title="Align Top">
+                        <i class="ms-Icon ms-Icon--AlignVerticalTop"></i>
+                        <span>Top</span>
+                    </button>
+                    <button class="align-btn" id="btnAlignMiddle" title="Align Middle">
+                        <i class="ms-Icon ms-Icon--AlignVerticalCenter"></i>
+                        <span>Middle</span>
+                    </button>
+                    <button class="align-btn" id="btnAlignBottom" title="Align Bottom">
+                        <i class="ms-Icon ms-Icon--AlignVerticalBottom"></i>
+                        <span>Bottom</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Distribute -->
+            <div class="align-section">
+                <h3 class="align-section-title">Distribute</h3>
+                <div class="align-button-row">
+                    <button class="align-btn wide" id="btnDistributeH" title="Distribute Horizontally">
+                        <i class="ms-Icon ms-Icon--DistributeDown"></i>
+                        <span>Horizontally</span>
+                    </button>
+                    <button class="align-btn wide" id="btnDistributeV" title="Distribute Vertically">
+                        <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i>
+                        <span>Vertically</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Match Size -->
+            <div class="align-section">
+                <h3 class="align-section-title">Match Size</h3>
+                <div class="align-button-row">
+                    <button class="align-btn" id="btnMatchWidth" title="Match Width">
+                        <i class="ms-Icon ms-Icon--FitWidth"></i>
+                        <span>Width</span>
+                    </button>
+                    <button class="align-btn" id="btnMatchHeight" title="Match Height">
+                        <i class="ms-Icon ms-Icon--FitPage"></i>
+                        <span>Height</span>
+                    </button>
+                    <button class="align-btn" id="btnMatchBoth" title="Match Both">
+                        <i class="ms-Icon ms-Icon--Resize"></i>
+                        <span>Both</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Swap & Arrange -->
+            <div class="align-section">
+                <h3 class="align-section-title">Arrange</h3>
+                <div class="align-button-row">
+                    <button class="align-btn wide" id="btnSwapPositions" title="Swap Positions">
+                        <i class="ms-Icon ms-Icon--Switch"></i>
+                        <span>Swap Positions</span>
+                    </button>
+                    <button class="align-btn wide" id="btnCenterOnSlide" title="Center on Slide">
+                        <i class="ms-Icon ms-Icon--PictureCenter"></i>
+                        <span>Center on Slide</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Message -->
+            <div id="alignStatusMessage" class="status-message">
+                <i class="ms-Icon"></i>
+                <span></span>
+            </div>
+
+            <!-- Help Info -->
+            <div class="feedback-info" style="margin-top: 16px;">
+                <h3>💡 Tips</h3>
+                <p style="font-size: 12px; color: var(--neutral-dark); line-height: 1.6;">
+                    • <strong>Align:</strong> Uses the first selected shape as reference<br>
+                    • <strong>Distribute:</strong> Requires 3+ shapes for even spacing<br>
+                    • <strong>Match Size:</strong> Uses the first selected shape's dimensions<br>
+                    • <strong>Swap:</strong> Works with exactly 2 shapes
+                </p>
+            </div>
+        </div>
+
+
         <!-- ==================== FEEDBACK TAB ==================== -->
         <div class="tab-content" id="tab-feedback">
             <div class="feedback-section">
@@ -1206,6 +1416,23 @@
             iconPreviewImage: document.getElementById('iconPreviewImage'),
             btnRegenerateIcon: document.getElementById('btnRegenerateIcon'),
             btnInsertIcon: document.getElementById('btnInsertIcon'),
+            
+            // Align tab
+            alignSelectionInfo: document.getElementById('alignSelectionInfo'),
+            alignStatusMessage: document.getElementById('alignStatusMessage'),
+            btnAlignLeft: document.getElementById('btnAlignLeft'),
+            btnAlignCenter: document.getElementById('btnAlignCenter'),
+            btnAlignRight: document.getElementById('btnAlignRight'),
+            btnAlignTop: document.getElementById('btnAlignTop'),
+            btnAlignMiddle: document.getElementById('btnAlignMiddle'),
+            btnAlignBottom: document.getElementById('btnAlignBottom'),
+            btnDistributeH: document.getElementById('btnDistributeH'),
+            btnDistributeV: document.getElementById('btnDistributeV'),
+            btnMatchWidth: document.getElementById('btnMatchWidth'),
+            btnMatchHeight: document.getElementById('btnMatchHeight'),
+            btnMatchBoth: document.getElementById('btnMatchBoth'),
+            btnSwapPositions: document.getElementById('btnSwapPositions'),
+            btnCenterOnSlide: document.getElementById('btnCenterOnSlide'),
             
             // Feedback tab
             feedbackText: document.getElementById('feedbackText'),
@@ -1319,6 +1546,21 @@
                     state.iconStyleNumber = styleNum;
                 });
             });
+
+            // Align tab
+            elements.btnAlignLeft.addEventListener('click', () => alignShapes('left'));
+            elements.btnAlignCenter.addEventListener('click', () => alignShapes('center'));
+            elements.btnAlignRight.addEventListener('click', () => alignShapes('right'));
+            elements.btnAlignTop.addEventListener('click', () => alignShapes('top'));
+            elements.btnAlignMiddle.addEventListener('click', () => alignShapes('middle'));
+            elements.btnAlignBottom.addEventListener('click', () => alignShapes('bottom'));
+            elements.btnDistributeH.addEventListener('click', () => distributeShapes('horizontal'));
+            elements.btnDistributeV.addEventListener('click', () => distributeShapes('vertical'));
+            elements.btnMatchWidth.addEventListener('click', () => matchSize('width'));
+            elements.btnMatchHeight.addEventListener('click', () => matchSize('height'));
+            elements.btnMatchBoth.addEventListener('click', () => matchSize('both'));
+            elements.btnSwapPositions.addEventListener('click', swapPositions);
+            elements.btnCenterOnSlide.addEventListener('click', centerOnSlide);
 
             // Feedback tab
             elements.btnSubmitFeedback.addEventListener('click', submitFeedback);
@@ -1797,6 +2039,321 @@
             localStorage.removeItem('image_history');
             renderHistory();
             showStatus('History cleared', 'info', 'images');
+        }
+
+
+        // ======================
+        // Alignment Functions
+        // ======================
+        
+        function showAlignStatus(message, type) {
+            const statusEl = elements.alignStatusMessage;
+            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
+            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
+            statusEl.className = `status-message visible ${type}`;
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
+        }
+
+        async function getSelectedShapes() {
+            try {
+                return await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    const shapes = [];
+                    for (let i = 0; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        shape.load(['id', 'left', 'top', 'width', 'height', 'name']);
+                    }
+                    await context.sync();
+                    
+                    for (let i = 0; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        shapes.push({
+                            id: shape.id,
+                            left: shape.left,
+                            top: shape.top,
+                            width: shape.width,
+                            height: shape.height,
+                            name: shape.name,
+                            shape: shape
+                        });
+                    }
+                    
+                    return shapes;
+                });
+            } catch (error) {
+                console.error('Error getting selected shapes:', error);
+                return [];
+            }
+        }
+
+        async function alignShapes(direction) {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    if (selection.items.length < 2) {
+                        showAlignStatus('Select at least 2 shapes to align', 'error');
+                        return;
+                    }
+                    
+                    // Load shape properties
+                    for (let i = 0; i < selection.items.length; i++) {
+                        selection.items[i].load(['left', 'top', 'width', 'height']);
+                    }
+                    await context.sync();
+                    
+                    // Use first shape as reference
+                    const ref = selection.items[0];
+                    
+                    for (let i = 1; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        
+                        switch (direction) {
+                            case 'left':
+                                shape.left = ref.left;
+                                break;
+                            case 'center':
+                                shape.left = ref.left + (ref.width / 2) - (shape.width / 2);
+                                break;
+                            case 'right':
+                                shape.left = ref.left + ref.width - shape.width;
+                                break;
+                            case 'top':
+                                shape.top = ref.top;
+                                break;
+                            case 'middle':
+                                shape.top = ref.top + (ref.height / 2) - (shape.height / 2);
+                                break;
+                            case 'bottom':
+                                shape.top = ref.top + ref.height - shape.height;
+                                break;
+                        }
+                    }
+                    
+                    await context.sync();
+                    showAlignStatus(`Aligned ${selection.items.length} shapes`, 'success');
+                });
+            } catch (error) {
+                console.error('Align error:', error);
+                showAlignStatus('Failed to align shapes: ' + error.message, 'error');
+            }
+        }
+
+        async function distributeShapes(direction) {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    if (selection.items.length < 3) {
+                        showAlignStatus('Select at least 3 shapes to distribute', 'error');
+                        return;
+                    }
+                    
+                    // Load shape properties
+                    const shapes = [];
+                    for (let i = 0; i < selection.items.length; i++) {
+                        selection.items[i].load(['left', 'top', 'width', 'height']);
+                    }
+                    await context.sync();
+                    
+                    for (let i = 0; i < selection.items.length; i++) {
+                        shapes.push({
+                            shape: selection.items[i],
+                            left: selection.items[i].left,
+                            top: selection.items[i].top,
+                            width: selection.items[i].width,
+                            height: selection.items[i].height
+                        });
+                    }
+                    
+                    if (direction === 'horizontal') {
+                        // Sort by left position
+                        shapes.sort((a, b) => a.left - b.left);
+                        
+                        const first = shapes[0];
+                        const last = shapes[shapes.length - 1];
+                        const totalWidth = (last.left + last.width) - first.left;
+                        const shapesWidth = shapes.reduce((sum, s) => sum + s.width, 0);
+                        const gap = (totalWidth - shapesWidth) / (shapes.length - 1);
+                        
+                        let currentLeft = first.left + first.width + gap;
+                        for (let i = 1; i < shapes.length - 1; i++) {
+                            shapes[i].shape.left = currentLeft;
+                            currentLeft += shapes[i].width + gap;
+                        }
+                    } else {
+                        // Sort by top position
+                        shapes.sort((a, b) => a.top - b.top);
+                        
+                        const first = shapes[0];
+                        const last = shapes[shapes.length - 1];
+                        const totalHeight = (last.top + last.height) - first.top;
+                        const shapesHeight = shapes.reduce((sum, s) => sum + s.height, 0);
+                        const gap = (totalHeight - shapesHeight) / (shapes.length - 1);
+                        
+                        let currentTop = first.top + first.height + gap;
+                        for (let i = 1; i < shapes.length - 1; i++) {
+                            shapes[i].shape.top = currentTop;
+                            currentTop += shapes[i].height + gap;
+                        }
+                    }
+                    
+                    await context.sync();
+                    showAlignStatus(`Distributed ${shapes.length} shapes ${direction}ly`, 'success');
+                });
+            } catch (error) {
+                console.error('Distribute error:', error);
+                showAlignStatus('Failed to distribute shapes: ' + error.message, 'error');
+            }
+        }
+
+        async function matchSize(dimension) {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    if (selection.items.length < 2) {
+                        showAlignStatus('Select at least 2 shapes to match size', 'error');
+                        return;
+                    }
+                    
+                    // Load shape properties
+                    for (let i = 0; i < selection.items.length; i++) {
+                        selection.items[i].load(['width', 'height']);
+                    }
+                    await context.sync();
+                    
+                    // Use first shape as reference
+                    const ref = selection.items[0];
+                    
+                    for (let i = 1; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        
+                        if (dimension === 'width' || dimension === 'both') {
+                            shape.width = ref.width;
+                        }
+                        if (dimension === 'height' || dimension === 'both') {
+                            shape.height = ref.height;
+                        }
+                    }
+                    
+                    await context.sync();
+                    showAlignStatus(`Matched ${dimension} for ${selection.items.length} shapes`, 'success');
+                });
+            } catch (error) {
+                console.error('Match size error:', error);
+                showAlignStatus('Failed to match size: ' + error.message, 'error');
+            }
+        }
+
+        async function swapPositions() {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    if (selection.items.length !== 2) {
+                        showAlignStatus('Select exactly 2 shapes to swap positions', 'error');
+                        return;
+                    }
+                    
+                    // Load shape properties
+                    selection.items[0].load(['left', 'top']);
+                    selection.items[1].load(['left', 'top']);
+                    await context.sync();
+                    
+                    const shape1 = selection.items[0];
+                    const shape2 = selection.items[1];
+                    
+                    // Store positions
+                    const pos1 = { left: shape1.left, top: shape1.top };
+                    const pos2 = { left: shape2.left, top: shape2.top };
+                    
+                    // Swap
+                    shape1.left = pos2.left;
+                    shape1.top = pos2.top;
+                    shape2.left = pos1.left;
+                    shape2.top = pos1.top;
+                    
+                    await context.sync();
+                    showAlignStatus('Swapped positions', 'success');
+                });
+            } catch (error) {
+                console.error('Swap error:', error);
+                showAlignStatus('Failed to swap positions: ' + error.message, 'error');
+            }
+        }
+
+        async function centerOnSlide() {
+            try {
+                await PowerPoint.run(async (context) => {
+                    const selection = context.presentation.getSelectedShapes();
+                    selection.load('items');
+                    await context.sync();
+                    
+                    if (selection.items.length === 0) {
+                        showAlignStatus('Select at least 1 shape to center', 'error');
+                        return;
+                    }
+                    
+                    // Get slide dimensions (standard 16:9 = 960x540 points, 4:3 = 720x540 points)
+                    // PowerPoint uses points (1/72 inch). Default 16:9 slide is 10" x 7.5" = 720x540pt
+                    // But modern default is often 13.333" x 7.5" = 960x540pt
+                    const slideWidth = 960;  // points
+                    const slideHeight = 540; // points
+                    
+                    // Load shape properties
+                    for (let i = 0; i < selection.items.length; i++) {
+                        selection.items[i].load(['left', 'top', 'width', 'height']);
+                    }
+                    await context.sync();
+                    
+                    // Calculate bounding box of all selected shapes
+                    let minLeft = Infinity, minTop = Infinity;
+                    let maxRight = -Infinity, maxBottom = -Infinity;
+                    
+                    for (let i = 0; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        minLeft = Math.min(minLeft, shape.left);
+                        minTop = Math.min(minTop, shape.top);
+                        maxRight = Math.max(maxRight, shape.left + shape.width);
+                        maxBottom = Math.max(maxBottom, shape.top + shape.height);
+                    }
+                    
+                    const groupWidth = maxRight - minLeft;
+                    const groupHeight = maxBottom - minTop;
+                    
+                    // Calculate offset to center
+                    const offsetX = (slideWidth - groupWidth) / 2 - minLeft;
+                    const offsetY = (slideHeight - groupHeight) / 2 - minTop;
+                    
+                    // Apply offset to all shapes
+                    for (let i = 0; i < selection.items.length; i++) {
+                        const shape = selection.items[i];
+                        shape.left = shape.left + offsetX;
+                        shape.top = shape.top + offsetY;
+                    }
+                    
+                    await context.sync();
+                    showAlignStatus(`Centered ${selection.items.length} shape(s) on slide`, 'success');
+                });
+            } catch (error) {
+                console.error('Center error:', error);
+                showAlignStatus('Failed to center on slide: ' + error.message, 'error');
+            }
         }
 
 
