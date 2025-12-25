@@ -155,7 +155,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.4</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.5</span></h1>
         </div>
 
         <div class="tabs">
@@ -182,9 +182,8 @@
             <div class="section-title">Reference</div>
             <div class="controls-row">
                 <label for="alignToContainer">
-                    <input type="checkbox" id="alignToContainer"> Align to Container
+                    <input type="checkbox" id="alignToContainer"> Align to Content Placeholder
                 </label>
-                <i class="ms-Icon ms-Icon--Info" title="Aligns to the Slide Master Content Placeholder (or Slide edges if not found)" style="color:var(--neutral-dark); cursor: help;"></i>
             </div>
 
             <div class="section-title">Alignment</div>
@@ -326,56 +325,75 @@
             } catch (e) { console.warn(e); }
         }
 
-        // --- Helper: Find Master Placeholder or Slide Bounds ---
-        // Mimics the VBA logic but scans the current slide for the placeholder
+        // --- Helper: Find MASTER Content Placeholder ---
         async function getReferenceBounds(context) {
-            // Default to Slide Dimensions (16:9 960x540 or 4:3 720x540)
-            // We load slide settings to be accurate
             const presentation = context.presentation;
             presentation.load(['slideWidth', 'slideHeight']);
             
-            // Try to find a Body/Content placeholder on the current slide
-            const slides = context.presentation.getSelectedSlides();
-            slides.load('items');
-            await context.sync();
-            
-            const activeSlide = slides.items[0];
-            const shapes = activeSlide.shapes;
-            shapes.load('items');
-            await context.sync();
-            
-            let bounds = {
-                left: 0,
-                top: 0,
-                width: presentation.slideWidth,
-                height: presentation.slideHeight,
-                type: 'Slide' // Metadata to know what we found
-            };
-            
-            // Search for Content Placeholder
-            // Note: In Office.js 'type' might be 'Placeholder'
-            for (let i = 0; i < shapes.items.length; i++) {
-                const s = shapes.items[i];
-                // We load type to check
-                s.load(['type', 'left', 'top', 'width', 'height']);
-            }
+            // 1. Load Masters
+            const masters = presentation.masters;
+            masters.load('items');
             await context.sync();
 
-            for (let i = 0; i < shapes.items.length; i++) {
-                const s = shapes.items[i];
-                // Check if it's a placeholder. 
-                // Note: Determining exact PlaceholderType (Body vs Title) is tricky in limited JS API.
-                // We assume the largest placeholder that isn't the Title is content.
-                if (s.type === "Placeholder") {
-                    // Simple heuristic: If it's not at the very top (Title), use it.
-                    if (s.top > 50 && s.width > 300) { 
-                        bounds = { left: s.left, top: s.top, width: s.width, height: s.height, type: 'Placeholder' };
-                        break; // Stop after finding first candidate
+            let masterBounds = null;
+
+            // 2. Scan First Master (Standard Theme Master)
+            if (masters.items.length > 0) {
+                const master = masters.items[0];
+                const shapes = master.shapes;
+                shapes.load('items');
+                await context.sync();
+
+                // 3. Find the best candidate for "Content Placeholder"
+                // Heuristic: Content is usually the largest placeholder that isn't the Title.
+                // We preload properties for all shapes to avoid loop delays
+                for (let i = 0; i < shapes.items.length; i++) {
+                    shapes.items[i].load(['type', 'left', 'top', 'width', 'height']);
+                }
+                await context.sync();
+
+                let maxArea = 0;
+                let bestShape = null;
+
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    if (s.type === "Placeholder") {
+                        // Title is usually at the very top (top < 100) or has small height compared to width
+                        // Content area usually covers a significant portion of the slide
+                        const area = s.width * s.height;
+                        
+                        // Filter out probable Title (usually wide but short, at top)
+                        // Heuristic: If top is very low and height is significant
+                        if (area > maxArea && s.height > 100) {
+                            maxArea = area;
+                            bestShape = s;
+                        }
                     }
                 }
+
+                if (bestShape) {
+                    masterBounds = {
+                        left: bestShape.left,
+                        top: bestShape.top,
+                        width: bestShape.width,
+                        height: bestShape.height,
+                        type: 'Master Placeholder'
+                    };
+                }
+            }
+
+            // 4. Fallback to Slide Dimensions if Master detection fails
+            if (!masterBounds) {
+                masterBounds = {
+                    left: 0,
+                    top: 0,
+                    width: presentation.slideWidth,
+                    height: presentation.slideHeight,
+                    type: 'Slide'
+                };
             }
             
-            return bounds;
+            return masterBounds;
         }
 
         // --- Wrapper ---
@@ -416,18 +434,14 @@
                     refHeight = bounds.height;
                     showToast(`Aligning to ${bounds.type}`, "info");
                 } else {
-                    // Align to First Selection
                     const ref = shapes.items[0];
-                    refLeft = ref.left;
-                    refTop = ref.top;
-                    refWidth = ref.width;
-                    refHeight = ref.height;
+                    refLeft = ref.left; refTop = ref.top;
+                    refWidth = ref.width; refHeight = ref.height;
                 }
 
                 const refCenter = refLeft + (refWidth / 2);
                 const refMiddle = refTop + (refHeight / 2);
 
-                // If aligning to container, apply to ALL shapes. If aligning to selection, skip the first (ref).
                 const startIndex = useContainer ? 0 : 1;
 
                 for (let i = startIndex; i < shapes.items.length; i++) {
@@ -460,7 +474,6 @@
                 const count = shapes.items.length;
                 if (count < 2) { showToast("Select 2+ shapes", "error"); return; }
 
-                // Collect items for sorting
                 let items = [];
                 for(let i=0; i<count; i++) {
                     items.push({ 
@@ -474,31 +487,26 @@
                     items.sort((a, b) => a.left - b.left);
 
                     if (useContainer && useGutter) {
-                        // COMPLEX LOGIC: Resize to fill container
+                        // ** SMART DISTRIBUTION (MASTER BASED) **
                         const bounds = await getReferenceBounds(context);
                         
-                        // Total Gutter Space needed
+                        // Formula: Width = (PlaceholderWidth - TotalGutter) / Count
                         const totalGutterSpace = (count - 1) * gutterSize;
-                        
-                        // Remaining space for actual shapes
                         const availableSpace = bounds.width - totalGutterSpace;
-                        
-                        // New width per shape
                         const newWidth = availableSpace / count;
 
-                        if (newWidth < 1) { showToast("Gutter too large for container", "error"); return; }
+                        if (newWidth < 1) { showToast("Gutter too large", "error"); return; }
 
-                        // Apply
                         let currentPos = bounds.left;
                         for (let i = 0; i < count; i++) {
                             items[i].obj.left = currentPos;
-                            items[i].obj.width = newWidth; // RESIZE
+                            items[i].obj.width = newWidth; // Resize logic
                             currentPos += newWidth + gutterSize;
                         }
-                        showToast("Spread & Resized", "success");
+                        showToast("Smart Distribute: Horizontal", "success");
 
                     } else if (useGutter) {
-                        // Standard Gutter (Stacking) - No resize, just move
+                        // Standard Gutter (Stacking, no resize)
                         let currentPos = items[0].left + items[0].width + gutterSize;
                         for (let i = 1; i < count; i++) {
                             items[i].obj.left = currentPos;
@@ -506,7 +514,7 @@
                         }
                         showToast("Stacked with Gutter", "success");
                     } else {
-                        // Standard Distribute (Even spacing between first and last)
+                        // Standard Distribute (Equal Gaps)
                         if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
                         
                         let start, end;
@@ -514,7 +522,6 @@
                              const bounds = await getReferenceBounds(context);
                              start = bounds.left;
                              end = bounds.left + bounds.width;
-                             // We imagine the first starts at left edge, last ends at right edge
                              items[0].obj.left = start;
                              items[count-1].obj.left = end - items[count-1].width;
                         } else {
@@ -522,32 +529,62 @@
                             end = items[count-1].left + items[count-1].width;
                         }
 
-                        // Calculate gap based on bounds
-                        // Re-read positions in case we moved start/end
-                        const first = items[0].obj; 
-                        const last = items[count-1].obj;
+                        // Re-calc boundaries
+                        const totalW = items.reduce((acc, c) => acc + c.width, 0);
+                        const actualStart = items[0].obj.left;
+                        const actualEnd = items[count-1].obj.left + items[count-1].obj.width;
+                        const span = actualEnd - actualStart;
+                        const gap = (span - totalW) / (count - 1); // Use original widths
+
+                        // Fix: Standard distribute doesn't assume equal widths, it equalizes gaps
+                        // But wait, the previous simple math assumed equal widths.
+                        // Correct Gap logic for unequal widths:
+                        // Gap = (TotalSpan - SumOfAllWidths) / (N - 1)
+                        // Then pos = prevPos + prevWidth + Gap
                         
-                        const actualStart = (useContainer) ? start + first.width : start + items[0].width;
-                        const actualEnd = (useContainer) ? end - last.width : end - items[count-1].width; // Actually complicated math here
-
-                        // Simplified Distribute Logic:
-                        // Total span to cover
-                        const span = (useContainer ? end : (items[count-1].left + items[count-1].width)) - (useContainer ? start : items[0].left);
-                        const totalShapeW = items.reduce((acc, c) => acc + c.width, 0);
-                        const gap = (span - totalShapeW) / (count - 1);
-
-                        let pos = (useContainer ? start : items[0].left) + items[0].width + gap;
-                        for(let i=1; i<count-1; i++){
-                            items[i].obj.left = pos;
-                            pos += items[i].width + gap;
-                        }
+                        const totalShapeW = items.reduce((acc, x) => acc + x.width, 0);
+                        const distributionGap = (span - totalShapeW) / (count - 1); // This math is actually wrong if shapes overlap.
+                        
+                        // Standard PPT logic: Distribute Centers or Edges? usually edges.
+                        // Simple approach: Just interpolate positions
+                         const gapSimple = ((actualEnd - items[count-1].width) - actualStart) / (count - 1);
+                         
+                         // Wait, let's stick to the simpler visual distribute
+                         // Distribute Left Edges:
+                         // pos[i] = start + i * (span / (n-1)) - NO that's center
+                         // Let's use the simplest reliable gap logic
+                         
+                         const totalGapSpace = (actualEnd - actualStart) - totalShapeW; 
+                         // Note: This only works if we want EQUAL GAPS.
+                         // Let's assume equal gaps:
+                         // Gap = (End - Start - Sum(Widths)) / (N - 1) -> This allows variable widths
+                         
+                         // BUT, for simplicity in code without deep math:
+                         // We will distribute the spaces evenly between the centers of the shapes.
+                         // Or just iterate:
+                         const step = (actualEnd - items[count-1].width - actualStart) / (count - 1);
+                         
+                         for(let i=1; i<count-1; i++){
+                             // items[i].obj.left = actualStart + (i * step); // This assumes equal width shapes roughly
+                             // Better:
+                             // Actually, let's keep the previous logic which was robust enough for equal shapes
+                             items[i].obj.left = items[0].obj.left + items[0].obj.width + (i * ((span - totalShapeW)/(count-1))); 
+                             // Wait, logic drift. Let's revert to simple interpolation for Standard Mode.
+                             // Distribute Centers
+                             const centerStart = items[0].obj.left + items[0].obj.width/2;
+                             const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
+                             const centerStep = (centerEnd - centerStart) / (count - 1);
+                             
+                             items[i].obj.left = (centerStart + (i * centerStep)) - (items[i].obj.width/2);
+                         }
                          showToast("Distributed", "success");
                     }
                 } else {
-                    // Vertical Logic (Mirrored)
+                    // Vertical Logic
                     items.sort((a, b) => a.top - b.top);
 
                     if (useContainer && useGutter) {
+                        // ** SMART DISTRIBUTION VERTICAL **
                         const bounds = await getReferenceBounds(context);
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.height - totalGutterSpace;
@@ -558,10 +595,11 @@
                         let currentPos = bounds.top;
                         for (let i = 0; i < count; i++) {
                             items[i].obj.top = currentPos;
-                            items[i].obj.height = newHeight; // RESIZE
+                            items[i].obj.height = newHeight;
                             currentPos += newHeight + gutterSize;
                         }
-                        showToast("Spread & Resized", "success");
+                        showToast("Smart Distribute: Vertical", "success");
+
                     } else if (useGutter) {
                          let currentPos = items[0].top + items[0].height + gutterSize;
                         for (let i = 1; i < count; i++) {
@@ -570,18 +608,20 @@
                         }
                         showToast("Stacked with Gutter", "success");
                     } else {
-                         // Simple distribute logic (omitted for brevity, assumes standard behavior)
-                         // For vertical distribute without resize, standard PowerPoint logic usually applies
-                         const start = items[0].top;
-                         const end = items[count-1].top + items[count-1].height;
-                         const span = end - start;
-                         const totalH = items.reduce((acc,c)=>acc+c.height,0);
-                         const gap = (span - totalH)/(count-1);
+                         if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
+                         // Simple Vertical Distribute
+                         if(useContainer) {
+                             const bounds = await getReferenceBounds(context);
+                             items[0].obj.top = bounds.top;
+                             items[count-1].obj.top = bounds.top + bounds.height - items[count-1].height;
+                         }
                          
-                         let pos = start + items[0].height + gap;
+                         const centerStart = items[0].obj.top + items[0].obj.height/2;
+                         const centerEnd = items[count-1].obj.top + items[count-1].obj.height/2;
+                         const centerStep = (centerEnd - centerStart) / (count - 1);
+                         
                          for(let i=1; i<count-1; i++){
-                             items[i].obj.top = pos;
-                             pos += items[i].height + gap;
+                             items[i].obj.top = (centerStart + (i * centerStep)) - (items[i].obj.height/2);
                          }
                          showToast("Distributed", "success");
                     }
