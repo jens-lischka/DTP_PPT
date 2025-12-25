@@ -3,2464 +3,521 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
+    <title>AI Image & Tools</title>
     
-    <!-- Office.js -->
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     
-    <!-- Fluent UI Icons -->
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
     
     <style>
         :root {
             --primary: #0078d4;
             --primary-hover: #106ebe;
-            --primary-pressed: #005a9e;
-            --success: #107c10;
-            --warning: #ffaa44;
-            --danger: #d13438;
             --neutral-bg: #faf9f8;
-            --neutral-lighter: #f3f2f1;
             --neutral-light: #edebe9;
             --neutral-dark: #605e5c;
-            --neutral-darker: #323130;
             --white: #ffffff;
-            --shadow-sm: 0 1.6px 3.6px rgba(0,0,0,0.13), 0 0.3px 0.9px rgba(0,0,0,0.11);
-            --shadow-md: 0 3.2px 7.2px rgba(0,0,0,0.13), 0 0.6px 1.8px rgba(0,0,0,0.11);
             --radius: 4px;
-            --radius-lg: 8px;
+            --shadow: 0 1.6px 3.6px rgba(0,0,0,0.13);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             font-size: 14px;
-            line-height: 1.5;
-            color: var(--neutral-darker);
+            color: #323130;
             background: var(--neutral-bg);
-            min-height: 100vh;
+            /* Important for shortcuts: make body focusable */
+            outline: none; 
         }
 
-        .taskpane {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+        .taskpane { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* Header */
+        /* --- Header & Tabs --- */
         .header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px;
-            border-bottom: 1px solid var(--neutral-light);
-            background: var(--white);
-        }
-
-        .header-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), #50e6ff);
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
-        }
-
-        .header-text h1 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--neutral-darker);
-        }
-
-        .header-text p {
-            font-size: 12px;
-            color: var(--neutral-dark);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
+            padding: 12px 16px;
             background: var(--white);
             border-bottom: 1px solid var(--neutral-light);
-            padding: 0 8px;
+            display: flex; align-items: center; gap: 10px;
         }
-
+        .header h1 { font-size: 16px; font-weight: 600; margin: 0; }
+        
+        .tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--neutral-light); }
         .tab {
-            flex: 1;
-            padding: 10px 4px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--neutral-dark);
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .tab i {
-            font-size: 16px;
-        }
-
-        .tab:hover {
-            color: var(--primary);
-            background: var(--neutral-lighter);
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* API Key Section */
-        .api-key-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 12px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .api-key-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .api-key-header label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--neutral-dark);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .api-key-status {
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-
-        .api-key-status.connected {
-            background: #dff6dd;
-            color: var(--success);
-        }
-
-        .api-key-status.disconnected {
-            background: #fed9cc;
-            color: var(--danger);
-        }
-
-        .api-key-input-wrapper {
-            display: flex;
-            gap: 8px;
-        }
-
-        .api-key-input-wrapper input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-family: 'Consolas', monospace;
-            transition: border-color 0.15s;
-        }
-
-        .api-key-input-wrapper input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn-save-key {
-            padding: 8px 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .btn-save-key:hover {
-            background: var(--primary-hover);
-        }
-
-        .btn-save-key:active {
-            background: var(--primary-pressed);
-        }
-
-        /* Prompt Section */
-        .prompt-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .prompt-section label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--neutral-darker);
-        }
-
-        .prompt-textarea {
-            width: 100%;
-            min-height: 80px;
-            padding: 12px;
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            transition: border-color 0.15s;
-        }
-
-        .prompt-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .prompt-textarea::placeholder {
-            color: var(--neutral-dark);
-        }
-
-        /* Style Presets */
-        .style-presets {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .style-preset {
-            padding: 6px 12px;
-            background: var(--neutral-lighter);
-            border: 1px solid var(--neutral-light);
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .style-preset:hover {
-            background: var(--neutral-light);
-        }
-
-        .style-preset.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Options */
-        .options-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .option-group {
-            flex: 1;
-        }
-
-        .option-group label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--neutral-dark);
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .option-group select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            font-size: 13px;
-            background: var(--white);
-            cursor: pointer;
-        }
-
-        .option-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Generate Button */
-        .btn-generate {
-            width: 100%;
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.15s;
-            margin-top: 12px;
-        }
-
-        .btn-generate:hover:not(:disabled) {
-            background: var(--primary-hover);
-        }
-
-        .btn-generate:active:not(:disabled) {
-            background: var(--primary-pressed);
-        }
-
-        .btn-generate:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-generate .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Shape Info */
-        .shape-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 12px;
-            margin-top: 12px;
-            background: var(--neutral-lighter);
-            border-radius: var(--radius);
-            font-size: 12px;
-            color: var(--neutral-dark);
-        }
-
-        .shape-info.detected {
-            background: #e7f3ff;
-            color: var(--primary);
-        }
-
-        .shape-info i {
-            font-size: 14px;
-        }
-
-        /* Preview Section */
-        .preview-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-            display: none;
-        }
-
-        .preview-section.visible {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .preview-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .preview-header h2 {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--neutral-darker);
-        }
-
-        .preview-image-container {
-            position: relative;
-            background: var(--neutral-lighter);
-            border-radius: var(--radius);
-            overflow: hidden;
-            aspect-ratio: 1;
-        }
-
-        .preview-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .preview-loading {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: var(--neutral-lighter);
-        }
-
-        .preview-loading .spinner-large {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--neutral-light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .preview-loading p {
-            font-size: 13px;
-            color: var(--neutral-dark);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 10px 16px;
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.15s;
-        }
-
-        .btn-regenerate {
-            background: var(--white);
-            border: 1px solid var(--neutral-light);
-            color: var(--neutral-darker);
-        }
-
-        .btn-regenerate:hover {
-            background: var(--neutral-lighter);
-        }
-
-        .btn-insert {
-            background: var(--success);
-            border: 1px solid var(--success);
-            color: white;
-        }
-
-        .btn-insert:hover {
-            background: #0b5c0b;
-        }
-
-        /* Insert Options */
-        .insert-options {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .insert-option {
-            flex: 1;
-            padding: 8px;
-            background: var(--neutral-lighter);
-            border: 2px solid transparent;
-            border-radius: var(--radius);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.15s;
-        }
-
-        .insert-option:hover {
-            background: var(--neutral-light);
-        }
-
-        .insert-option.selected {
-            border-color: var(--primary);
-            background: #e7f3ff;
-        }
-
-        .insert-option i {
-            display: block;
-            font-size: 20px;
-            margin-bottom: 4px;
-            color: var(--neutral-dark);
-        }
-
-        .insert-option.selected i {
-            color: var(--primary);
-        }
-
-        .insert-option span {
-            font-size: 11px;
-            color: var(--neutral-dark);
-        }
-
-        /* Status Messages */
-        .status-message {
-            padding: 10px 12px;
-            border-radius: var(--radius);
-            font-size: 13px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-message.visible {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .status-message.success {
-            background: #dff6dd;
-            color: var(--success);
-        }
-
-        .status-message.error {
-            background: #fed9cc;
-            color: var(--danger);
-        }
-
-        .status-message.info {
-            background: #e7f3ff;
-            color: var(--primary);
-        }
-
-        /* History Section */
-        .history-section {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid var(--neutral-light);
-        }
-
-        .history-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .history-header h3 {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--neutral-dark);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-clear-history {
-            font-size: 11px;
-            color: var(--neutral-dark);
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .history-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-        }
-
-        .history-item {
-            aspect-ratio: 1;
-            border-radius: var(--radius);
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.15s;
-        }
-
-        .history-item:hover {
-            border-color: var(--primary);
-        }
-
-        .history-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .history-empty {
-            text-align: center;
-            padding: 16px;
-            color: var(--neutral-dark);
-            font-size: 12px;
-        }
-
-        /* Feedback Tab Styles */
-        .feedback-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .feedback-section h2 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--neutral-darker);
-        }
-
-        .feedback-section p {
-            font-size: 13px;
-            color: var(--neutral-dark);
-            margin-bottom: 12px;
-        }
-
-        .feedback-textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            margin-bottom: 12px;
-        }
-
-        .feedback-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn-submit-feedback {
-            width: 100%;
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .btn-submit-feedback:hover {
-            background: var(--primary-hover);
-        }
-
-        .feedback-info {
-            margin-top: 16px;
-            padding: 12px;
-            background: var(--neutral-lighter);
-            border-radius: var(--radius);
-        }
-
-        .feedback-info h3 {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--neutral-darker);
-        }
-
-        .feedback-info a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .feedback-info a:hover {
-            text-decoration: underline;
-        }
-
-        /* Icon Style Grid */
-        .icon-style-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .icon-style-card {
-            border: 2px solid var(--neutral-light);
-            border-radius: var(--radius-lg);
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            background: var(--white);
-        }
-
-        .icon-style-card:hover {
-            border-color: var(--neutral-dark);
-        }
-
-        .icon-style-card.selected {
-            border-color: var(--primary);
-            background: #e7f3ff;
-        }
-
-        .icon-style-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .icon-style-preview {
-            width: 50px;
-            height: 50px;
-            border-radius: var(--radius);
-            margin: 0 auto 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .icon-style-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--neutral-darker);
-        }
-
-        .icon-style-desc {
-            font-size: 11px;
-            color: var(--neutral-dark);
-        }
-
-        /* Search Input Styles */
-        .search-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input-wrapper .search-input {
-            padding-right: 80px;
-        }
-
-        .search-btn, .clear-btn {
-            position: absolute;
-            right: 8px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .search-btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .clear-btn {
-            right: 44px;
-            background: var(--neutral-light);
-            color: var(--neutral-dark);
-        }
-
-        .clear-btn:hover {
-            background: var(--neutral);
-        }
-
-        /* Alignment Tab Styles */
-        .align-selection-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px;
-            background: #fff4ce;
-            border-radius: var(--radius);
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #7a6200;
-        }
-
-        .align-selection-info.success {
-            background: #dff6dd;
-            color: #107c10;
-        }
-
-        .align-selection-info i {
-            font-size: 16px;
-        }
-
-        .align-section {
-            margin-bottom: 20px;
-        }
-
-        .align-section-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--neutral-dark);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            flex: 1; padding: 10px; background: none; border: none;
+            border-bottom: 2px solid transparent; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: var(--neutral-dark); font-size: 11px;
+        }
+        .tab:hover { background: var(--neutral-light); }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab i { font-size: 16px; }
+
+        /* --- Content Area --- */
+        .tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px; }
+        .tab-content.active { display: flex; flex-direction: column; gap: 16px; }
+
+        /* --- Components --- */
+        .card {
+            background: var(--white); border-radius: 8px; padding: 16px;
+            box-shadow: var(--shadow); margin-bottom: 10px;
+        }
+
+        label { display: block; font-weight: 600; font-size: 12px; margin-bottom: 6px; }
+        
+        input, select, textarea {
+            width: 100%; padding: 8px; border: 1px solid var(--neutral-light);
+            border-radius: var(--radius); font-family: inherit; font-size: 13px;
             margin-bottom: 10px;
         }
-
-        .align-button-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .align-btn {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 12px 8px;
-            background: var(--white);
-            border: 1px solid var(--neutral-light);
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.15s;
-            min-height: 60px;
-        }
-
-        .align-btn:hover {
-            background: var(--neutral-lighter);
-            border-color: var(--neutral-dark);
-        }
-
-        .align-btn:active {
-            background: var(--neutral-light);
-            transform: scale(0.98);
-        }
-
-        .align-btn i {
-            font-size: 18px;
-            color: var(--primary);
-        }
-
-        .align-btn span {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--neutral-darker);
-        }
-
-        .align-btn.wide {
-            flex: 1;
-        }
-
-        .align-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .align-btn:disabled:hover {
-            background: var(--white);
-            border-color: var(--neutral-light);
-            transform: none;
-        }
-
-        .feedback-info code {
-            background: var(--neutral-lighter);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 11px;
-            border: 1px solid var(--neutral-light);
-        }
-
-        /* Platform-specific shortcuts - default to Windows */
-        .shortcut-mac { display: none; }
-        .shortcut-win { display: inline; }
+        textarea { resize: vertical; min-height: 80px; }
         
-        /* Show Mac shortcuts on Mac */
-        body.is-mac .shortcut-mac { display: inline; }
-        body.is-mac .shortcut-win { display: none; }
+        button {
+            width: 100%; padding: 10px; border: none; border-radius: var(--radius);
+            cursor: pointer; font-weight: 600; font-size: 13px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+        .btn-primary:disabled { background: #c8c8c8; cursor: not-allowed; }
+
+        /* --- Align Tab Specifics --- */
+        .align-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .align-btn {
+            background: var(--white); border: 1px solid var(--neutral-light);
+            color: var(--neutral-dark); height: 60px;
+            flex-direction: column; gap: 4px;
+        }
+        .align-btn:hover { background: var(--neutral-light); border-color: var(--neutral-dark); }
+        .align-btn:active { transform: scale(0.98); }
+        .align-btn span { font-size: 10px; font-weight: normal; }
+        
+        .section-title {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--neutral-dark); margin-bottom: 8px; font-weight: 600;
+        }
+
+        .shortcut-hint {
+            font-size: 11px; color: var(--neutral-dark); background: #f0f0f0;
+            padding: 8px; border-radius: 4px; border-left: 3px solid var(--primary);
+        }
+
+        /* --- Status & Loading --- */
+        .status-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;
+        }
+        .status-toast.success { background: #dff6dd; color: #107c10; }
+        .status-toast.error { background: #fde7e9; color: #a80000; }
+        .status-toast.visible { display: block; animation: fadeIn 0.3s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        /* Helper for mac vs win */
+        .mac-only { display: none; }
+        body.is-mac .mac-only { display: inline; }
+        body.is-mac .win-only { display: none; }
+        
+        /* Focus indicator */
+        .focus-indicator {
+            font-size: 11px; text-align: center; color: var(--primary);
+            cursor: pointer; padding: 4px; border: 1px dashed transparent;
+        }
+        .focus-indicator:hover { border-color: var(--primary); background: #eef8ff; }
 
     </style>
 </head>
-<body>
+<body tabindex="0" id="app-body">
+
     <div class="taskpane">
-        <!-- Header -->
         <div class="header">
-            <div class="header-icon">
-                <i class="ms-Icon ms-Icon--ImagePixel"></i>
-            </div>
-            <div class="header-text">
-                <h1>AI Image Generator <span style="font-size: 12px; font-weight: 400; color: var(--neutral-dark);">v2.1</span></h1>
-                <p>Powered by OpenAI gpt-image-1</p>
-            </div>
+            <h1>PowerPoint Tools</h1>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" data-tab="images">
+            <button class="tab active" data-tab="align">
+                <i class="ms-Icon ms-Icon--AlignCenter"></i>
+                <span>Align</span>
+            </button>
+            <button class="tab" data-tab="images">
                 <i class="ms-Icon ms-Icon--Photo2"></i>
-                <span>Images</span>
+                <span>Gen AI</span>
             </button>
             <button class="tab" data-tab="icons">
                 <i class="ms-Icon ms-Icon--AppIconDefaultList"></i>
                 <span>Icons</span>
             </button>
-            <button class="tab" data-tab="align">
-                <i class="ms-Icon ms-Icon--AlignCenter"></i>
-                <span>Align</span>
-            </button>
-            <button class="tab" data-tab="feedback">
-                <i class="ms-Icon ms-Icon--Feedback"></i>
-                <span>More</span>
-            </button>
         </div>
 
-        <!-- ==================== IMAGES TAB ==================== -->
-        <div class="tab-content active" id="tab-images">
-            <!-- API Key Section -->
-            <div class="api-key-section">
-                <div class="api-key-header">
-                    <label>OpenAI API Key</label>
-                    <span id="apiKeyStatus" class="api-key-status disconnected">Not Set</span>
-                </div>
-                <div class="api-key-input-wrapper">
-                    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
-                    <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
-                </div>
-                <script>
-                    // Immediate binding for Save button (runs as soon as button exists)
-                    (function() {
-                        var btn = document.getElementById('btnSaveKey');
-                        var input = document.getElementById('apiKeyInput');
-                        var statusEl = document.getElementById('apiKeyStatus');
-                        
-                        btn.onclick = function() {
-                            console.log('Save button clicked');
-                            var key = input.value.trim();
-                            if (!key || key === '••••••••••••••••') {
-                                alert('Please enter your API key first');
-                                return;
-                            }
-                            
-                            // Store in window for global access
-                            window._openaiApiKey = key;
-                            
-                            // Also store in state if it exists
-                            if (typeof state !== 'undefined') {
-                                state.apiKey = key;
-                            }
-                            
-                            // Try localStorage (clear history first to make room)
-                            try {
-                                localStorage.removeItem('image_history');
-                                localStorage.setItem('openai_api_key', key);
-                                console.log('Key saved to localStorage');
-                            } catch(e) {
-                                console.log('localStorage failed, key only in memory');
-                            }
-                            
-                            // Update UI
-                            input.value = '••••••••••••••••';
-                            statusEl.textContent = 'Connected';
-                            statusEl.className = 'api-key-status connected';
-                            
-                            // Enable generate buttons
-                            var btns = document.querySelectorAll('.btn-generate');
-                            btns.forEach(function(b) { b.disabled = false; });
-                            
-                            // Update generate buttons if function exists
-                            if (typeof updateGenerateButtons === 'function') {
-                                updateGenerateButtons();
-                            }
-                            
-                            alert('API key saved!');
-                        };
-                    })();
-                </script>
+        <div class="tab-content active" id="tab-align">
+            
+            <div id="selectionStatus" style="font-size: 12px; margin-bottom: 10px; color: var(--neutral-dark);">
+                Checking selection...
             </div>
 
-            <!-- Prompt Section -->
-            <div class="prompt-section">
-                <label for="promptInput">Describe your image</label>
-                <textarea 
-                    id="promptInput" 
-                    class="prompt-textarea" 
-                    placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."
-                ></textarea>
-                
-                <div class="options-row">
-                    <div class="option-group">
-                        <label>Size</label>
-                        <select id="sizeSelect">
-                            <option value="auto">Auto (from selection)</option>
-                            <option value="1024x1024">Square (1024×1024)</option>
-                            <option value="1792x1024">Landscape (1792×1024)</option>
-                            <option value="1024x1792">Portrait (1024×1792)</option>
-                        </select>
-                    </div>
-                    <div class="option-group">
-                        <label>Quality</label>
-                        <select id="qualitySelect">
-                            <option value="medium">Medium</option>
-                            <option value="low">Low (faster)</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="shapeInfo" class="shape-info">
-                    <i class="ms-Icon ms-Icon--RectangleShape"></i>
-                    <span id="shapeInfoText">No shape selected - will use size setting</span>
-                </div>
-                
-                <button class="btn-generate" id="btnGenerate" disabled>
-                    <i class="ms-Icon ms-Icon--Rocket"></i>
-                    <span>Generate Image</span>
+            <div class="section-title">Alignment</div>
+            <div class="align-grid">
+                <button class="align-btn" onclick="runAlign('left')" title="Align Left">
+                    <i class="ms-Icon ms-Icon--AlignLeft"></i><span>Left</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('center')" title="Align Center">
+                    <i class="ms-Icon ms-Icon--AlignCenter"></i><span>Center</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('right')" title="Align Right">
+                    <i class="ms-Icon ms-Icon--AlignRight"></i><span>Right</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('top')" title="Align Top">
+                    <i class="ms-Icon ms-Icon--AlignVerticalTop"></i><span>Top</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('middle')" title="Align Middle">
+                    <i class="ms-Icon ms-Icon--AlignVerticalCenter"></i><span>Middle</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('bottom')" title="Align Bottom">
+                    <i class="ms-Icon ms-Icon--AlignVerticalBottom"></i><span>Bottom</span>
                 </button>
             </div>
 
-            <!-- Status Message -->
-            <div id="statusMessage" class="status-message">
-                <i class="ms-Icon"></i>
-                <span></span>
+            <div class="section-title">Distribute</div>
+            <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
+                <button class="align-btn" onclick="runDistribute('horizontal')">
+                    <i class="ms-Icon ms-Icon--DistributeDown"></i><span>Horiz.</span>
+                </button>
+                <button class="align-btn" onclick="runDistribute('vertical')">
+                    <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i><span>Vert.</span>
+                </button>
             </div>
 
-            <!-- Preview Section -->
-            <div id="previewSection" class="preview-section">
-                <div class="preview-header">
-                    <h2>Generated Image</h2>
-                </div>
-                
-                <div class="preview-image-container">
-                    <div id="previewLoading" class="preview-loading">
-                        <div class="spinner-large"></div>
-                        <p>Generating your image...</p>
-                    </div>
-                    <img id="previewImage" class="preview-image" alt="Generated image preview">
-                </div>
-                
-                <div class="insert-options">
-                    <div class="insert-option selected" data-mode="auto">
-                        <i class="ms-Icon ms-Icon--AutoFit"></i>
-                        <span>Auto Detect</span>
-                    </div>
-                    <div class="insert-option" data-mode="slide">
-                        <i class="ms-Icon ms-Icon--Presentation"></i>
-                        <span>On Slide</span>
-                    </div>
-                    <div class="insert-option" data-mode="fill">
-                        <i class="ms-Icon ms-Icon--RectangleShape"></i>
-                        <span>Fill Shape</span>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn-action btn-regenerate" id="btnRegenerate">
-                        <i class="ms-Icon ms-Icon--Refresh"></i>
-                        Regenerate
-                    </button>
-                    <button class="btn-action btn-insert" id="btnInsert">
-                        <i class="ms-Icon ms-Icon--CheckMark"></i>
-                        Insert
-                    </button>
-                </div>
+            <div class="section-title">Size & Arrange</div>
+            <div class="align-grid">
+                <button class="align-btn" onclick="runMatchSize('width')">
+                    <i class="ms-Icon ms-Icon--FitWidth"></i><span>Width</span>
+                </button>
+                <button class="align-btn" onclick="runMatchSize('height')">
+                    <i class="ms-Icon ms-Icon--FitPage"></i><span>Height</span>
+                </button>
+                <button class="align-btn" onclick="runSwap()">
+                    <i class="ms-Icon ms-Icon--Switch"></i><span>Swap</span>
+                </button>
             </div>
 
-            <!-- History Section -->
-            <div class="history-section">
-                <div class="history-header">
-                    <h3>Recent Images</h3>
-                    <button class="btn-clear-history" id="btnClearHistory">Clear</button>
+            <div class="shortcut-hint" style="margin-top:auto">
+                <div class="focus-indicator" onclick="document.body.focus()">
+                    <i class="ms-Icon ms-Icon--Touch"></i> Click here to enable shortcuts
                 </div>
-                <div id="historyGrid" class="history-grid">
-                    <div class="history-empty">No images generated yet</div>
-                </div>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+                <strong>Align Shortcuts:</strong><br>
+                <span class="win-only">Alt + Arrow Keys</span>
+                <span class="mac-only">Ctrl + Arrow Keys</span>
+                <br>
+                (Use Shift for Slide Align)
             </div>
         </div>
 
-        <!-- ==================== ICONS TAB ==================== -->
+        <div class="tab-content" id="tab-images">
+            <div class="card">
+                <label>Prompt</label>
+                <textarea id="promptInput" placeholder="Describe image..."></textarea>
+                <button class="btn-primary" id="btnGenerate">Generate Image</button>
+            </div>
+            <div id="imagePreview" style="margin-top:10px; text-align:center;"></div>
+        </div>
+
         <div class="tab-content" id="tab-icons">
-            <!-- Style Selection -->
-            <div class="prompt-section">
-                <label>Select Style</label>
-                <div class="icon-style-grid" id="iconStyleGrid">
-                    <div class="icon-style-card selected" data-style="1">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #ffe135, #f5c842);">
-                            🍌
-                        </div>
-                        <div class="icon-style-name">Style 1</div>
-                        <div class="icon-style-desc">Banana</div>
-                    </div>
-                    <div class="icon-style-card" data-style="2">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #1a237e, #3949ab);">
-                            🦢
-                        </div>
-                        <div class="icon-style-name">Style 2</div>
-                        <div class="icon-style-desc">Origami</div>
-                    </div>
-                    <div class="icon-style-card" data-style="3">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
-                            🔜
-                        </div>
-                        <div class="icon-style-name">Style 3</div>
-                        <div class="icon-style-desc">Coming soon</div>
-                    </div>
-                    <div class="icon-style-card" data-style="4">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e);">
-                            🔜
-                        </div>
-                        <div class="icon-style-name">Style 4</div>
-                        <div class="icon-style-desc">Coming soon</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subject Input -->
-            <div class="prompt-section">
-                <label for="iconSubjectInput">Enter Subject</label>
-                <input 
-                    type="text"
-                    id="iconSubjectInput" 
-                    class="cs-input"
-                    placeholder="play button, house, car, lightbulb..."
-                    style="font-size: 14px;"
-                >
-                <p style="font-size: 11px; color: var(--neutral-dark); margin-top: 6px;">
-                    Enter a simple object or symbol. The selected style will be applied automatically.
-                </p>
-
-                <div class="options-row" style="margin-top: 12px;">
-                    <div class="option-group">
-                        <label>Quality</label>
-                        <select id="iconQualitySelect">
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low (faster)</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <button class="btn-generate" id="btnGenerateIcon" disabled>
-                    <i class="ms-Icon ms-Icon--Rocket"></i>
-                    <span>Generate Icon</span>
-                </button>
-            </div>
-
-            <!-- Status Message -->
-            <div id="iconStatusMessage" class="status-message">
-                <i class="ms-Icon"></i>
-                <span></span>
-            </div>
-
-            <!-- Preview Section -->
-            <div id="iconPreviewSection" class="preview-section">
-                <div class="preview-header">
-                    <h2>Generated Icon</h2>
-                </div>
-                
-                <div class="preview-image-container">
-                    <div id="iconPreviewLoading" class="preview-loading">
-                        <div class="spinner-large"></div>
-                        <p>Generating your icon...</p>
-                    </div>
-                    <img id="iconPreviewImage" class="preview-image" alt="Generated icon preview">
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn-action btn-regenerate" id="btnRegenerateIcon">
-                        <i class="ms-Icon ms-Icon--Refresh"></i>
-                        Regenerate
-                    </button>
-                    <button class="btn-action btn-insert" id="btnInsertIcon">
-                        <i class="ms-Icon ms-Icon--CheckMark"></i>
-                        Insert
-                    </button>
-                </div>
+            <div class="card">
+                <label>Icon Subject</label>
+                <input type="text" id="iconInput" placeholder="e.g. House, Car">
+                <button class="btn-primary" id="btnGenerateIcon">Generate Icon</button>
             </div>
         </div>
 
-
-        <!-- ==================== ALIGN TAB ==================== -->
-        <div class="tab-content" id="tab-align">
-            <!-- Selection Info -->
-            <div class="align-selection-info" id="alignSelectionInfo">
-                <i class="ms-Icon ms-Icon--Info"></i>
-                <span>Select 2 or more shapes to use alignment tools</span>
-            </div>
-
-            <!-- Horizontal Alignment -->
-            <div class="align-section">
-                <h3 class="align-section-title">Horizontal Alignment</h3>
-                <div class="align-button-row">
-                    <button class="align-btn" id="btnAlignLeft" title="Align Left">
-                        <i class="ms-Icon ms-Icon--AlignLeft"></i>
-                        <span>Left</span>
-                    </button>
-                    <button class="align-btn" id="btnAlignCenter" title="Align Center">
-                        <i class="ms-Icon ms-Icon--AlignCenter"></i>
-                        <span>Center</span>
-                    </button>
-                    <button class="align-btn" id="btnAlignRight" title="Align Right">
-                        <i class="ms-Icon ms-Icon--AlignRight"></i>
-                        <span>Right</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Vertical Alignment -->
-            <div class="align-section">
-                <h3 class="align-section-title">Vertical Alignment</h3>
-                <div class="align-button-row">
-                    <button class="align-btn" id="btnAlignTop" title="Align Top">
-                        <i class="ms-Icon ms-Icon--AlignVerticalTop"></i>
-                        <span>Top</span>
-                    </button>
-                    <button class="align-btn" id="btnAlignMiddle" title="Align Middle">
-                        <i class="ms-Icon ms-Icon--AlignVerticalCenter"></i>
-                        <span>Middle</span>
-                    </button>
-                    <button class="align-btn" id="btnAlignBottom" title="Align Bottom">
-                        <i class="ms-Icon ms-Icon--AlignVerticalBottom"></i>
-                        <span>Bottom</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Distribute -->
-            <div class="align-section">
-                <h3 class="align-section-title">Distribute</h3>
-                <div class="align-button-row">
-                    <button class="align-btn wide" id="btnDistributeH" title="Distribute Horizontally">
-                        <i class="ms-Icon ms-Icon--DistributeDown"></i>
-                        <span>Horizontally</span>
-                    </button>
-                    <button class="align-btn wide" id="btnDistributeV" title="Distribute Vertically">
-                        <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i>
-                        <span>Vertically</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Match Size -->
-            <div class="align-section">
-                <h3 class="align-section-title">Match Size</h3>
-                <div class="align-button-row">
-                    <button class="align-btn" id="btnMatchWidth" title="Match Width">
-                        <i class="ms-Icon ms-Icon--FitWidth"></i>
-                        <span>Width</span>
-                    </button>
-                    <button class="align-btn" id="btnMatchHeight" title="Match Height">
-                        <i class="ms-Icon ms-Icon--FitPage"></i>
-                        <span>Height</span>
-                    </button>
-                    <button class="align-btn" id="btnMatchBoth" title="Match Both">
-                        <i class="ms-Icon ms-Icon--Resize"></i>
-                        <span>Both</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Swap & Arrange -->
-            <div class="align-section">
-                <h3 class="align-section-title">Arrange</h3>
-                <div class="align-button-row">
-                    <button class="align-btn wide" id="btnSwapPositions" title="Swap Positions">
-                        <i class="ms-Icon ms-Icon--Switch"></i>
-                        <span>Swap Positions</span>
-                    </button>
-                    <button class="align-btn wide" id="btnCenterOnSlide" title="Center on Slide">
-                        <i class="ms-Icon ms-Icon--PictureCenter"></i>
-                        <span>Center on Slide</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Status Message -->
-            <div id="alignStatusMessage" class="status-message">
-                <i class="ms-Icon"></i>
-                <span></span>
-            </div>
-
-            <!-- Keyboard Shortcuts -->
-            <div class="feedback-info" style="margin-top: 16px;">
-                <h3>⌨️ Keyboard Shortcuts</h3>
-                <p style="font-size: 11px; color: var(--neutral-dark); line-height: 1.8;">
-                    <strong>Align to first selected shape:</strong><br>
-                    <span class="shortcut-win"><code>Alt + ←↑↓→</code></span>
-                    <span class="shortcut-mac"><code>⌥ Option + ←↑↓→</code></span><br><br>
-                    <strong>Align to content placeholder:</strong><br>
-                    <span class="shortcut-win"><code>Alt + Shift + ←↑↓→</code></span>
-                    <span class="shortcut-mac"><code>⌥⇧ Option + Shift + ←↑↓→</code></span>
-                </p>
-            </div>
-
-            <!-- Help Info -->
-            <div class="feedback-info" style="margin-top: 12px;">
-                <h3>💡 Tips</h3>
-                <p style="font-size: 12px; color: var(--neutral-dark); line-height: 1.6;">
-                    • <strong>Align:</strong> Uses the first selected shape as reference<br>
-                    • <strong>Distribute:</strong> Requires 3+ shapes for even spacing<br>
-                    • <strong>Match Size:</strong> Uses the first selected shape's dimensions<br>
-                    • <strong>Swap:</strong> Works with exactly 2 shapes
-                </p>
-            </div>
-        </div>
-
-
-        <!-- ==================== FEEDBACK TAB ==================== -->
-        <div class="tab-content" id="tab-feedback">
-            <div class="feedback-section">
-                <h2>Send Feedback</h2>
-                <p>Help us improve this add-in! Share your thoughts, report bugs, or request features.</p>
-                
-                <textarea 
-                    id="feedbackText" 
-                    class="feedback-textarea" 
-                    placeholder="Your feedback..."
-                ></textarea>
-                
-                <div class="option-group" style="margin-bottom: 12px;">
-                    <label>Feedback Type</label>
-                    <select id="feedbackType">
-                        <option value="suggestion">💡 Suggestion</option>
-                        <option value="bug">🐛 Bug Report</option>
-                        <option value="feature">✨ Feature Request</option>
-                        <option value="other">💬 Other</option>
-                    </select>
-                </div>
-                
-                <button class="btn-submit-feedback" id="btnSubmitFeedback">
-                    <i class="ms-Icon ms-Icon--Send"></i>
-                    Send Feedback
-                </button>
-            </div>
-
-            <div class="feedback-info">
-                <h3>Contact</h3>
-                <p style="font-size: 13px; color: var(--neutral-dark);">
-                    📧 Email: <a href="/cdn-cgi/l/email-protection#4b2d2e2e2f292a28200b2e332a263b272e65282426"><span class="__cf_email__" data-cfemail="b3d5d6d6d7d1d2d0d8f3d6cbd2dec3dfd69dd0dcde">[email&#160;protected]</span></a><br>
-                    🐙 GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a>
-                </p>
-            </div>
-
-            <div class="feedback-section" style="margin-top: 16px;">
-                <h2>About</h2>
-                <p style="font-size: 13px; color: var(--neutral-dark);">
-                    <strong>AI Image Generator</strong> v2.0<br><br>
-                    Generate AI images and icons using OpenAI's gpt-image-1 and insert them directly into your PowerPoint slides.<br><br>
-                    Made with ❤️
-                </p>
-            </div>
-        </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        // ======================
-        // State Management
-        // ======================
-        const state = {
-            apiKey: '',
-            currentImageUrl: null,
-            currentImageBase64: null,
-            currentImageSize: '1024x1024',
-            insertMode: 'auto',
-            history: [],
-            isGenerating: false,
-            selectedShape: null,
-            activeTab: 'images',
-            // Icon tab state
-            iconStyleNumber: 1,
-            iconImageBase64: null
-        };
+    <div id="statusToast" class="status-toast"></div>
 
-        // ======================
-        // DOM Elements
-        // ======================
-        const elements = {
-            // Tabs
-            tabs: document.querySelectorAll('.tab'),
-            tabContents: document.querySelectorAll('.tab-content'),
-            
-            // Images tab
-            apiKeyInput: document.getElementById('apiKeyInput'),
-            apiKeyStatus: document.getElementById('apiKeyStatus'),
-            btnSaveKey: document.getElementById('btnSaveKey'),
-            promptInput: document.getElementById('promptInput'),
-            sizeSelect: document.getElementById('sizeSelect'),
-            qualitySelect: document.getElementById('qualitySelect'),
-            btnGenerate: document.getElementById('btnGenerate'),
-            statusMessage: document.getElementById('statusMessage'),
-            previewSection: document.getElementById('previewSection'),
-            previewLoading: document.getElementById('previewLoading'),
-            previewImage: document.getElementById('previewImage'),
-            btnRegenerate: document.getElementById('btnRegenerate'),
-            btnInsert: document.getElementById('btnInsert'),
-            historyGrid: document.getElementById('historyGrid'),
-            btnClearHistory: document.getElementById('btnClearHistory'),
-            insertOptions: document.querySelectorAll('.insert-option'),
-            shapeInfo: document.getElementById('shapeInfo'),
-            shapeInfoText: document.getElementById('shapeInfoText'),
-            
-            // Icons tab
-            iconSubjectInput: document.getElementById('iconSubjectInput'),
-            iconStyleGrid: document.querySelectorAll('#iconStyleGrid .icon-style-card'),
-            iconQualitySelect: document.getElementById('iconQualitySelect'),
-            btnGenerateIcon: document.getElementById('btnGenerateIcon'),
-            iconStatusMessage: document.getElementById('iconStatusMessage'),
-            iconPreviewSection: document.getElementById('iconPreviewSection'),
-            iconPreviewLoading: document.getElementById('iconPreviewLoading'),
-            iconPreviewImage: document.getElementById('iconPreviewImage'),
-            btnRegenerateIcon: document.getElementById('btnRegenerateIcon'),
-            btnInsertIcon: document.getElementById('btnInsertIcon'),
-            
-            // Align tab
-            alignSelectionInfo: document.getElementById('alignSelectionInfo'),
-            alignStatusMessage: document.getElementById('alignStatusMessage'),
-            btnAlignLeft: document.getElementById('btnAlignLeft'),
-            btnAlignCenter: document.getElementById('btnAlignCenter'),
-            btnAlignRight: document.getElementById('btnAlignRight'),
-            btnAlignTop: document.getElementById('btnAlignTop'),
-            btnAlignMiddle: document.getElementById('btnAlignMiddle'),
-            btnAlignBottom: document.getElementById('btnAlignBottom'),
-            btnDistributeH: document.getElementById('btnDistributeH'),
-            btnDistributeV: document.getElementById('btnDistributeV'),
-            btnMatchWidth: document.getElementById('btnMatchWidth'),
-            btnMatchHeight: document.getElementById('btnMatchHeight'),
-            btnMatchBoth: document.getElementById('btnMatchBoth'),
-            btnSwapPositions: document.getElementById('btnSwapPositions'),
-            btnCenterOnSlide: document.getElementById('btnCenterOnSlide'),
-            
-            // Feedback tab
-            feedbackText: document.getElementById('feedbackText'),
-            feedbackType: document.getElementById('feedbackType'),
-            btnSubmitFeedback: document.getElementById('btnSubmitFeedback')
-        };
+    <script>
+        // --- State Management ---
+        let isBusy = false; // Lock to prevent overlapping operations
+        let debounceTimer;
 
-        // ======================
-        // Office.js Initialization
-        // ======================
+        // --- Initialization ---
         Office.onReady((info) => {
-            console.log('Office ready:', info.host);
-            initializeApp();
-        });
+            console.log('Office Ready:', info);
 
-        // Also initialize after DOM is ready (fallback)
-        document.addEventListener('DOMContentLoaded', () => {
-            // Give Office.js a moment, then init anyway
-            setTimeout(() => {
-                if (!state.apiKey && !elements.btnSaveKey._listenerAdded) {
-                    console.log('Fallback initialization');
-                    initializeApp();
-                }
-            }, 1000);
-        });
-
-        function initializeApp() {
-            // Prevent double initialization
-            if (elements.btnSaveKey._listenerAdded) return;
-            elements.btnSaveKey._listenerAdded = true;
-            
-            // Detect Mac for keyboard shortcuts display
-            if (navigator.platform.toUpperCase().indexOf('MAC') >= 0 || 
-                navigator.userAgent.toUpperCase().indexOf('MAC') >= 0) {
+            // Mac Detection
+            if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
                 document.body.classList.add('is-mac');
             }
+
+            // Tabs Logic
+            document.querySelectorAll('.tab').forEach(t => {
+                t.onclick = () => {
+                    document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
+                    t.classList.add('active');
+                    document.getElementById(`tab-${t.dataset.tab}`).classList.add('active');
+                    // Check selection immediately when switching to Align
+                    if(t.dataset.tab === 'align') checkSelection();
+                };
+            });
+
+            // Shortcuts Listener
+            document.body.addEventListener('keydown', handleShortcuts);
+
+            // Optimized Selection Handler
+            if (Office.context.document) {
+                Office.context.document.addHandlerAsync(
+                    Office.EventType.DocumentSelectionChanged,
+                    onSelectionChanged
+                );
+            }
             
-            // Clear oversized data from localStorage
-            try {
-                const historySize = (localStorage.getItem('image_history') || '').length;
-                if (historySize > 50000) { // If history > 50KB, clear it
-                    localStorage.removeItem('image_history');
-                    console.log('Cleared oversized history');
-                }
-            } catch (e) {
-                try { localStorage.clear(); } catch(e2) {}
-            }
+            checkSelection(); // Initial check
+        });
 
-            // Load saved API key
-            try {
-                const savedKey = localStorage.getItem('openai_api_key');
-                if (savedKey) {
-                    state.apiKey = savedKey;
-                    elements.apiKeyInput.value = '••••••••••••••••';
-                    updateApiKeyStatus(true);
-                }
-            } catch (e) {
-                console.warn('Could not load API key from storage');
-            }
-
-            // Load history
-            try {
-                const savedHistory = localStorage.getItem('image_history');
-                if (savedHistory) {
-                    state.history = JSON.parse(savedHistory);
-                    renderHistory();
-                }
-            } catch (e) {
-                state.history = [];
-            }
-
-            setupEventListeners();
-            updateGenerateButtons();
+        // --- Performance Optimized Selection Check ---
+        function onSelectionChanged() {
+            // Debounce: Wait 500ms after last event before hitting PowerPoint
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(checkSelection, 500);
         }
 
-        function setupEventListeners() {
-            // Tab switching
-            elements.tabs.forEach(tab => {
-                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-            });
-
-            // API Key
-            elements.btnSaveKey.addEventListener('click', saveApiKey);
-            elements.apiKeyInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') saveApiKey();
-            });
-
-            // Images tab
-            elements.btnGenerate.addEventListener('click', () => generateImage('images'));
-            elements.promptInput.addEventListener('input', updateGenerateButtons);
-            elements.btnRegenerate.addEventListener('click', () => generateImage('images'));
-            elements.btnInsert.addEventListener('click', () => insertImage('images'));
-            elements.insertOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    elements.insertOptions.forEach(o => o.classList.remove('selected'));
-                    option.classList.add('selected');
-                    state.insertMode = option.dataset.mode;
-                });
-            });
-            elements.btnClearHistory.addEventListener('click', clearHistory);
-
-            // Icons tab
-            elements.btnGenerateIcon.addEventListener('click', () => generateImage('icons'));
-            elements.iconSubjectInput.addEventListener('input', updateGenerateButtons);
-            elements.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
-            elements.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
-            elements.iconStyleGrid.forEach(card => {
-                card.addEventListener('click', () => {
-                    const styleNum = parseInt(card.dataset.style);
-                    // Only allow Style 1 and 2 for now
-                    if (styleNum > 2) {
-                        alert('This style is coming soon! Please use Style 1 or 2 for now.');
-                        return;
-                    }
-                    elements.iconStyleGrid.forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    state.iconStyleNumber = styleNum;
-                });
-            });
-
-            // Align tab
-            elements.btnAlignLeft.addEventListener('click', () => alignShapes('left'));
-            elements.btnAlignCenter.addEventListener('click', () => alignShapes('center'));
-            elements.btnAlignRight.addEventListener('click', () => alignShapes('right'));
-            elements.btnAlignTop.addEventListener('click', () => alignShapes('top'));
-            elements.btnAlignMiddle.addEventListener('click', () => alignShapes('middle'));
-            elements.btnAlignBottom.addEventListener('click', () => alignShapes('bottom'));
-            elements.btnDistributeH.addEventListener('click', () => distributeShapes('horizontal'));
-            elements.btnDistributeV.addEventListener('click', () => distributeShapes('vertical'));
-            elements.btnMatchWidth.addEventListener('click', () => matchSize('width'));
-            elements.btnMatchHeight.addEventListener('click', () => matchSize('height'));
-            elements.btnMatchBoth.addEventListener('click', () => matchSize('both'));
-            elements.btnSwapPositions.addEventListener('click', swapPositions);
-            elements.btnCenterOnSlide.addEventListener('click', centerOnSlide);
-
-            // Feedback tab
-            elements.btnSubmitFeedback.addEventListener('click', submitFeedback);
-
-            // Shape detection
-            detectSelectedShape();
-            setInterval(detectSelectedShape, 1000);
+        async function checkSelection() {
+            if (isBusy) return;
+            const statusEl = document.getElementById('selectionStatus');
             
-            // Keyboard shortcuts for alignment
-            document.addEventListener('keydown', handleAlignmentShortcuts);
-            
-            // Try to get content placeholder bounds from current slide
-            updateContentPlaceholderBounds();
-        }
-
-        // ======================
-        // Tab Switching
-        // ======================
-        function switchTab(tabName) {
-            state.activeTab = tabName;
-            
-            elements.tabs.forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-            
-            elements.tabContents.forEach(content => {
-                content.classList.toggle('active', content.id === `tab-${tabName}`);
-            });
-        }
-
-        // ======================
-        // API Key Management
-        // ======================
-        function saveApiKey() {
-            const key = elements.apiKeyInput.value.trim();
-            if (key && key !== '••••••••••••••••') {
-                // Always set in memory first - this makes the add-in work
-                state.apiKey = key;
-                elements.apiKeyInput.value = '••••••••••••••••';
-                updateApiKeyStatus(true);
-                
-                // Try to persist to localStorage (optional, may fail)
-                try {
-                    // Clear everything first to make room
-                    localStorage.removeItem('image_history');
-                    state.history = [];
-                    renderHistory();
-                    localStorage.setItem('openai_api_key', key);
-                    showStatus('API key saved!', 'success', 'images');
-                } catch (e) {
-                    console.warn('Could not persist API key to localStorage:', e);
-                    // Still works for this session
-                    showStatus('API key set for this session', 'info', 'images');
-                }
-            }
-            updateGenerateButtons();
-        }
-
-        function updateApiKeyStatus(isSet) {
-            if (isSet) {
-                elements.apiKeyStatus.textContent = 'Connected';
-                elements.apiKeyStatus.className = 'api-key-status connected';
-            } else {
-                elements.apiKeyStatus.textContent = 'Not Set';
-                elements.apiKeyStatus.className = 'api-key-status disconnected';
-            }
-        }
-
-        // ======================
-        // Shape Detection
-        // ======================
-        async function detectSelectedShape() {
             try {
                 await PowerPoint.run(async (context) => {
                     const shapes = context.presentation.getSelectedShapes();
                     shapes.load('items');
                     await context.sync();
 
-                    if (shapes.items.length > 0) {
-                        const shape = shapes.items[0];
-                        shape.load(['width', 'height', 'name', 'type']);
-                        await context.sync();
-
-                        state.selectedShape = {
-                            width: shape.width,
-                            height: shape.height,
-                            aspectRatio: shape.width / shape.height,
-                            name: shape.name
-                        };
-
-                        const dalleSize = getBestDalleSize(state.selectedShape.aspectRatio);
-                        elements.shapeInfo.classList.add('detected');
-                        elements.shapeInfoText.textContent = `${shape.name} (${Math.round(shape.width)}×${Math.round(shape.height)}pt) → ${dalleSize}`;
+                    const count = shapes.items.length;
+                    if (count === 0) {
+                        statusEl.innerText = "No shapes selected.";
+                        statusEl.style.color = "var(--neutral-dark)";
+                    } else if (count === 1) {
+                        statusEl.innerText = "1 shape selected.";
+                        statusEl.style.color = "var(--primary)";
                     } else {
-                        state.selectedShape = null;
-                        elements.shapeInfo.classList.remove('detected');
-                        elements.shapeInfoText.textContent = 'No shape selected - will use size setting';
+                        statusEl.innerText = `${count} shapes selected.`;
+                        statusEl.style.color = "var(--primary)";
                     }
                 });
-            } catch (error) {
-                state.selectedShape = null;
+            } catch (e) {
+                console.warn("Selection check failed (likely context invalid):", e);
+                // Don't show error to user, just fail silently
             }
         }
 
-        function getBestDalleSize(aspectRatio) {
-            if (aspectRatio > 1.35) return '1792x1024';
-            if (aspectRatio < 0.75) return '1024x1792';
-            return '1024x1024';
-        }
-
-        function getGenerationSize() {
-            const selectedSize = elements.sizeSelect.value;
-            if (selectedSize === 'auto') {
-                return state.selectedShape ? getBestDalleSize(state.selectedShape.aspectRatio) : '1024x1024';
+        // --- Robust Action Runner (Fixes "Stops Working") ---
+        // This wrapper ensures we never get stuck in a busy state
+        async function runAction(actionFunction) {
+            if (isBusy) {
+                showToast("Working...", "normal");
+                return;
             }
-            return selectedSize;
-        }
-
-        // ======================
-        // Image Generation
-        // ======================
-        async function generateImage(tab) {
-            let prompt, quality, statusEl, previewSection, previewLoading, previewImage;
             
-            if (tab === 'images') {
-                prompt = elements.promptInput.value.trim();
-                quality = elements.qualitySelect.value;
-                statusEl = elements.statusMessage;
-                previewSection = elements.previewSection;
-                previewLoading = elements.previewLoading;
-                previewImage = elements.previewImage;
-            } else if (tab === 'icons') {
-                const subject = elements.iconSubjectInput.value.trim();
-                const styleNum = state.iconStyleNumber;
-                
-                // Build prompt based on style
-                if (styleNum === 1) {
-                    // Style 1: Banana style - use JSON prompt
-                    const jsonPrompt = {
-                        "object": subject,
-                        "task_type": "generation",
-                        "priority": {
-                            "primary": "create a banana-themed rendition of the object",
-                            "secondary": "merge banana characteristics with the object's functional design"
-                        },
-                        "parameters": {
-                            "banana_integration": {
-                                "style": "organic and seamless",
-                                "features": ["curved banana form", "peel textures", "yellow coloration", "subtle spotting"]
-                            },
-                            "object_design": {
-                                "reference_object_key": "object",
-                                "maintain_functionality": true
-                            }
-                        },
-                        "subject": {
-                            "main": "banana-inspired version of the object",
-                            "attributes": {
-                                "physical": "smooth yellow banana texture shaped to match the object's silhouette",
-                                "pose": "studio product angle",
-                                "expression": "none"
-                            }
-                        },
-                        "environment": {
-                            "setting": "clean product studio backdrop",
-                            "lighting": {
-                                "type": "soft",
-                                "direction": "front",
-                                "quality": "diffused"
-                            }
-                        },
-                        "style": {
-                            "artistic": "photorealistic",
-                            "camera": {
-                                "angle": "eye_level",
-                                "lens": "normal",
-                                "aperture": "shallow_depth_of_field"
-                            },
-                            "mood": "modern and playful",
-                            "color_palette": "banana yellow with natural peel browns"
-                        },
-                        "technical": {
-                            "resolution": "high",
-                            "aspect_ratio": "1:1",
-                            "quality": "maximum"
-                        },
-                        "constraints": {
-                            "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
-                            "ensure": ["clear banana identity", "clear object identity"]
-                        },
-                        "output_specs": {
-                            "include_synthid": true,
-                            "file_type": "high_resolution_image",
-                            "transparent_background": true
-                        }
-                    };
-                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
-                } else if (styleNum === 2) {
-                    // Style 2: Origami style - midnight blue paper
-                    const jsonPrompt = {
-                        "object": subject,
-                        "task_type": "generation",
-                        "priority": {
-                            "primary": "create an origami-style rendition of the object",
-                            "secondary": "merge origami characteristics with the object's functional design"
-                        },
-                        "parameters": {
-                            "origami_integration": {
-                                "style": "organic and seamless",
-                                "features": ["precise fold geometry", "paper creases", "midnight blue paper grain", "clean edges"]
-                            },
-                            "object_design": {
-                                "reference_object_key": "object",
-                                "maintain_functionality": true
-                            }
-                        },
-                        "subject": {
-                            "main": "origami-inspired version of the object",
-                            "attributes": {
-                                "physical": "folded midnight blue paper with visible creases, slight paper grain, shaped to match the object's silhouette",
-                                "pose": "studio product angle",
-                                "expression": "none"
-                            }
-                        },
-                        "environment": {
-                            "setting": "clean product studio backdrop",
-                            "lighting": {
-                                "type": "soft",
-                                "direction": "front",
-                                "quality": "diffused"
-                            }
-                        },
-                        "style": {
-                            "artistic": "photorealistic",
-                            "camera": {
-                                "angle": "eye_level",
-                                "lens": "normal",
-                                "aperture": "shallow_depth_of_field"
-                            },
-                            "mood": "modern and playful",
-                            "color_palette": "midnight blue with natural fold shadows and subtle highlights"
-                        },
-                        "technical": {
-                            "resolution": "high",
-                            "aspect_ratio": "1:1",
-                            "quality": "maximum"
-                        },
-                        "constraints": {
-                            "avoid": ["cartoon exaggeration", "melting form", "unrecognizable silhouette"],
-                            "ensure": ["clear origami identity", "clear object identity"]
-                        },
-                        "output_specs": {
-                            "include_synthid": true,
-                            "file_type": "high_resolution_image",
-                            "transparent_background": true
-                        }
-                    };
-                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
-                } else {
-                    // Placeholder for other styles
-                    prompt = `Icon of ${subject}, clean simple design, centered, high quality`;
-                }
-                
-                quality = elements.iconQualitySelect.value;
-                statusEl = elements.iconStatusMessage;
-                previewSection = elements.iconPreviewSection;
-                previewLoading = elements.iconPreviewLoading;
-                previewImage = elements.iconPreviewImage;
-            }
-
-            // Get API key from state or global fallback
-            const apiKey = state.apiKey || window._openaiApiKey;
-            if (!prompt || !apiKey || state.isGenerating) return;
-
-            state.isGenerating = true;
-            updateGenerateButtons();
+            isBusy = true;
+            document.body.style.cursor = "wait"; // Visual feedback
             
-            previewSection.classList.add('visible');
-            previewLoading.style.display = 'flex';
-            previewImage.style.display = 'none';
-            
-            const size = tab === 'images' ? getGenerationSize() : '1024x1024';
-            showStatus(`Generating ${size} image...`, 'info', tab);
-
             try {
-                const response = await fetch('https://api.openai.com/v1/images/generations', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-image-1',
-                        prompt: prompt,
-                        n: 1,
-                        size: size,
-                        quality: quality
-                    })
+                await PowerPoint.run(async (context) => {
+                    await actionFunction(context);
                 });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'Failed to generate image');
-                }
-
-                const data = await response.json();
-                const base64Data = data.data[0].b64_json;
-                const imageUrl = `data:image/png;base64,${base64Data}`;
-
-                // Store in appropriate state
-                if (tab === 'images') {
-                    state.currentImageUrl = imageUrl;
-                    state.currentImageBase64 = base64Data;
-                    state.currentImageSize = size;
-                    addToHistory(imageUrl, elements.promptInput.value.trim(), size);
-                } else if (tab === 'icons') {
-                    state.iconImageBase64 = base64Data;
-                }
-
-                previewImage.src = imageUrl;
-                previewImage.style.display = 'block';
-                previewLoading.style.display = 'none';
-
-                showStatus('Image generated successfully!', 'success', tab);
             } catch (error) {
-                console.error('Generation error:', error);
-                showStatus(error.message || 'Failed to generate image', 'error', tab);
-                previewLoading.style.display = 'none';
+                console.error(error);
+                showToast("Error: " + error.message, "error");
             } finally {
-                state.isGenerating = false;
-                updateGenerateButtons();
+                isBusy = false;
+                document.body.style.cursor = "default";
             }
         }
 
-        // ======================
-        // Insert Image
-        // ======================
-        async function insertImage(tab) {
-            let base64Data;
-            
-            if (tab === 'images') {
-                base64Data = state.currentImageBase64;
-            } else if (tab === 'icons') {
-                base64Data = state.iconImageBase64;
-            }
+        // --- Alignment Logic ---
 
-            if (!base64Data) {
-                showStatus('No image to insert', 'error', tab);
-                return;
-            }
+        function runAlign(direction) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top', 'width', 'height']);
+                await context.sync();
 
-            showStatus('Inserting image...', 'info', tab);
+                if (shapes.items.length < 2) {
+                    showToast("Select 2+ shapes", "error");
+                    return;
+                }
 
-            // For icons, always insert at fixed size
-            const imgWidth = tab === 'images' && state.selectedShape ? state.selectedShape.width : 300;
-            const imgHeight = tab === 'images' && state.selectedShape ? state.selectedShape.height : 300;
+                const ref = shapes.items[0]; // Align to first selected
+                const refLeft = ref.left;
+                const refTop = ref.top;
+                const refWidth = ref.width;
+                const refHeight = ref.height;
+                const refCenter = refLeft + (refWidth / 2);
+                const refMiddle = refTop + (refHeight / 2);
 
-            Office.context.document.setSelectedDataAsync(
-                base64Data,
-                {
-                    coercionType: Office.CoercionType.Image,
-                    imageWidth: imgWidth,
-                    imageHeight: imgHeight
-                },
-                function(result) {
-                    if (result.status === Office.AsyncResultStatus.Succeeded) {
-                        showStatus('Image inserted!', 'success', tab);
-                    } else {
-                        showStatus('Failed to insert: ' + result.error.message, 'error', tab);
+                for (let i = 1; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    switch (direction) {
+                        case 'left': s.left = refLeft; break;
+                        case 'right': s.left = refLeft + refWidth - s.width; break;
+                        case 'center': s.left = refCenter - (s.width / 2); break;
+                        case 'top': s.top = refTop; break;
+                        case 'bottom': s.top = refTop + refHeight - s.height; break;
+                        case 'middle': s.top = refMiddle - (s.height / 2); break;
                     }
                 }
-            );
+                await context.sync();
+                showToast(`Aligned ${direction}`, "success");
+            });
         }
 
-        // ======================
-        // History Management (completely optional, errors won't break anything)
-        // ======================
-        function addToHistory(imageUrl, prompt, size = '1024x1024') {
-            try {
-                // Create a small thumbnail to save storage space
-                createThumbnail(imageUrl, 80, (thumbnailUrl) => {
-                    state.history.unshift({ 
-                        url: thumbnailUrl,
-                        fullUrl: imageUrl,
-                        prompt: prompt, 
-                        size: size, 
-                        timestamp: Date.now() 
+        function runDistribute(axis) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top', 'width', 'height']);
+                await context.sync();
+
+                if (shapes.items.length < 3) {
+                    showToast("Select 3+ shapes", "error");
+                    return;
+                }
+
+                // Convert to array for sorting
+                let items = [];
+                for(let i=0; i<shapes.items.length; i++) {
+                    items.push({ 
+                        obj: shapes.items[i], 
+                        left: shapes.items[i].left, 
+                        top: shapes.items[i].top,
+                        width: shapes.items[i].width,
+                        height: shapes.items[i].height
                     });
-                    
-                    // Keep only 4 items
-                    if (state.history.length > 4) {
-                        state.history = state.history.slice(0, 4);
-                    }
-                    
-                    // Try to save (silently fail if quota exceeded)
-                    try {
-                        const historyToSave = state.history.map(item => ({
-                            url: item.url,
-                            prompt: item.prompt,
-                            size: item.size
-                        }));
-                        localStorage.setItem('image_history', JSON.stringify(historyToSave));
-                    } catch (e) {
-                        // Silently ignore storage errors
-                    }
-                    renderHistory();
-                });
-            } catch (e) {
-                // Silently ignore any errors in history
-            }
-        }
+                }
 
-        // Create a small thumbnail from a base64 image
-        function createThumbnail(dataUrl, maxSize, callback) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Calculate thumbnail size
-                let width = img.width;
-                let height = img.height;
-                if (width > height) {
-                    if (width > maxSize) {
-                        height = height * (maxSize / width);
-                        width = maxSize;
+                if (axis === 'horizontal') {
+                    items.sort((a, b) => a.left - b.left);
+                    const start = items[0].left + items[0].width;
+                    const end = items[items.length - 1].left;
+                    const totalSpace = end - start;
+                    const middleItemsWidth = items.slice(1, -1).reduce((acc, curr) => acc + curr.width, 0);
+                    const gap = (totalSpace - middleItemsWidth) / (items.length - 1);
+                    
+                    let currentPos = items[0].left + items[0].width + gap;
+                    for (let i = 1; i < items.length - 1; i++) {
+                        items[i].obj.left = currentPos;
+                        currentPos += items[i].width + gap;
                     }
                 } else {
-                    if (height > maxSize) {
-                        width = width * (maxSize / height);
-                        height = maxSize;
+                    items.sort((a, b) => a.top - b.top);
+                    const start = items[0].top + items[0].height;
+                    const end = items[items.length - 1].top;
+                    const totalSpace = end - start;
+                    const middleItemsHeight = items.slice(1, -1).reduce((acc, curr) => acc + curr.height, 0);
+                    const gap = (totalSpace - middleItemsHeight) / (items.length - 1);
+                    
+                    let currentPos = items[0].top + items[0].height + gap;
+                    for (let i = 1; i < items.length - 1; i++) {
+                        items[i].obj.top = currentPos;
+                        currentPos += items[i].height + gap;
                     }
                 }
-                
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // Use JPEG for smaller file size
-                callback(canvas.toDataURL('image/jpeg', 0.6));
-            };
-            img.onerror = function() {
-                callback(dataUrl); // Fallback to original
-            };
-            img.src = dataUrl;
-        }
 
-        function renderHistory() {
-            if (state.history.length === 0) {
-                elements.historyGrid.innerHTML = '<div class="history-empty">No images generated yet</div>';
-                return;
-            }
-            elements.historyGrid.innerHTML = state.history.map((item, index) => `
-                <div class="history-item" data-index="${index}" title="${item.prompt}">
-                    <img src="${item.url}" alt="Generated image">
-                </div>
-            `).join('');
-            document.querySelectorAll('.history-item').forEach(item => {
-                item.addEventListener('click', () => loadFromHistory(parseInt(item.dataset.index)));
+                await context.sync();
+                showToast("Distributed", "success");
             });
         }
 
-        function loadFromHistory(index) {
-            const item = state.history[index];
-            if (item) {
-                // If we have the full URL in memory, use it; otherwise use the thumbnail
-                const imageUrl = item.fullUrl || item.url;
-                state.currentImageUrl = imageUrl;
-                state.currentImageBase64 = imageUrl.split(',')[1];
-                state.currentImageSize = item.size || '1024x1024';
-                elements.previewImage.src = imageUrl;
-                elements.previewImage.style.display = 'block';
-                elements.previewLoading.style.display = 'none';
-                elements.previewSection.classList.add('visible');
-                elements.promptInput.value = item.prompt;
-                showStatus('Image loaded from history', 'info', 'images');
-            }
-        }
+        function runMatchSize(dimension) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'width', 'height']);
+                await context.sync();
 
-        function clearHistory() {
-            state.history = [];
-            localStorage.removeItem('image_history');
-            renderHistory();
-            showStatus('History cleared', 'info', 'images');
-        }
-
-
-        // ======================
-        // Alignment Functions (Queue-based for reliability)
-        // ======================
-        
-        // Constants for slide dimensions
-        const PLACEHOLDER_BOUNDS = { left: 50, top: 100, right: 910, bottom: 490 };
-        const SLIDE_WIDTH = 960;
-        const SLIDE_HEIGHT = 540;
-        
-        // Operation queue to prevent concurrent PowerPoint.run calls
-        let operationQueue = Promise.resolve();
-        let lastOperationTime = 0;
-        const MIN_OPERATION_DELAY = 100; // ms between operations
-        
-        function showAlignStatus(message, type) {
-            try {
-                const statusEl = elements.alignStatusMessage;
-                if (!statusEl) return;
-                const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
-                statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-                statusEl.className = `status-message visible ${type}`;
-                
-                if (type === 'success' || type === 'info') {
-                    setTimeout(() => statusEl.classList.remove('visible'), 3000);
+                if (shapes.items.length < 2) {
+                    showToast("Select 2+ shapes", "error");
+                    return;
                 }
-            } catch (e) {
-                console.log('Status display error:', e);
-            }
-        }
 
-        // Queue an operation to run after previous ones complete
-        function queueOperation(operation) {
-            operationQueue = operationQueue
-                .then(() => {
-                    // Ensure minimum delay between operations
-                    const now = Date.now();
-                    const timeSinceLast = now - lastOperationTime;
-                    if (timeSinceLast < MIN_OPERATION_DELAY) {
-                        return new Promise(resolve => 
-                            setTimeout(resolve, MIN_OPERATION_DELAY - timeSinceLast)
-                        );
-                    }
-                })
-                .then(() => {
-                    lastOperationTime = Date.now();
-                    return operation();
-                })
-                .catch(err => {
-                    console.error('Operation error:', err);
-                    showAlignStatus('Operation failed - try again', 'error');
-                });
-        }
+                const targetW = shapes.items[0].width;
+                const targetH = shapes.items[0].height;
 
-        // Keyboard shortcut handler
-        let lastShortcutTime = 0;
-        function handleAlignmentShortcuts(e) {
-            // Check for Alt key (Option on Mac)
-            if (!e.altKey) return;
-            
-            const arrowKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-            if (!arrowKeys.includes(e.key)) return;
-            
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Debounce - ignore if less than 300ms since last shortcut
-            const now = Date.now();
-            if (now - lastShortcutTime < 300) return;
-            lastShortcutTime = now;
-            
-            const directionMap = {
-                'ArrowLeft': 'left',
-                'ArrowRight': 'right',
-                'ArrowUp': 'top',
-                'ArrowDown': 'bottom'
-            };
-            
-            const direction = directionMap[e.key];
-            if (e.shiftKey) {
-                alignToPlaceholder(direction);
-            } else {
-                alignShapes(direction);
-            }
-        }
-
-        // No-op placeholder function
-        function updateContentPlaceholderBounds() {
-            // Using static defaults
-        }
-
-        // Core function to get shapes and their properties
-        async function getShapesWithProperties(context, properties) {
-            const selection = context.presentation.getSelectedShapes();
-            selection.load('items');
-            await context.sync();
-            
-            if (!selection.items || selection.items.length === 0) {
-                return null;
-            }
-            
-            // Load requested properties
-            const items = selection.items;
-            for (let i = 0; i < items.length; i++) {
-                items[i].load(properties);
-            }
-            await context.sync();
-            
-            return items;
-        }
-
-        // Align shapes to content placeholder edge
-        function alignToPlaceholder(edge) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    
-                    if (!items) {
-                        showAlignStatus('Select at least 1 shape', 'error');
-                        return;
-                    }
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        const shape = items[i];
-                        const width = shape.width;
-                        const height = shape.height;
-                        
-                        switch (edge) {
-                            case 'left': shape.left = PLACEHOLDER_BOUNDS.left; break;
-                            case 'right': shape.left = PLACEHOLDER_BOUNDS.right - width; break;
-                            case 'top': shape.top = PLACEHOLDER_BOUNDS.top; break;
-                            case 'bottom': shape.top = PLACEHOLDER_BOUNDS.bottom - height; break;
-                        }
-                    }
-                    
-                    await context.sync();
-                    showAlignStatus(`Aligned to ${edge}`, 'success');
-                });
+                for (let i = 1; i < shapes.items.length; i++) {
+                    if (dimension === 'width') shapes.items[i].width = targetW;
+                    if (dimension === 'height') shapes.items[i].height = targetH;
+                }
+                await context.sync();
+                showToast("Size Matched", "success");
             });
         }
 
-        function alignShapes(direction) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    
-                    if (!items || items.length < 2) {
-                        showAlignStatus('Select at least 2 shapes', 'error');
-                        return;
-                    }
-                    
-                    // Get reference values from first shape
-                    const refLeft = items[0].left;
-                    const refTop = items[0].top;
-                    const refWidth = items[0].width;
-                    const refHeight = items[0].height;
-                    
-                    for (let i = 1; i < items.length; i++) {
-                        const shape = items[i];
-                        const shapeWidth = shape.width;
-                        const shapeHeight = shape.height;
-                        
-                        switch (direction) {
-                            case 'left': shape.left = refLeft; break;
-                            case 'center': shape.left = refLeft + (refWidth - shapeWidth) / 2; break;
-                            case 'right': shape.left = refLeft + refWidth - shapeWidth; break;
-                            case 'top': shape.top = refTop; break;
-                            case 'middle': shape.top = refTop + (refHeight - shapeHeight) / 2; break;
-                            case 'bottom': shape.top = refTop + refHeight - shapeHeight; break;
-                        }
-                    }
-                    
-                    await context.sync();
-                    showAlignStatus(`Aligned ${items.length} shapes`, 'success');
-                });
+        function runSwap() {
+             runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top']);
+                await context.sync();
+
+                if (shapes.items.length !== 2) {
+                    showToast("Select exactly 2 shapes", "error");
+                    return;
+                }
+
+                const s1 = shapes.items[0];
+                const s2 = shapes.items[1];
+                
+                const s1Left = s1.left;
+                const s1Top = s1.top;
+
+                s1.left = s2.left;
+                s1.top = s2.top;
+                s2.left = s1Left;
+                s2.top = s1Top;
+
+                await context.sync();
+                showToast("Swapped", "success");
             });
         }
 
-        function distributeShapes(direction) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    
-                    if (!items || items.length < 3) {
-                        showAlignStatus('Select at least 3 shapes', 'error');
-                        return;
-                    }
-                    
-                    // Copy values to local array
-                    const shapes = [];
-                    for (let i = 0; i < items.length; i++) {
-                        shapes.push({
-                            item: items[i],
-                            left: items[i].left,
-                            top: items[i].top,
-                            width: items[i].width,
-                            height: items[i].height
-                        });
-                    }
-                    
-                    const count = shapes.length;
-                    
-                    if (direction === 'horizontal') {
-                        shapes.sort((a, b) => a.left - b.left);
-                        const first = shapes[0];
-                        const last = shapes[count - 1];
-                        const totalSpan = (last.left + last.width) - first.left;
-                        const totalShapeWidth = shapes.reduce((sum, s) => sum + s.width, 0);
-                        const gap = (totalSpan - totalShapeWidth) / (count - 1);
-                        
-                        let pos = first.left + first.width + gap;
-                        for (let i = 1; i < count - 1; i++) {
-                            shapes[i].item.left = pos;
-                            pos += shapes[i].width + gap;
-                        }
-                    } else {
-                        shapes.sort((a, b) => a.top - b.top);
-                        const first = shapes[0];
-                        const last = shapes[count - 1];
-                        const totalSpan = (last.top + last.height) - first.top;
-                        const totalShapeHeight = shapes.reduce((sum, s) => sum + s.height, 0);
-                        const gap = (totalSpan - totalShapeHeight) / (count - 1);
-                        
-                        let pos = first.top + first.height + gap;
-                        for (let i = 1; i < count - 1; i++) {
-                            shapes[i].item.top = pos;
-                            pos += shapes[i].height + gap;
-                        }
-                    }
-                    
-                    await context.sync();
-                    showAlignStatus(`Distributed ${count} shapes`, 'success');
-                });
-            });
-        }
+        // --- Keyboard Shortcuts ---
+        function handleShortcuts(e) {
+            // Requirement: Use Alt for Win, Ctrl for Mac (to avoid text cursor conflicts)
+            const isMac = document.body.classList.contains('is-mac');
+            const modifier = isMac ? e.ctrlKey : e.altKey;
 
-        function matchSize(dimension) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['width', 'height']);
-                    
-                    if (!items || items.length < 2) {
-                        showAlignStatus('Select at least 2 shapes', 'error');
-                        return;
-                    }
-                    
-                    const refWidth = items[0].width;
-                    const refHeight = items[0].height;
-                    
-                    for (let i = 1; i < items.length; i++) {
-                        if (dimension === 'width' || dimension === 'both') {
-                            items[i].width = refWidth;
-                        }
-                        if (dimension === 'height' || dimension === 'both') {
-                            items[i].height = refHeight;
-                        }
-                    }
-                    
-                    await context.sync();
-                    showAlignStatus(`Matched ${dimension}`, 'success');
-                });
-            });
-        }
+            if (!modifier) return;
 
-        function swapPositions() {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top']);
-                    
-                    if (!items || items.length !== 2) {
-                        showAlignStatus('Select exactly 2 shapes', 'error');
-                        return;
-                    }
-                    
-                    // Store positions
-                    const pos1 = { left: items[0].left, top: items[0].top };
-                    const pos2 = { left: items[1].left, top: items[1].top };
-                    
-                    // Swap
-                    items[0].left = pos2.left;
-                    items[0].top = pos2.top;
-                    items[1].left = pos1.left;
-                    items[1].top = pos1.top;
-                    
-                    await context.sync();
-                    showAlignStatus('Swapped positions', 'success');
-                });
-            });
-        }
-
-        function centerOnSlide() {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    
-                    if (!items) {
-                        showAlignStatus('Select at least 1 shape', 'error');
-                        return;
-                    }
-                    
-                    // Calculate bounding box
-                    let minLeft = Infinity, minTop = Infinity;
-                    let maxRight = -Infinity, maxBottom = -Infinity;
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        const s = items[i];
-                        minLeft = Math.min(minLeft, s.left);
-                        minTop = Math.min(minTop, s.top);
-                        maxRight = Math.max(maxRight, s.left + s.width);
-                        maxBottom = Math.max(maxBottom, s.top + s.height);
-                    }
-                    
-                    const offsetX = (SLIDE_WIDTH - (maxRight - minLeft)) / 2 - minLeft;
-                    const offsetY = (SLIDE_HEIGHT - (maxBottom - minTop)) / 2 - minTop;
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        items[i].left = items[i].left + offsetX;
-                        items[i].top = items[i].top + offsetY;
-                    }
-                    
-                    await context.sync();
-                    showAlignStatus(`Centered ${items.length} shape(s)`, 'success');
-                });
-            });
-        }
-
-
-        // ======================
-        // Feedback
-        // ======================
-        function submitFeedback() {
-            const feedback = elements.feedbackText.value.trim();
-            const type = elements.feedbackType.value;
-            
-            if (!feedback) {
-                alert('Please enter your feedback before submitting.');
-                return;
-            }
-            
-            // For now, just show confirmation. You could integrate with a backend or email service.
-            console.log('Feedback submitted:', { type, feedback });
-            alert('Thank you for your feedback! 🎉');
-            elements.feedbackText.value = '';
-        }
-
-        // ======================
-        // UI Helpers
-        // ======================
-        function updateGenerateButtons() {
-            const hasApiKey = (state.apiKey && state.apiKey.length > 0) || (window._openaiApiKey && window._openaiApiKey.length > 0);
-            
-            elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
-            elements.btnGenerateIcon.disabled = !elements.iconSubjectInput.value.trim() || !hasApiKey || state.isGenerating;
-            
-            const btnText = state.isGenerating ? '<div class="spinner"></div><span>Generating...</span>' : '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate</span>';
-            if (state.isGenerating) {
-                elements.btnGenerate.innerHTML = btnText;
-                elements.btnGenerateIcon.innerHTML = btnText;
-            } else {
-                elements.btnGenerate.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Image</span>';
-                elements.btnGenerateIcon.innerHTML = '<i class="ms-Icon ms-Icon--Rocket"></i><span>Generate Icon</span>';
+            // Map keys
+            switch(e.key) {
+                case 'ArrowLeft': 
+                    e.preventDefault(); 
+                    runAlign('left'); 
+                    break;
+                case 'ArrowRight': 
+                    e.preventDefault(); 
+                    runAlign('right'); 
+                    break;
+                case 'ArrowUp': 
+                    e.preventDefault(); 
+                    runAlign('top'); 
+                    break;
+                case 'ArrowDown': 
+                    e.preventDefault(); 
+                    runAlign('bottom'); 
+                    break;
             }
         }
 
-        function showStatus(message, type, tab) {
-            let statusEl;
-            if (tab === 'images') statusEl = elements.statusMessage;
-            else if (tab === 'icons') statusEl = elements.iconStatusMessage;
-            else return;
-
-            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
-            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.className = `status-message visible ${type}`;
-            
-            if (type === 'success' || type === 'info') {
-                setTimeout(() => statusEl.classList.remove('visible'), 3000);
-            }
+        // --- UI Utils ---
+        function showToast(msg, type) {
+            const t = document.getElementById('statusToast');
+            t.textContent = msg;
+            t.className = `status-toast visible ${type}`;
+            setTimeout(() => {
+                t.classList.remove('visible');
+            }, 2500);
         }
+
     </script>
 </body>
 </html>
