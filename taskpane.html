@@ -155,7 +155,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.5</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.6</span></h1>
         </div>
 
         <div class="tabs">
@@ -325,75 +325,84 @@
             } catch (e) { console.warn(e); }
         }
 
-        // --- Helper: Find MASTER Content Placeholder ---
+        // --- Helper: Find Layout Content Placeholder ---
         async function getReferenceBounds(context) {
-            const presentation = context.presentation;
-            presentation.load(['slideWidth', 'slideHeight']);
-            
-            // 1. Load Masters
-            const masters = presentation.masters;
-            masters.load('items');
+            // 1. Get Current Slide
+            const slides = context.presentation.getSelectedSlides();
+            slides.load('items');
+            await context.sync();
+            const slide = slides.items[0];
+
+            // 2. Get the Layout associated with this slide
+            const layout = slide.layout;
+            layout.load(['shapes', 'name']);
             await context.sync();
 
-            let masterBounds = null;
+            // 3. Scan Layout Shapes for "Text Placeholder" or "Content"
+            const layoutShapes = layout.shapes;
+            layoutShapes.load('items');
+            await context.sync();
 
-            // 2. Scan First Master (Standard Theme Master)
-            if (masters.items.length > 0) {
-                const master = masters.items[0];
-                const shapes = master.shapes;
-                shapes.load('items');
-                await context.sync();
+            // Load properties for filtering
+            for (let i = 0; i < layoutShapes.items.length; i++) {
+                layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
+            }
+            await context.sync();
 
-                // 3. Find the best candidate for "Content Placeholder"
-                // Heuristic: Content is usually the largest placeholder that isn't the Title.
-                // We preload properties for all shapes to avoid loop delays
-                for (let i = 0; i < shapes.items.length; i++) {
-                    shapes.items[i].load(['type', 'left', 'top', 'width', 'height']);
-                }
-                await context.sync();
+            let bestShape = null;
+            let maxArea = 0;
 
-                let maxArea = 0;
-                let bestShape = null;
+            for (let i = 0; i < layoutShapes.items.length; i++) {
+                const s = layoutShapes.items[i];
+                const nameLower = s.name.toLowerCase();
 
-                for (let i = 0; i < shapes.items.length; i++) {
-                    const s = shapes.items[i];
-                    if (s.type === "Placeholder") {
-                        // Title is usually at the very top (top < 100) or has small height compared to width
-                        // Content area usually covers a significant portion of the slide
-                        const area = s.width * s.height;
-                        
-                        // Filter out probable Title (usually wide but short, at top)
-                        // Heuristic: If top is very low and height is significant
-                        if (area > maxArea && s.height > 100) {
-                            maxArea = area;
-                            bestShape = s;
-                        }
+                // Logic: 
+                // 1. Must be a Placeholder
+                // 2. Look for explicit names "Text Placeholder", "Content Placeholder"
+                // 3. Fallback to largest non-title placeholder
+                if (s.type === "Placeholder") {
+                    const isTitle = nameLower.includes("title");
+                    const area = s.width * s.height;
+
+                    // Priority 1: Exact Name matches (user mentioned Text Placeholder 2)
+                    if (nameLower.includes("text placeholder") || nameLower.includes("content placeholder") || nameLower.includes("body")) {
+                         // Found a strong candidate.
+                         // Use this immediately unless we found one before, then pick largest? 
+                         // Usually layout only has one main body, or two. 
+                         // Let's stick to largest area matching this criteria.
+                         if (area > maxArea) {
+                             maxArea = area;
+                             bestShape = s;
+                         }
+                    } 
+                    // Priority 2: Generic fallback (Largest placeholder that isn't title)
+                    else if (!isTitle && area > maxArea && !bestShape) {
+                        maxArea = area;
+                        bestShape = s;
                     }
                 }
-
-                if (bestShape) {
-                    masterBounds = {
-                        left: bestShape.left,
-                        top: bestShape.top,
-                        width: bestShape.width,
-                        height: bestShape.height,
-                        type: 'Master Placeholder'
-                    };
-                }
             }
 
-            // 4. Fallback to Slide Dimensions if Master detection fails
-            if (!masterBounds) {
-                masterBounds = {
-                    left: 0,
-                    top: 0,
-                    width: presentation.slideWidth,
-                    height: presentation.slideHeight,
-                    type: 'Slide'
+            if (bestShape) {
+                return {
+                    left: bestShape.left,
+                    top: bestShape.top,
+                    width: bestShape.width,
+                    height: bestShape.height,
+                    type: 'Layout Placeholder (' + bestShape.name + ')'
                 };
             }
-            
-            return masterBounds;
+
+            // Fallback to Slide Dimensions if nothing found
+            context.presentation.load(['slideWidth', 'slideHeight']);
+            await context.sync();
+            return {
+                left: 0,
+                top: 0,
+                width: context.presentation.slideWidth,
+                height: context.presentation.slideHeight,
+                type: 'Slide Edge (No Placeholder Found)'
+            };
         }
 
         // --- Wrapper ---
@@ -487,7 +496,7 @@
                     items.sort((a, b) => a.left - b.left);
 
                     if (useContainer && useGutter) {
-                        // ** SMART DISTRIBUTION (MASTER BASED) **
+                        // ** SMART DISTRIBUTION (LAYOUT BASED) **
                         const bounds = await getReferenceBounds(context);
                         
                         // Formula: Width = (PlaceholderWidth - TotalGutter) / Count
@@ -503,7 +512,7 @@
                             items[i].obj.width = newWidth; // Resize logic
                             currentPos += newWidth + gutterSize;
                         }
-                        showToast("Smart Distribute: Horizontal", "success");
+                        showToast(`Distributed in ${bounds.type}`, "success");
 
                     } else if (useGutter) {
                         // Standard Gutter (Stacking, no resize)
@@ -514,7 +523,7 @@
                         }
                         showToast("Stacked with Gutter", "success");
                     } else {
-                        // Standard Distribute (Equal Gaps)
+                        // Standard Distribute
                         if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
                         
                         let start, end;
@@ -529,55 +538,15 @@
                             end = items[count-1].left + items[count-1].width;
                         }
 
-                        // Re-calc boundaries
-                        const totalW = items.reduce((acc, c) => acc + c.width, 0);
-                        const actualStart = items[0].obj.left;
-                        const actualEnd = items[count-1].obj.left + items[count-1].obj.width;
-                        const span = actualEnd - actualStart;
-                        const gap = (span - totalW) / (count - 1); // Use original widths
-
-                        // Fix: Standard distribute doesn't assume equal widths, it equalizes gaps
-                        // But wait, the previous simple math assumed equal widths.
-                        // Correct Gap logic for unequal widths:
-                        // Gap = (TotalSpan - SumOfAllWidths) / (N - 1)
-                        // Then pos = prevPos + prevWidth + Gap
+                        // Distribute Centers Logic for Standard Mode
+                        const centerStart = items[0].obj.left + items[0].obj.width/2;
+                        const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
+                        const centerStep = (centerEnd - centerStart) / (count - 1);
                         
-                        const totalShapeW = items.reduce((acc, x) => acc + x.width, 0);
-                        const distributionGap = (span - totalShapeW) / (count - 1); // This math is actually wrong if shapes overlap.
-                        
-                        // Standard PPT logic: Distribute Centers or Edges? usually edges.
-                        // Simple approach: Just interpolate positions
-                         const gapSimple = ((actualEnd - items[count-1].width) - actualStart) / (count - 1);
-                         
-                         // Wait, let's stick to the simpler visual distribute
-                         // Distribute Left Edges:
-                         // pos[i] = start + i * (span / (n-1)) - NO that's center
-                         // Let's use the simplest reliable gap logic
-                         
-                         const totalGapSpace = (actualEnd - actualStart) - totalShapeW; 
-                         // Note: This only works if we want EQUAL GAPS.
-                         // Let's assume equal gaps:
-                         // Gap = (End - Start - Sum(Widths)) / (N - 1) -> This allows variable widths
-                         
-                         // BUT, for simplicity in code without deep math:
-                         // We will distribute the spaces evenly between the centers of the shapes.
-                         // Or just iterate:
-                         const step = (actualEnd - items[count-1].width - actualStart) / (count - 1);
-                         
-                         for(let i=1; i<count-1; i++){
-                             // items[i].obj.left = actualStart + (i * step); // This assumes equal width shapes roughly
-                             // Better:
-                             // Actually, let's keep the previous logic which was robust enough for equal shapes
-                             items[i].obj.left = items[0].obj.left + items[0].obj.width + (i * ((span - totalShapeW)/(count-1))); 
-                             // Wait, logic drift. Let's revert to simple interpolation for Standard Mode.
-                             // Distribute Centers
-                             const centerStart = items[0].obj.left + items[0].obj.width/2;
-                             const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
-                             const centerStep = (centerEnd - centerStart) / (count - 1);
-                             
-                             items[i].obj.left = (centerStart + (i * centerStep)) - (items[i].obj.width/2);
-                         }
-                         showToast("Distributed", "success");
+                        for(let i=1; i<count-1; i++){
+                            items[i].obj.left = (centerStart + (i * centerStep)) - (items[i].obj.width/2);
+                        }
+                        showToast("Distributed", "success");
                     }
                 } else {
                     // Vertical Logic
@@ -598,7 +567,7 @@
                             items[i].obj.height = newHeight;
                             currentPos += newHeight + gutterSize;
                         }
-                        showToast("Smart Distribute: Vertical", "success");
+                        showToast(`Distributed in ${bounds.type}`, "success");
 
                     } else if (useGutter) {
                          let currentPos = items[0].top + items[0].height + gutterSize;
@@ -609,7 +578,7 @@
                         showToast("Stacked with Gutter", "success");
                     } else {
                          if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
-                         // Simple Vertical Distribute
+                         
                          if(useContainer) {
                              const bounds = await getReferenceBounds(context);
                              items[0].obj.top = bounds.top;
