@@ -155,7 +155,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.6</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.7</span></h1>
         </div>
 
         <div class="tabs">
@@ -208,10 +208,10 @@
                 </button>
             </div>
 
-            <div class="section-title">Distribute & Spread</div>
+            <div class="section-title">Distribute & Smart Fit</div>
             <div class="controls-row">
                 <label for="useGutter">
-                    <input type="checkbox" id="useGutter"> Fixed Gutter
+                    <input type="checkbox" id="useGutter"> Use Gutter
                 </label>
                 <input type="number" id="gutterSize" value="40" disabled>
                 <span style="font-size: 11px; color: var(--neutral-dark);">pt</span>
@@ -327,23 +327,19 @@
 
         // --- Helper: Find Layout Content Placeholder ---
         async function getReferenceBounds(context) {
-            // 1. Get Current Slide
             const slides = context.presentation.getSelectedSlides();
             slides.load('items');
             await context.sync();
             const slide = slides.items[0];
 
-            // 2. Get the Layout associated with this slide
             const layout = slide.layout;
             layout.load(['shapes', 'name']);
             await context.sync();
 
-            // 3. Scan Layout Shapes for "Text Placeholder" or "Content"
             const layoutShapes = layout.shapes;
             layoutShapes.load('items');
             await context.sync();
 
-            // Load properties for filtering
             for (let i = 0; i < layoutShapes.items.length; i++) {
                 layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
             }
@@ -356,26 +352,16 @@
                 const s = layoutShapes.items[i];
                 const nameLower = s.name.toLowerCase();
 
-                // Logic: 
-                // 1. Must be a Placeholder
-                // 2. Look for explicit names "Text Placeholder", "Content Placeholder"
-                // 3. Fallback to largest non-title placeholder
                 if (s.type === "Placeholder") {
                     const isTitle = nameLower.includes("title");
                     const area = s.width * s.height;
 
-                    // Priority 1: Exact Name matches (user mentioned Text Placeholder 2)
                     if (nameLower.includes("text placeholder") || nameLower.includes("content placeholder") || nameLower.includes("body")) {
-                         // Found a strong candidate.
-                         // Use this immediately unless we found one before, then pick largest? 
-                         // Usually layout only has one main body, or two. 
-                         // Let's stick to largest area matching this criteria.
                          if (area > maxArea) {
                              maxArea = area;
                              bestShape = s;
                          }
                     } 
-                    // Priority 2: Generic fallback (Largest placeholder that isn't title)
                     else if (!isTitle && area > maxArea && !bestShape) {
                         maxArea = area;
                         bestShape = s;
@@ -393,7 +379,6 @@
                 };
             }
 
-            // Fallback to Slide Dimensions if nothing found
             context.presentation.load(['slideWidth', 'slideHeight']);
             await context.sync();
             return {
@@ -469,11 +454,12 @@
             });
         }
 
-        // --- DISTRIBUTE ---
+        // --- DISTRIBUTE / SMART FIT ---
         function runDistribute(axis) {
             const useGutter = document.getElementById('useGutter').checked;
             const useContainer = document.getElementById('alignToContainer').checked;
-            const gutterSize = parseFloat(document.getElementById('gutterSize').value) || 0;
+            // If checked use value, else 0
+            const gutterSize = useGutter ? (parseFloat(document.getElementById('gutterSize').value) || 0) : 0;
 
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
@@ -483,6 +469,7 @@
                 const count = shapes.items.length;
                 if (count < 2) { showToast("Select 2+ shapes", "error"); return; }
 
+                // Create sorting array
                 let items = [];
                 for(let i=0; i<count; i++) {
                     items.push({ 
@@ -493,52 +480,37 @@
                 }
 
                 if (axis === 'horizontal') {
+                    // Sort Left to Right
                     items.sort((a, b) => a.left - b.left);
 
-                    if (useContainer && useGutter) {
-                        // ** SMART DISTRIBUTION (LAYOUT BASED) **
+                    if (useContainer) {
+                        // ** SMART FIT HORIZONTAL **
+                        // 1. Calculate adjusted width (keep Height same)
                         const bounds = await getReferenceBounds(context);
-                        
-                        // Formula: Width = (PlaceholderWidth - TotalGutter) / Count
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.width - totalGutterSpace;
                         const newWidth = availableSpace / count;
 
                         if (newWidth < 1) { showToast("Gutter too large", "error"); return; }
 
-                        let currentPos = bounds.left;
+                        // 3, 4, 5. Place items Left to Right
+                        let currentLeft = bounds.left;
                         for (let i = 0; i < count; i++) {
-                            items[i].obj.left = currentPos;
-                            items[i].obj.width = newWidth; // Resize logic
-                            currentPos += newWidth + gutterSize;
+                            items[i].obj.width = newWidth; // Resize Width
+                            items[i].obj.left = currentLeft; // Set X
+                            // Height and Y (Top) remain UNCHANGED per request
+                            currentLeft += newWidth + gutterSize;
                         }
-                        showToast(`Distributed in ${bounds.type}`, "success");
-
-                    } else if (useGutter) {
-                        // Standard Gutter (Stacking, no resize)
-                        let currentPos = items[0].left + items[0].width + gutterSize;
-                        for (let i = 1; i < count; i++) {
-                            items[i].obj.left = currentPos;
-                            currentPos += items[i].width + gutterSize;
-                        }
-                        showToast("Stacked with Gutter", "success");
+                        showToast(`Smart Fit: Horizontal`, "success");
                     } else {
-                        // Standard Distribute
-                        if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
+                        // Standard Distribute Logic (No container)
+                        // Simple equal gaps between outer elements
+                        const start = items[0].left;
+                        const end = items[count-1].left + items[count-1].width;
+                        const totalW = items.reduce((acc, c) => acc + c.width, 0);
+                        const span = end - start;
                         
-                        let start, end;
-                        if (useContainer) {
-                             const bounds = await getReferenceBounds(context);
-                             start = bounds.left;
-                             end = bounds.left + bounds.width;
-                             items[0].obj.left = start;
-                             items[count-1].obj.left = end - items[count-1].width;
-                        } else {
-                            start = items[0].left;
-                            end = items[count-1].left + items[count-1].width;
-                        }
-
-                        // Distribute Centers Logic for Standard Mode
+                        // Distribute Centers
                         const centerStart = items[0].obj.left + items[0].obj.width/2;
                         const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
@@ -549,11 +521,13 @@
                         showToast("Distributed", "success");
                     }
                 } else {
-                    // Vertical Logic
+                    // Vertical
+                    // Sort Top to Bottom
                     items.sort((a, b) => a.top - b.top);
 
-                    if (useContainer && useGutter) {
-                        // ** SMART DISTRIBUTION VERTICAL **
+                    if (useContainer) {
+                        // ** SMART FIT VERTICAL **
+                        // 1. Calculate adjusted height (keep Width same)
                         const bounds = await getReferenceBounds(context);
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.height - totalGutterSpace;
@@ -561,38 +535,25 @@
 
                         if (newHeight < 1) { showToast("Gutter too large", "error"); return; }
 
-                        let currentPos = bounds.top;
+                        // 3, 4, 5. Place items Top to Bottom
+                        let currentTop = bounds.top;
                         for (let i = 0; i < count; i++) {
-                            items[i].obj.top = currentPos;
-                            items[i].obj.height = newHeight;
-                            currentPos += newHeight + gutterSize;
+                            items[i].obj.height = newHeight; // Resize Height
+                            items[i].obj.top = currentTop;   // Set Y
+                            // Width and X (Left) remain UNCHANGED per request
+                            currentTop += newHeight + gutterSize;
                         }
-                        showToast(`Distributed in ${bounds.type}`, "success");
-
-                    } else if (useGutter) {
-                         let currentPos = items[0].top + items[0].height + gutterSize;
-                        for (let i = 1; i < count; i++) {
-                            items[i].obj.top = currentPos;
-                            currentPos += items[i].height + gutterSize;
-                        }
-                        showToast("Stacked with Gutter", "success");
+                        showToast(`Smart Fit: Vertical`, "success");
                     } else {
-                         if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
-                         
-                         if(useContainer) {
-                             const bounds = await getReferenceBounds(context);
-                             items[0].obj.top = bounds.top;
-                             items[count-1].obj.top = bounds.top + bounds.height - items[count-1].height;
-                         }
-                         
-                         const centerStart = items[0].obj.top + items[0].obj.height/2;
-                         const centerEnd = items[count-1].obj.top + items[count-1].obj.height/2;
-                         const centerStep = (centerEnd - centerStart) / (count - 1);
-                         
-                         for(let i=1; i<count-1; i++){
-                             items[i].obj.top = (centerStart + (i * centerStep)) - (items[i].obj.height/2);
-                         }
-                         showToast("Distributed", "success");
+                        // Standard Vertical Distribute
+                        const centerStart = items[0].obj.top + items[0].obj.height/2;
+                        const centerEnd = items[count-1].obj.top + items[count-1].obj.height/2;
+                        const centerStep = (centerEnd - centerStart) / (count - 1);
+                        
+                        for(let i=1; i<count-1; i++){
+                            items[i].obj.top = (centerStart + (i * centerStep)) - (items[i].obj.height/2);
+                        }
+                        showToast("Distributed", "success");
                     }
                 }
                 await context.sync();
