@@ -42,22 +42,13 @@
         }
         
         .header h1 { 
-            font-size: 16px; 
-            font-weight: 600; 
-            margin: 0; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
+            font-size: 16px; font-weight: 600; margin: 0; 
+            display: flex; align-items: center; gap: 8px; 
         }
 
         .version-badge {
-            font-size: 10px;
-            background: var(--neutral-light);
-            color: var(--neutral-dark);
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: normal;
-            vertical-align: middle;
+            font-size: 10px; background: var(--neutral-light); color: var(--neutral-dark);
+            padding: 2px 6px; border-radius: 10px; font-weight: normal; vertical-align: middle;
         }
         
         .tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--neutral-light); }
@@ -117,20 +108,16 @@
             color: var(--neutral-dark); margin-bottom: 8px; font-weight: 600;
         }
 
-        /* Gutter Controls */
-        .gutter-control {
+        /* Controls Row */
+        .controls-row {
             display: flex; align-items: center; gap: 8px; 
             padding: 8px; background: var(--white); 
             border: 1px solid var(--neutral-light); border-radius: var(--radius);
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
-        .gutter-control input[type="number"] {
-            width: 50px; margin: 0; text-align: center;
-        }
-        .gutter-control input[type="checkbox"] {
-            width: auto; margin: 0;
-        }
-        .gutter-control label {
+        .controls-row input[type="number"] { width: 50px; margin: 0; text-align: center; }
+        .controls-row input[type="checkbox"] { width: auto; margin: 0; }
+        .controls-row label {
             margin: 0; font-weight: normal; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; flex: 1;
         }
 
@@ -147,16 +134,15 @@
         }
         .status-toast.success { background: #dff6dd; color: #107c10; }
         .status-toast.error { background: #fde7e9; color: #a80000; }
+        .status-toast.info { background: #e1f0fa; color: #0078d4; }
         .status-toast.visible { display: block; animation: fadeIn 0.3s; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-        /* Helper for mac vs win */
         .mac-only { display: none; }
         body.is-mac .mac-only { display: inline; }
         body.is-mac .win-only { display: none; }
         
-        /* Focus indicator */
         .focus-indicator {
             font-size: 11px; text-align: center; color: var(--primary);
             cursor: pointer; padding: 4px; border: 1px dashed transparent;
@@ -169,7 +155,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.3</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.4</span></h1>
         </div>
 
         <div class="tabs">
@@ -191,6 +177,14 @@
             
             <div id="selectionStatus" style="font-size: 12px; margin-bottom: 10px; color: var(--neutral-dark);">
                 Checking selection...
+            </div>
+
+            <div class="section-title">Reference</div>
+            <div class="controls-row">
+                <label for="alignToContainer">
+                    <input type="checkbox" id="alignToContainer"> Align to Container
+                </label>
+                <i class="ms-Icon ms-Icon--Info" title="Aligns to the Slide Master Content Placeholder (or Slide edges if not found)" style="color:var(--neutral-dark); cursor: help;"></i>
             </div>
 
             <div class="section-title">Alignment</div>
@@ -215,7 +209,15 @@
                 </button>
             </div>
 
-            <div class="section-title">Distribute</div>
+            <div class="section-title">Distribute & Spread</div>
+            <div class="controls-row">
+                <label for="useGutter">
+                    <input type="checkbox" id="useGutter"> Fixed Gutter
+                </label>
+                <input type="number" id="gutterSize" value="40" disabled>
+                <span style="font-size: 11px; color: var(--neutral-dark);">pt</span>
+            </div>
+            
             <div class="align-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 8px;">
                 <button class="align-btn" onclick="runDistribute('horizontal')">
                     <i class="ms-Icon ms-Icon--DistributeDown"></i><span>Horiz.</span>
@@ -223,14 +225,6 @@
                 <button class="align-btn" onclick="runDistribute('vertical')">
                     <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i><span>Vert.</span>
                 </button>
-            </div>
-            
-            <div class="gutter-control">
-                <label for="useGutter">
-                    <input type="checkbox" id="useGutter"> Use Gutter
-                </label>
-                <input type="number" id="gutterSize" value="40" disabled>
-                <span style="font-size: 11px; color: var(--neutral-dark);">pt</span>
             </div>
 
             <div class="section-title">Size & Arrange</div>
@@ -251,11 +245,7 @@
                     <i class="ms-Icon ms-Icon--Touch"></i> Click here to enable shortcuts
                 </div>
                 <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
-                <strong>Align Shortcuts:</strong><br>
-                <span class="win-only">Alt + Arrow Keys</span>
-                <span class="mac-only">Ctrl + Arrow Keys</span>
-                <br>
-                (Use Shift for Slide Align)
+                <strong>Shortcuts:</strong> <span class="win-only">Alt</span><span class="mac-only">Ctrl</span> + Arrows
             </div>
         </div>
 
@@ -287,14 +277,11 @@
 
         // --- Initialization ---
         Office.onReady((info) => {
-            console.log('Office Ready:', info);
-
-            // Mac Detection
             if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
                 document.body.classList.add('is-mac');
             }
 
-            // Tabs Logic
+            // Tabs
             document.querySelectorAll('.tab').forEach(t => {
                 t.onclick = () => {
                     document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
@@ -304,29 +291,21 @@
                 };
             });
 
-            // Gutter Checkbox Toggle
-            const gutterCheck = document.getElementById('useGutter');
-            const gutterInput = document.getElementById('gutterSize');
-            gutterCheck.addEventListener('change', (e) => {
-                gutterInput.disabled = !e.target.checked;
-                if(e.target.checked) gutterInput.focus();
+            // Toggle Input States
+            document.getElementById('useGutter').addEventListener('change', (e) => {
+                document.getElementById('gutterSize').disabled = !e.target.checked;
+                if(e.target.checked) document.getElementById('gutterSize').focus();
             });
 
-            // Shortcuts Listener
             document.body.addEventListener('keydown', handleShortcuts);
 
-            // Optimized Selection Handler
             if (Office.context.document) {
-                Office.context.document.addHandlerAsync(
-                    Office.EventType.DocumentSelectionChanged,
-                    onSelectionChanged
-                );
+                Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, onSelectionChanged);
             }
-            
             checkSelection(); 
         });
 
-        // --- Performance Optimized Selection Check ---
+        // --- Selection Logic ---
         function onSelectionChanged() {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(checkSelection, 500);
@@ -335,44 +314,77 @@
         async function checkSelection() {
             if (isBusy) return;
             const statusEl = document.getElementById('selectionStatus');
-            
             try {
                 await PowerPoint.run(async (context) => {
                     const shapes = context.presentation.getSelectedShapes();
                     shapes.load('items');
                     await context.sync();
-
                     const count = shapes.items.length;
-                    if (count === 0) {
-                        statusEl.innerText = "No shapes selected.";
-                        statusEl.style.color = "var(--neutral-dark)";
-                    } else if (count === 1) {
-                        statusEl.innerText = "1 shape selected.";
-                        statusEl.style.color = "var(--primary)";
-                    } else {
-                        statusEl.innerText = `${count} shapes selected.`;
-                        statusEl.style.color = "var(--primary)";
-                    }
+                    statusEl.innerText = count === 0 ? "No shapes selected." : `${count} shapes selected.`;
+                    statusEl.style.color = count > 0 ? "var(--primary)" : "var(--neutral-dark)";
                 });
-            } catch (e) {
-                console.warn("Selection check failed:", e);
-            }
+            } catch (e) { console.warn(e); }
         }
 
-        // --- Robust Action Runner ---
-        async function runAction(actionFunction) {
-            if (isBusy) {
-                showToast("Working...", "normal");
-                return;
+        // --- Helper: Find Master Placeholder or Slide Bounds ---
+        // Mimics the VBA logic but scans the current slide for the placeholder
+        async function getReferenceBounds(context) {
+            // Default to Slide Dimensions (16:9 960x540 or 4:3 720x540)
+            // We load slide settings to be accurate
+            const presentation = context.presentation;
+            presentation.load(['slideWidth', 'slideHeight']);
+            
+            // Try to find a Body/Content placeholder on the current slide
+            const slides = context.presentation.getSelectedSlides();
+            slides.load('items');
+            await context.sync();
+            
+            const activeSlide = slides.items[0];
+            const shapes = activeSlide.shapes;
+            shapes.load('items');
+            await context.sync();
+            
+            let bounds = {
+                left: 0,
+                top: 0,
+                width: presentation.slideWidth,
+                height: presentation.slideHeight,
+                type: 'Slide' // Metadata to know what we found
+            };
+            
+            // Search for Content Placeholder
+            // Note: In Office.js 'type' might be 'Placeholder'
+            for (let i = 0; i < shapes.items.length; i++) {
+                const s = shapes.items[i];
+                // We load type to check
+                s.load(['type', 'left', 'top', 'width', 'height']);
+            }
+            await context.sync();
+
+            for (let i = 0; i < shapes.items.length; i++) {
+                const s = shapes.items[i];
+                // Check if it's a placeholder. 
+                // Note: Determining exact PlaceholderType (Body vs Title) is tricky in limited JS API.
+                // We assume the largest placeholder that isn't the Title is content.
+                if (s.type === "Placeholder") {
+                    // Simple heuristic: If it's not at the very top (Title), use it.
+                    if (s.top > 50 && s.width > 300) { 
+                        bounds = { left: s.left, top: s.top, width: s.width, height: s.height, type: 'Placeholder' };
+                        break; // Stop after finding first candidate
+                    }
+                }
             }
             
+            return bounds;
+        }
+
+        // --- Wrapper ---
+        async function runAction(actionFunction) {
+            if (isBusy) return;
             isBusy = true;
-            document.body.style.cursor = "wait"; 
-            
+            document.body.style.cursor = "wait";
             try {
-                await PowerPoint.run(async (context) => {
-                    await actionFunction(context);
-                });
+                await PowerPoint.run(async (context) => { await actionFunction(context); });
             } catch (error) {
                 console.error(error);
                 showToast("Error: " + error.message, "error");
@@ -382,28 +394,43 @@
             }
         }
 
-        // --- Alignment Logic ---
-
+        // --- ALIGNMENT ---
         function runAlign(direction) {
+            const useContainer = document.getElementById('alignToContainer').checked;
+
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'left', 'top', 'width', 'height']);
                 await context.sync();
 
-                if (shapes.items.length < 2) {
-                    showToast("Select 2+ shapes", "error");
-                    return;
+                if (shapes.items.length < 1) { showToast("Select a shape", "error"); return; }
+                if (!useContainer && shapes.items.length < 2) { showToast("Select 2+ shapes", "error"); return; }
+
+                let refLeft, refTop, refWidth, refHeight;
+
+                if (useContainer) {
+                    const bounds = await getReferenceBounds(context);
+                    refLeft = bounds.left;
+                    refTop = bounds.top;
+                    refWidth = bounds.width;
+                    refHeight = bounds.height;
+                    showToast(`Aligning to ${bounds.type}`, "info");
+                } else {
+                    // Align to First Selection
+                    const ref = shapes.items[0];
+                    refLeft = ref.left;
+                    refTop = ref.top;
+                    refWidth = ref.width;
+                    refHeight = ref.height;
                 }
 
-                const ref = shapes.items[0]; 
-                const refLeft = ref.left;
-                const refTop = ref.top;
-                const refWidth = ref.width;
-                const refHeight = ref.height;
                 const refCenter = refLeft + (refWidth / 2);
                 const refMiddle = refTop + (refHeight / 2);
 
-                for (let i = 1; i < shapes.items.length; i++) {
+                // If aligning to container, apply to ALL shapes. If aligning to selection, skip the first (ref).
+                const startIndex = useContainer ? 0 : 1;
+
+                for (let i = startIndex; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
                     switch (direction) {
                         case 'left': s.left = refLeft; break;
@@ -419,8 +446,10 @@
             });
         }
 
+        // --- DISTRIBUTE ---
         function runDistribute(axis) {
             const useGutter = document.getElementById('useGutter').checked;
+            const useContainer = document.getElementById('alignToContainer').checked;
             const gutterSize = parseFloat(document.getElementById('gutterSize').value) || 0;
 
             runAction(async (context) => {
@@ -428,99 +457,151 @@
                 shapes.load(['items', 'left', 'top', 'width', 'height']);
                 await context.sync();
 
-                // Validation: Gutter works with 2+, Standard Distribute needs 3+
-                const minShapes = useGutter ? 2 : 3;
-                if (shapes.items.length < minShapes) {
-                    showToast(`Select ${minShapes}+ shapes`, "error");
-                    return;
-                }
+                const count = shapes.items.length;
+                if (count < 2) { showToast("Select 2+ shapes", "error"); return; }
 
-                // Convert to array for sorting
+                // Collect items for sorting
                 let items = [];
-                for(let i=0; i<shapes.items.length; i++) {
+                for(let i=0; i<count; i++) {
                     items.push({ 
                         obj: shapes.items[i], 
-                        left: shapes.items[i].left, 
-                        top: shapes.items[i].top,
-                        width: shapes.items[i].width,
-                        height: shapes.items[i].height
+                        left: shapes.items[i].left, top: shapes.items[i].top,
+                        width: shapes.items[i].width, height: shapes.items[i].height
                     });
                 }
 
                 if (axis === 'horizontal') {
                     items.sort((a, b) => a.left - b.left);
-                    
-                    if (useGutter) {
-                        // GUTTER MODE: Stack items
+
+                    if (useContainer && useGutter) {
+                        // COMPLEX LOGIC: Resize to fill container
+                        const bounds = await getReferenceBounds(context);
+                        
+                        // Total Gutter Space needed
+                        const totalGutterSpace = (count - 1) * gutterSize;
+                        
+                        // Remaining space for actual shapes
+                        const availableSpace = bounds.width - totalGutterSpace;
+                        
+                        // New width per shape
+                        const newWidth = availableSpace / count;
+
+                        if (newWidth < 1) { showToast("Gutter too large for container", "error"); return; }
+
+                        // Apply
+                        let currentPos = bounds.left;
+                        for (let i = 0; i < count; i++) {
+                            items[i].obj.left = currentPos;
+                            items[i].obj.width = newWidth; // RESIZE
+                            currentPos += newWidth + gutterSize;
+                        }
+                        showToast("Spread & Resized", "success");
+
+                    } else if (useGutter) {
+                        // Standard Gutter (Stacking) - No resize, just move
                         let currentPos = items[0].left + items[0].width + gutterSize;
-                        for (let i = 1; i < items.length; i++) {
+                        for (let i = 1; i < count; i++) {
                             items[i].obj.left = currentPos;
                             currentPos += items[i].width + gutterSize;
                         }
+                        showToast("Stacked with Gutter", "success");
                     } else {
-                        // STANDARD DISTRIBUTE
-                        const start = items[0].left + items[0].width;
-                        const end = items[items.length - 1].left;
-                        const totalSpace = end - start;
-                        const middleItemsWidth = items.slice(1, -1).reduce((acc, curr) => acc + curr.width, 0);
-                        const gap = (totalSpace - middleItemsWidth) / (items.length - 1);
+                        // Standard Distribute (Even spacing between first and last)
+                        if (count < 3 && !useContainer) { showToast("Need 3+ shapes", "error"); return; }
                         
-                        let currentPos = items[0].left + items[0].width + gap;
-                        for (let i = 1; i < items.length - 1; i++) {
-                            items[i].obj.left = currentPos;
-                            currentPos += items[i].width + gap;
+                        let start, end;
+                        if (useContainer) {
+                             const bounds = await getReferenceBounds(context);
+                             start = bounds.left;
+                             end = bounds.left + bounds.width;
+                             // We imagine the first starts at left edge, last ends at right edge
+                             items[0].obj.left = start;
+                             items[count-1].obj.left = end - items[count-1].width;
+                        } else {
+                            start = items[0].left;
+                            end = items[count-1].left + items[count-1].width;
                         }
-                    }
 
+                        // Calculate gap based on bounds
+                        // Re-read positions in case we moved start/end
+                        const first = items[0].obj; 
+                        const last = items[count-1].obj;
+                        
+                        const actualStart = (useContainer) ? start + first.width : start + items[0].width;
+                        const actualEnd = (useContainer) ? end - last.width : end - items[count-1].width; // Actually complicated math here
+
+                        // Simplified Distribute Logic:
+                        // Total span to cover
+                        const span = (useContainer ? end : (items[count-1].left + items[count-1].width)) - (useContainer ? start : items[0].left);
+                        const totalShapeW = items.reduce((acc, c) => acc + c.width, 0);
+                        const gap = (span - totalShapeW) / (count - 1);
+
+                        let pos = (useContainer ? start : items[0].left) + items[0].width + gap;
+                        for(let i=1; i<count-1; i++){
+                            items[i].obj.left = pos;
+                            pos += items[i].width + gap;
+                        }
+                         showToast("Distributed", "success");
+                    }
                 } else {
-                    // Vertical
+                    // Vertical Logic (Mirrored)
                     items.sort((a, b) => a.top - b.top);
-                    
-                    if (useGutter) {
-                        // GUTTER MODE: Stack items
-                        let currentPos = items[0].top + items[0].height + gutterSize;
-                        for (let i = 1; i < items.length; i++) {
+
+                    if (useContainer && useGutter) {
+                        const bounds = await getReferenceBounds(context);
+                        const totalGutterSpace = (count - 1) * gutterSize;
+                        const availableSpace = bounds.height - totalGutterSpace;
+                        const newHeight = availableSpace / count;
+
+                        if (newHeight < 1) { showToast("Gutter too large", "error"); return; }
+
+                        let currentPos = bounds.top;
+                        for (let i = 0; i < count; i++) {
+                            items[i].obj.top = currentPos;
+                            items[i].obj.height = newHeight; // RESIZE
+                            currentPos += newHeight + gutterSize;
+                        }
+                        showToast("Spread & Resized", "success");
+                    } else if (useGutter) {
+                         let currentPos = items[0].top + items[0].height + gutterSize;
+                        for (let i = 1; i < count; i++) {
                             items[i].obj.top = currentPos;
                             currentPos += items[i].height + gutterSize;
                         }
+                        showToast("Stacked with Gutter", "success");
                     } else {
-                        // STANDARD DISTRIBUTE
-                        const start = items[0].top + items[0].height;
-                        const end = items[items.length - 1].top;
-                        const totalSpace = end - start;
-                        const middleItemsHeight = items.slice(1, -1).reduce((acc, curr) => acc + curr.height, 0);
-                        const gap = (totalSpace - middleItemsHeight) / (items.length - 1);
-                        
-                        let currentPos = items[0].top + items[0].height + gap;
-                        for (let i = 1; i < items.length - 1; i++) {
-                            items[i].obj.top = currentPos;
-                            currentPos += items[i].height + gap;
-                        }
+                         // Simple distribute logic (omitted for brevity, assumes standard behavior)
+                         // For vertical distribute without resize, standard PowerPoint logic usually applies
+                         const start = items[0].top;
+                         const end = items[count-1].top + items[count-1].height;
+                         const span = end - start;
+                         const totalH = items.reduce((acc,c)=>acc+c.height,0);
+                         const gap = (span - totalH)/(count-1);
+                         
+                         let pos = start + items[0].height + gap;
+                         for(let i=1; i<count-1; i++){
+                             items[i].obj.top = pos;
+                             pos += items[i].height + gap;
+                         }
+                         showToast("Distributed", "success");
                     }
                 }
-
                 await context.sync();
-                showToast(useGutter ? "Stacked with Gutter" : "Distributed", "success");
             });
         }
 
+        // --- Other Tools ---
         function runMatchSize(dimension) {
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'width', 'height']);
                 await context.sync();
-
-                if (shapes.items.length < 2) {
-                    showToast("Select 2+ shapes", "error");
-                    return;
-                }
-
-                const targetW = shapes.items[0].width;
-                const targetH = shapes.items[0].height;
-
+                if (shapes.items.length < 2) return;
+                const tW = shapes.items[0].width;
+                const tH = shapes.items[0].height;
                 for (let i = 1; i < shapes.items.length; i++) {
-                    if (dimension === 'width') shapes.items[i].width = targetW;
-                    if (dimension === 'height') shapes.items[i].height = targetH;
+                    if (dimension === 'width') shapes.items[i].width = tW;
+                    if (dimension === 'height') shapes.items[i].height = tH;
                 }
                 await context.sync();
                 showToast("Size Matched", "success");
@@ -532,65 +613,28 @@
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'left', 'top']);
                 await context.sync();
-
-                if (shapes.items.length !== 2) {
-                    showToast("Select exactly 2 shapes", "error");
-                    return;
-                }
-
-                const s1 = shapes.items[0];
-                const s2 = shapes.items[1];
-                
-                const s1Left = s1.left;
-                const s1Top = s1.top;
-
-                s1.left = s2.left;
-                s1.top = s2.top;
-                s2.left = s1Left;
-                s2.top = s1Top;
-
+                if (shapes.items.length !== 2) return;
+                const s1 = shapes.items[0], s2 = shapes.items[1];
+                const l = s1.left, t = s1.top;
+                s1.left = s2.left; s1.top = s2.top;
+                s2.left = l; s2.top = t;
                 await context.sync();
                 showToast("Swapped", "success");
             });
         }
 
-        // --- Keyboard Shortcuts ---
         function handleShortcuts(e) {
-            const isMac = document.body.classList.contains('is-mac');
-            const modifier = isMac ? e.ctrlKey : e.altKey;
-
-            if (!modifier) return;
-
-            switch(e.key) {
-                case 'ArrowLeft': 
-                    e.preventDefault(); 
-                    runAlign('left'); 
-                    break;
-                case 'ArrowRight': 
-                    e.preventDefault(); 
-                    runAlign('right'); 
-                    break;
-                case 'ArrowUp': 
-                    e.preventDefault(); 
-                    runAlign('top'); 
-                    break;
-                case 'ArrowDown': 
-                    e.preventDefault(); 
-                    runAlign('bottom'); 
-                    break;
-            }
+            const mod = document.body.classList.contains('is-mac') ? e.ctrlKey : e.altKey;
+            if (!mod) return;
+            if (e.key.startsWith('Arrow')) { e.preventDefault(); runAlign(e.key.replace('Arrow','').toLowerCase()); }
         }
 
-        // --- UI Utils ---
         function showToast(msg, type) {
             const t = document.getElementById('statusToast');
             t.textContent = msg;
             t.className = `status-toast visible ${type}`;
-            setTimeout(() => {
-                t.classList.remove('visible');
-            }, 2500);
+            setTimeout(() => t.classList.remove('visible'), 2500);
         }
-
     </script>
 </body>
 </html>
