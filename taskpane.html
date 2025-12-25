@@ -906,6 +906,14 @@
             border: 1px solid var(--neutral-light);
         }
 
+        /* Platform-specific shortcuts - default to Windows */
+        .shortcut-mac { display: none; }
+        .shortcut-win { display: inline; }
+        
+        /* Show Mac shortcuts on Mac */
+        body.is-mac .shortcut-mac { display: inline; }
+        body.is-mac .shortcut-win { display: none; }
+
     </style>
 </head>
 <body>
@@ -1312,13 +1320,11 @@
                 <h3>⌨️ Keyboard Shortcuts</h3>
                 <p style="font-size: 11px; color: var(--neutral-dark); line-height: 1.8;">
                     <strong>Align to first selected shape:</strong><br>
-                    <code>Alt + ←</code> Left &nbsp;|&nbsp; <code>Alt + →</code> Right<br>
-                    <code>Alt + ↑</code> Top &nbsp;|&nbsp; <code>Alt + ↓</code> Bottom<br><br>
+                    <span class="shortcut-win"><code>Alt + ←↑↓→</code></span>
+                    <span class="shortcut-mac"><code>⌥ Option + ←↑↓→</code></span><br><br>
                     <strong>Align to content placeholder:</strong><br>
-                    <code>Alt + Shift + ←</code> Left edge<br>
-                    <code>Alt + Shift + →</code> Right edge<br>
-                    <code>Alt + Shift + ↑</code> Top edge<br>
-                    <code>Alt + Shift + ↓</code> Bottom edge
+                    <span class="shortcut-win"><code>Alt + Shift + ←↑↓→</code></span>
+                    <span class="shortcut-mac"><code>⌥⇧ Option + Shift + ←↑↓→</code></span>
                 </p>
             </div>
 
@@ -1487,6 +1493,12 @@
             // Prevent double initialization
             if (elements.btnSaveKey._listenerAdded) return;
             elements.btnSaveKey._listenerAdded = true;
+            
+            // Detect Mac for keyboard shortcuts display
+            if (navigator.platform.toUpperCase().indexOf('MAC') >= 0 || 
+                navigator.userAgent.toUpperCase().indexOf('MAC') >= 0) {
+                document.body.classList.add('is-mac');
+            }
             
             // Clear oversized data from localStorage
             try {
@@ -2073,13 +2085,18 @@
 
 
         // ======================
-        // Alignment Functions (Robust Version)
+        // Alignment Functions (Queue-based for reliability)
         // ======================
         
-        // Content placeholder defaults for 16:9 slides
+        // Constants for slide dimensions
         const PLACEHOLDER_BOUNDS = { left: 50, top: 100, right: 910, bottom: 490 };
         const SLIDE_WIDTH = 960;
         const SLIDE_HEIGHT = 540;
+        
+        // Operation queue to prevent concurrent PowerPoint.run calls
+        let operationQueue = Promise.resolve();
+        let lastOperationTime = 0;
+        const MIN_OPERATION_DELAY = 100; // ms between operations
         
         function showAlignStatus(message, type) {
             try {
@@ -2097,15 +2114,40 @@
             }
         }
 
-        // Simple debounce for keyboard shortcuts
+        // Queue an operation to run after previous ones complete
+        function queueOperation(operation) {
+            operationQueue = operationQueue
+                .then(() => {
+                    // Ensure minimum delay between operations
+                    const now = Date.now();
+                    const timeSinceLast = now - lastOperationTime;
+                    if (timeSinceLast < MIN_OPERATION_DELAY) {
+                        return new Promise(resolve => 
+                            setTimeout(resolve, MIN_OPERATION_DELAY - timeSinceLast)
+                        );
+                    }
+                })
+                .then(() => {
+                    lastOperationTime = Date.now();
+                    return operation();
+                })
+                .catch(err => {
+                    console.error('Operation error:', err);
+                    showAlignStatus('Operation failed - try again', 'error');
+                });
+        }
+
+        // Keyboard shortcut handler
         let lastShortcutTime = 0;
         function handleAlignmentShortcuts(e) {
+            // Check for Alt key (Option on Mac)
             if (!e.altKey) return;
             
             const arrowKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
             if (!arrowKeys.includes(e.key)) return;
             
             e.preventDefault();
+            e.stopPropagation();
             
             // Debounce - ignore if less than 300ms since last shortcut
             const now = Date.now();
@@ -2129,123 +2171,117 @@
 
         // No-op placeholder function
         function updateContentPlaceholderBounds() {
-            // Using static defaults - no async operations needed
+            // Using static defaults
+        }
+
+        // Core function to get shapes and their properties
+        async function getShapesWithProperties(context, properties) {
+            const selection = context.presentation.getSelectedShapes();
+            selection.load('items');
+            await context.sync();
+            
+            if (!selection.items || selection.items.length === 0) {
+                return null;
+            }
+            
+            // Load requested properties
+            const items = selection.items;
+            for (let i = 0; i < items.length; i++) {
+                items[i].load(properties);
+            }
+            await context.sync();
+            
+            return items;
         }
 
         // Align shapes to content placeholder edge
-        async function alignToPlaceholder(edge) {
-            try {
+        function alignToPlaceholder(edge) {
+            queueOperation(async () => {
                 await PowerPoint.run(async (context) => {
-                    const selection = context.presentation.getSelectedShapes();
-                    selection.load('items');
-                    await context.sync();
+                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
                     
-                    const items = selection.items;
-                    if (!items || items.length === 0) {
+                    if (!items) {
                         showAlignStatus('Select at least 1 shape', 'error');
                         return;
                     }
                     
-                    // Load properties for all items
-                    for (const item of items) {
-                        item.load(['left', 'top', 'width', 'height']);
-                    }
-                    await context.sync();
-                    
-                    // Apply alignment
-                    for (const shape of items) {
+                    for (let i = 0; i < items.length; i++) {
+                        const shape = items[i];
+                        const width = shape.width;
+                        const height = shape.height;
+                        
                         switch (edge) {
                             case 'left': shape.left = PLACEHOLDER_BOUNDS.left; break;
-                            case 'right': shape.left = PLACEHOLDER_BOUNDS.right - shape.width; break;
+                            case 'right': shape.left = PLACEHOLDER_BOUNDS.right - width; break;
                             case 'top': shape.top = PLACEHOLDER_BOUNDS.top; break;
-                            case 'bottom': shape.top = PLACEHOLDER_BOUNDS.bottom - shape.height; break;
+                            case 'bottom': shape.top = PLACEHOLDER_BOUNDS.bottom - height; break;
                         }
                     }
                     
                     await context.sync();
                     showAlignStatus(`Aligned to ${edge}`, 'success');
                 });
-            } catch (error) {
-                console.error('alignToPlaceholder error:', error);
-                showAlignStatus('Alignment failed - try again', 'error');
-            }
+            });
         }
 
-        async function alignShapes(direction) {
-            try {
+        function alignShapes(direction) {
+            queueOperation(async () => {
                 await PowerPoint.run(async (context) => {
-                    const selection = context.presentation.getSelectedShapes();
-                    selection.load('items');
-                    await context.sync();
+                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
                     
-                    const items = selection.items;
                     if (!items || items.length < 2) {
                         showAlignStatus('Select at least 2 shapes', 'error');
                         return;
                     }
                     
-                    // Load properties for all items
-                    for (const item of items) {
-                        item.load(['left', 'top', 'width', 'height']);
-                    }
-                    await context.sync();
+                    // Get reference values from first shape
+                    const refLeft = items[0].left;
+                    const refTop = items[0].top;
+                    const refWidth = items[0].width;
+                    const refHeight = items[0].height;
                     
-                    // Use first shape as reference
-                    const ref = items[0];
-                    const refLeft = ref.left;
-                    const refTop = ref.top;
-                    const refWidth = ref.width;
-                    const refHeight = ref.height;
-                    
-                    // Apply alignment to other shapes
                     for (let i = 1; i < items.length; i++) {
                         const shape = items[i];
+                        const shapeWidth = shape.width;
+                        const shapeHeight = shape.height;
+                        
                         switch (direction) {
                             case 'left': shape.left = refLeft; break;
-                            case 'center': shape.left = refLeft + (refWidth - shape.width) / 2; break;
-                            case 'right': shape.left = refLeft + refWidth - shape.width; break;
+                            case 'center': shape.left = refLeft + (refWidth - shapeWidth) / 2; break;
+                            case 'right': shape.left = refLeft + refWidth - shapeWidth; break;
                             case 'top': shape.top = refTop; break;
-                            case 'middle': shape.top = refTop + (refHeight - shape.height) / 2; break;
-                            case 'bottom': shape.top = refTop + refHeight - shape.height; break;
+                            case 'middle': shape.top = refTop + (refHeight - shapeHeight) / 2; break;
+                            case 'bottom': shape.top = refTop + refHeight - shapeHeight; break;
                         }
                     }
                     
                     await context.sync();
                     showAlignStatus(`Aligned ${items.length} shapes`, 'success');
                 });
-            } catch (error) {
-                console.error('alignShapes error:', error);
-                showAlignStatus('Alignment failed - try again', 'error');
-            }
+            });
         }
 
-        async function distributeShapes(direction) {
-            try {
+        function distributeShapes(direction) {
+            queueOperation(async () => {
                 await PowerPoint.run(async (context) => {
-                    const selection = context.presentation.getSelectedShapes();
-                    selection.load('items');
-                    await context.sync();
+                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
                     
-                    const items = selection.items;
                     if (!items || items.length < 3) {
                         showAlignStatus('Select at least 3 shapes', 'error');
                         return;
                     }
                     
-                    // Load properties for all items
-                    for (const item of items) {
-                        item.load(['left', 'top', 'width', 'height']);
+                    // Copy values to local array
+                    const shapes = [];
+                    for (let i = 0; i < items.length; i++) {
+                        shapes.push({
+                            item: items[i],
+                            left: items[i].left,
+                            top: items[i].top,
+                            width: items[i].width,
+                            height: items[i].height
+                        });
                     }
-                    await context.sync();
-                    
-                    // Build shapes array with current values (copy values, not references)
-                    const shapes = items.map(s => ({
-                        shape: s,
-                        left: s.left,
-                        top: s.top,
-                        width: s.width,
-                        height: s.height
-                    }));
                     
                     const count = shapes.length;
                     
@@ -2259,7 +2295,7 @@
                         
                         let pos = first.left + first.width + gap;
                         for (let i = 1; i < count - 1; i++) {
-                            shapes[i].shape.left = pos;
+                            shapes[i].item.left = pos;
                             pos += shapes[i].width + gap;
                         }
                     } else {
@@ -2272,7 +2308,7 @@
                         
                         let pos = first.top + first.height + gap;
                         for (let i = 1; i < count - 1; i++) {
-                            shapes[i].shape.top = pos;
+                            shapes[i].item.top = pos;
                             pos += shapes[i].height + gap;
                         }
                     }
@@ -2280,145 +2316,97 @@
                     await context.sync();
                     showAlignStatus(`Distributed ${count} shapes`, 'success');
                 });
-            } catch (error) {
-                console.error('distributeShapes error:', error);
-                showAlignStatus('Distribution failed - try again', 'error');
-            }
+            });
         }
 
-        async function matchSize(dimension) {
-            try {
+        function matchSize(dimension) {
+            queueOperation(async () => {
                 await PowerPoint.run(async (context) => {
-                    const selection = context.presentation.getSelectedShapes();
-                    selection.load('items');
-                    await context.sync();
+                    const items = await getShapesWithProperties(context, ['width', 'height']);
                     
-                    const items = selection.items;
                     if (!items || items.length < 2) {
                         showAlignStatus('Select at least 2 shapes', 'error');
                         return;
                     }
                     
-                    // Load properties for all items
-                    for (const item of items) {
-                        item.load(['width', 'height']);
-                    }
-                    await context.sync();
-                    
-                    // Use first shape as reference (copy values)
                     const refWidth = items[0].width;
                     const refHeight = items[0].height;
                     
-                    // Apply to other shapes
                     for (let i = 1; i < items.length; i++) {
-                        const shape = items[i];
                         if (dimension === 'width' || dimension === 'both') {
-                            shape.width = refWidth;
+                            items[i].width = refWidth;
                         }
                         if (dimension === 'height' || dimension === 'both') {
-                            shape.height = refHeight;
+                            items[i].height = refHeight;
                         }
                     }
                     
                     await context.sync();
                     showAlignStatus(`Matched ${dimension}`, 'success');
                 });
-            } catch (error) {
-                console.error('matchSize error:', error);
-                showAlignStatus('Match size failed - try again', 'error');
-            }
+            });
         }
 
-        async function swapPositions() {
-            try {
+        function swapPositions() {
+            queueOperation(async () => {
                 await PowerPoint.run(async (context) => {
-                    const selection = context.presentation.getSelectedShapes();
-                    selection.load('items');
-                    await context.sync();
+                    const items = await getShapesWithProperties(context, ['left', 'top']);
                     
-                    const items = selection.items;
                     if (!items || items.length !== 2) {
                         showAlignStatus('Select exactly 2 shapes', 'error');
                         return;
                     }
                     
-                    // Load properties
-                    items[0].load(['left', 'top']);
-                    items[1].load(['left', 'top']);
-                    await context.sync();
-                    
-                    // Store positions (copy values)
-                    const pos1Left = items[0].left;
-                    const pos1Top = items[0].top;
-                    const pos2Left = items[1].left;
-                    const pos2Top = items[1].top;
+                    // Store positions
+                    const pos1 = { left: items[0].left, top: items[0].top };
+                    const pos2 = { left: items[1].left, top: items[1].top };
                     
                     // Swap
-                    items[0].left = pos2Left;
-                    items[0].top = pos2Top;
-                    items[1].left = pos1Left;
-                    items[1].top = pos1Top;
+                    items[0].left = pos2.left;
+                    items[0].top = pos2.top;
+                    items[1].left = pos1.left;
+                    items[1].top = pos1.top;
                     
                     await context.sync();
                     showAlignStatus('Swapped positions', 'success');
                 });
-            } catch (error) {
-                console.error('swapPositions error:', error);
-                showAlignStatus('Swap failed - try again', 'error');
-            }
+            });
         }
 
-        async function centerOnSlide() {
-            try {
+        function centerOnSlide() {
+            queueOperation(async () => {
                 await PowerPoint.run(async (context) => {
-                    const selection = context.presentation.getSelectedShapes();
-                    selection.load('items');
-                    await context.sync();
+                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
                     
-                    const items = selection.items;
-                    if (!items || items.length === 0) {
+                    if (!items) {
                         showAlignStatus('Select at least 1 shape', 'error');
                         return;
                     }
                     
-                    // Load properties for all items
-                    for (const item of items) {
-                        item.load(['left', 'top', 'width', 'height']);
-                    }
-                    await context.sync();
-                    
-                    // Calculate bounding box (copy values)
+                    // Calculate bounding box
                     let minLeft = Infinity, minTop = Infinity;
                     let maxRight = -Infinity, maxBottom = -Infinity;
                     
-                    for (const s of items) {
-                        const left = s.left;
-                        const top = s.top;
-                        const right = left + s.width;
-                        const bottom = top + s.height;
-                        
-                        minLeft = Math.min(minLeft, left);
-                        minTop = Math.min(minTop, top);
-                        maxRight = Math.max(maxRight, right);
-                        maxBottom = Math.max(maxBottom, bottom);
+                    for (let i = 0; i < items.length; i++) {
+                        const s = items[i];
+                        minLeft = Math.min(minLeft, s.left);
+                        minTop = Math.min(minTop, s.top);
+                        maxRight = Math.max(maxRight, s.left + s.width);
+                        maxBottom = Math.max(maxBottom, s.top + s.height);
                     }
                     
                     const offsetX = (SLIDE_WIDTH - (maxRight - minLeft)) / 2 - minLeft;
                     const offsetY = (SLIDE_HEIGHT - (maxBottom - minTop)) / 2 - minTop;
                     
-                    // Apply offset
-                    for (const s of items) {
-                        s.left = s.left + offsetX;
-                        s.top = s.top + offsetY;
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].left = items[i].left + offsetX;
+                        items[i].top = items[i].top + offsetY;
                     }
                     
                     await context.sync();
                     showAlignStatus(`Centered ${items.length} shape(s)`, 'success');
                 });
-            } catch (error) {
-                console.error('centerOnSlide error:', error);
-                showAlignStatus('Center failed - try again', 'error');
-            }
+            });
         }
 
 
