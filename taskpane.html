@@ -28,7 +28,6 @@
             font-size: 14px;
             color: #323130;
             background: var(--neutral-bg);
-            /* Important for shortcuts: make body focusable */
             outline: none; 
         }
 
@@ -51,7 +50,6 @@
             gap: 8px; 
         }
 
-        /* VERSION BADGE STYLE */
         .version-badge {
             font-size: 10px;
             background: var(--neutral-light);
@@ -119,6 +117,23 @@
             color: var(--neutral-dark); margin-bottom: 8px; font-weight: 600;
         }
 
+        /* Gutter Controls */
+        .gutter-control {
+            display: flex; align-items: center; gap: 8px; 
+            padding: 8px; background: var(--white); 
+            border: 1px solid var(--neutral-light); border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+        .gutter-control input[type="number"] {
+            width: 50px; margin: 0; text-align: center;
+        }
+        .gutter-control input[type="checkbox"] {
+            width: auto; margin: 0;
+        }
+        .gutter-control label {
+            margin: 0; font-weight: normal; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; flex: 1;
+        }
+
         .shortcut-hint {
             font-size: 11px; color: var(--neutral-dark); background: #f0f0f0;
             padding: 8px; border-radius: 4px; border-left: 3px solid var(--primary);
@@ -154,7 +169,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.2</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.3</span></h1>
         </div>
 
         <div class="tabs">
@@ -201,13 +216,21 @@
             </div>
 
             <div class="section-title">Distribute</div>
-            <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="align-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 8px;">
                 <button class="align-btn" onclick="runDistribute('horizontal')">
                     <i class="ms-Icon ms-Icon--DistributeDown"></i><span>Horiz.</span>
                 </button>
                 <button class="align-btn" onclick="runDistribute('vertical')">
                     <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i><span>Vert.</span>
                 </button>
+            </div>
+            
+            <div class="gutter-control">
+                <label for="useGutter">
+                    <input type="checkbox" id="useGutter"> Use Gutter
+                </label>
+                <input type="number" id="gutterSize" value="40" disabled>
+                <span style="font-size: 11px; color: var(--neutral-dark);">pt</span>
             </div>
 
             <div class="section-title">Size & Arrange</div>
@@ -259,7 +282,7 @@
 
     <script>
         // --- State Management ---
-        let isBusy = false; // Lock to prevent overlapping operations
+        let isBusy = false; 
         let debounceTimer;
 
         // --- Initialization ---
@@ -277,9 +300,16 @@
                     document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
                     t.classList.add('active');
                     document.getElementById(`tab-${t.dataset.tab}`).classList.add('active');
-                    // Check selection immediately when switching to Align
                     if(t.dataset.tab === 'align') checkSelection();
                 };
+            });
+
+            // Gutter Checkbox Toggle
+            const gutterCheck = document.getElementById('useGutter');
+            const gutterInput = document.getElementById('gutterSize');
+            gutterCheck.addEventListener('change', (e) => {
+                gutterInput.disabled = !e.target.checked;
+                if(e.target.checked) gutterInput.focus();
             });
 
             // Shortcuts Listener
@@ -293,12 +323,11 @@
                 );
             }
             
-            checkSelection(); // Initial check
+            checkSelection(); 
         });
 
         // --- Performance Optimized Selection Check ---
         function onSelectionChanged() {
-            // Debounce: Wait 500ms after last event before hitting PowerPoint
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(checkSelection, 500);
         }
@@ -326,13 +355,11 @@
                     }
                 });
             } catch (e) {
-                console.warn("Selection check failed (likely context invalid):", e);
-                // Don't show error to user, just fail silently
+                console.warn("Selection check failed:", e);
             }
         }
 
-        // --- Robust Action Runner (Fixes "Stops Working") ---
-        // This wrapper ensures we never get stuck in a busy state
+        // --- Robust Action Runner ---
         async function runAction(actionFunction) {
             if (isBusy) {
                 showToast("Working...", "normal");
@@ -340,7 +367,7 @@
             }
             
             isBusy = true;
-            document.body.style.cursor = "wait"; // Visual feedback
+            document.body.style.cursor = "wait"; 
             
             try {
                 await PowerPoint.run(async (context) => {
@@ -368,7 +395,7 @@
                     return;
                 }
 
-                const ref = shapes.items[0]; // Align to first selected
+                const ref = shapes.items[0]; 
                 const refLeft = ref.left;
                 const refTop = ref.top;
                 const refWidth = ref.width;
@@ -393,13 +420,18 @@
         }
 
         function runDistribute(axis) {
+            const useGutter = document.getElementById('useGutter').checked;
+            const gutterSize = parseFloat(document.getElementById('gutterSize').value) || 0;
+
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'left', 'top', 'width', 'height']);
                 await context.sync();
 
-                if (shapes.items.length < 3) {
-                    showToast("Select 3+ shapes", "error");
+                // Validation: Gutter works with 2+, Standard Distribute needs 3+
+                const minShapes = useGutter ? 2 : 3;
+                if (shapes.items.length < minShapes) {
+                    showToast(`Select ${minShapes}+ shapes`, "error");
                     return;
                 }
 
@@ -417,34 +449,58 @@
 
                 if (axis === 'horizontal') {
                     items.sort((a, b) => a.left - b.left);
-                    const start = items[0].left + items[0].width;
-                    const end = items[items.length - 1].left;
-                    const totalSpace = end - start;
-                    const middleItemsWidth = items.slice(1, -1).reduce((acc, curr) => acc + curr.width, 0);
-                    const gap = (totalSpace - middleItemsWidth) / (items.length - 1);
                     
-                    let currentPos = items[0].left + items[0].width + gap;
-                    for (let i = 1; i < items.length - 1; i++) {
-                        items[i].obj.left = currentPos;
-                        currentPos += items[i].width + gap;
+                    if (useGutter) {
+                        // GUTTER MODE: Stack items
+                        let currentPos = items[0].left + items[0].width + gutterSize;
+                        for (let i = 1; i < items.length; i++) {
+                            items[i].obj.left = currentPos;
+                            currentPos += items[i].width + gutterSize;
+                        }
+                    } else {
+                        // STANDARD DISTRIBUTE
+                        const start = items[0].left + items[0].width;
+                        const end = items[items.length - 1].left;
+                        const totalSpace = end - start;
+                        const middleItemsWidth = items.slice(1, -1).reduce((acc, curr) => acc + curr.width, 0);
+                        const gap = (totalSpace - middleItemsWidth) / (items.length - 1);
+                        
+                        let currentPos = items[0].left + items[0].width + gap;
+                        for (let i = 1; i < items.length - 1; i++) {
+                            items[i].obj.left = currentPos;
+                            currentPos += items[i].width + gap;
+                        }
                     }
+
                 } else {
+                    // Vertical
                     items.sort((a, b) => a.top - b.top);
-                    const start = items[0].top + items[0].height;
-                    const end = items[items.length - 1].top;
-                    const totalSpace = end - start;
-                    const middleItemsHeight = items.slice(1, -1).reduce((acc, curr) => acc + curr.height, 0);
-                    const gap = (totalSpace - middleItemsHeight) / (items.length - 1);
                     
-                    let currentPos = items[0].top + items[0].height + gap;
-                    for (let i = 1; i < items.length - 1; i++) {
-                        items[i].obj.top = currentPos;
-                        currentPos += items[i].height + gap;
+                    if (useGutter) {
+                        // GUTTER MODE: Stack items
+                        let currentPos = items[0].top + items[0].height + gutterSize;
+                        for (let i = 1; i < items.length; i++) {
+                            items[i].obj.top = currentPos;
+                            currentPos += items[i].height + gutterSize;
+                        }
+                    } else {
+                        // STANDARD DISTRIBUTE
+                        const start = items[0].top + items[0].height;
+                        const end = items[items.length - 1].top;
+                        const totalSpace = end - start;
+                        const middleItemsHeight = items.slice(1, -1).reduce((acc, curr) => acc + curr.height, 0);
+                        const gap = (totalSpace - middleItemsHeight) / (items.length - 1);
+                        
+                        let currentPos = items[0].top + items[0].height + gap;
+                        for (let i = 1; i < items.length - 1; i++) {
+                            items[i].obj.top = currentPos;
+                            currentPos += items[i].height + gap;
+                        }
                     }
                 }
 
                 await context.sync();
-                showToast("Distributed", "success");
+                showToast(useGutter ? "Stacked with Gutter" : "Distributed", "success");
             });
         }
 
@@ -500,13 +556,11 @@
 
         // --- Keyboard Shortcuts ---
         function handleShortcuts(e) {
-            // Requirement: Use Alt for Win, Ctrl for Mac (to avoid text cursor conflicts)
             const isMac = document.body.classList.contains('is-mac');
             const modifier = isMac ? e.ctrlKey : e.altKey;
 
             if (!modifier) return;
 
-            // Map keys
             switch(e.key) {
                 case 'ArrowLeft': 
                     e.preventDefault(); 
