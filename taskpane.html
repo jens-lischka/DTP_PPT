@@ -185,7 +185,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.11</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.12</span></h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="runInfo()" title="Presentation Info">
                     <i class="ms-Icon ms-Icon--Info"></i>
@@ -379,7 +379,7 @@
             } catch (e) { console.warn(e); }
         }
 
-        // --- INFO FEATURE (POPUP) ---
+        // --- INFO FEATURE (POPUP) - ROBUST VERSION ---
         async function runInfo() {
             document.getElementById('infoModal').classList.add('open');
             const content = document.getElementById('infoContent');
@@ -387,7 +387,6 @@
 
             try {
                 await PowerPoint.run(async (context) => {
-                    // 1. Get Master and Theme
                     const masters = context.presentation.masters;
                     masters.load('items');
                     await context.sync();
@@ -397,91 +396,81 @@
                     }
 
                     const master = masters.items[0];
-                    master.load(['name', 'shapes']);
-                    
-                    // Load Theme
-                    const theme = master.theme;
-                    theme.load(['fontScheme', 'colorScheme']);
-                    
-                    // Load Shapes to find placeholders
+                    master.load(['name', 'shapes', 'theme']);
+                    await context.sync();
+
+                    // Fonts & Colors (Try/Catch wrapper)
+                    let majorFont = "N/A", minorFont = "N/A";
+                    let colors = { dark1:'#333', light1:'#fff', accent1:'#ddd', accent2:'#ddd', accent3:'#ddd', accent4:'#ddd', accent5:'#ddd', accent6:'#ddd' };
+                    let themeLoaded = false;
+
+                    if (master.theme) {
+                        try {
+                            const theme = master.theme;
+                            // Check if properties are available to load
+                            // We do a blind attempt inside try block
+                            theme.load(['fontScheme', 'colorScheme']);
+                            await context.sync();
+                            
+                            if(theme.fontScheme) {
+                                theme.fontScheme.load(['majorFont', 'minorFont']);
+                                await context.sync();
+                                majorFont = theme.fontScheme.majorFont.latin || "Unknown";
+                                minorFont = theme.fontScheme.minorFont.latin || "Unknown";
+                            }
+                            if(theme.colorScheme) {
+                                theme.colorScheme.load(['accent1','accent2','accent3','accent4','accent5','accent6','dark1','light1']);
+                                await context.sync();
+                                colors = theme.colorScheme;
+                                themeLoaded = true;
+                            }
+                        } catch(err) {
+                            console.warn("Theme API not fully supported", err);
+                        }
+                    }
+
+                    // Content Placeholder Geometry
                     const shapes = master.shapes;
                     shapes.load('items');
-                    
                     await context.sync();
 
-                    // 2. Process Fonts & Colors
-                    const fonts = theme.fontScheme;
-                    fonts.load(['majorFont', 'minorFont']);
-                    const colors = theme.colorScheme;
-                    colors.load(['accent1', 'accent2', 'accent3', 'accent4', 'accent5', 'accent6', 'dark1', 'light1']);
-                    
-                    // 3. Process Placeholders (Size & Pos)
-                    // Preload properties
                     for(let i=0; i<shapes.items.length; i++){
-                        shapes.items[i].load(['type', 'name', 'left', 'top', 'width', 'height', 'textFrame']);
+                        shapes.items[i].load(['type', 'name', 'left', 'top', 'width', 'height']);
                     }
                     await context.sync();
 
-                    let titleSize = "N/A";
-                    let bodySize = "N/A";
-                    let contentPos = "Not Found";
-
-                    for(let i=0; i<shapes.items.length; i++){
-                        const s = shapes.items[i];
-                        if(s.type === "Placeholder") {
-                            // Check TextFrame for Font Size
-                            // Note: We need another sync to get font sizes from paragraphs
-                            // We will collect candidates and do one sync
-                        }
-                    }
-                    
-                    // To avoid complex syncing in loops for this display, we'll try to find the shapes first
-                    let titleShape = null;
                     let bodyShape = null;
+                    let titleSize = "N/A";
 
                     for(let i=0; i<shapes.items.length; i++){
                         const s = shapes.items[i];
-                        const n = s.name.toLowerCase();
                         if(s.type === "Placeholder") {
-                            if(n.includes("title")) titleShape = s;
-                            if(n.includes("text") || n.includes("content") || n.includes("body")) bodyShape = s;
+                            const n = s.name.toLowerCase();
+                            if(n.includes("text") || n.includes("content") || n.includes("body")) {
+                                bodyShape = s;
+                            }
                         }
                     }
 
-                    // Load paragraph fonts if shapes found
-                    if(titleShape) titleShape.textFrame.paragraphs.load('items');
-                    if(bodyShape) bodyShape.textFrame.paragraphs.load('items');
-                    await context.sync();
-
-                    if(titleShape && titleShape.textFrame.paragraphs.items.length > 0) {
-                        titleShape.textFrame.paragraphs.items[0].font.load('size');
-                    }
-                    if(bodyShape && bodyShape.textFrame.paragraphs.items.length > 0) {
-                        bodyShape.textFrame.paragraphs.items[0].font.load('size');
-                    }
-                    await context.sync();
-
-                    if(titleShape && titleShape.textFrame.paragraphs.items.length > 0) {
-                        titleSize = titleShape.textFrame.paragraphs.items[0].font.size + " pt";
-                    }
+                    let contentPos = "Not Found";
                     if(bodyShape) {
-                        if(bodyShape.textFrame.paragraphs.items.length > 0) {
-                            bodySize = bodyShape.textFrame.paragraphs.items[0].font.size + " pt";
-                        }
-                        contentPos = `L:${Math.round(bodyShape.left)}, T:${Math.round(bodyShape.top)} <br> W:${Math.round(bodyShape.width)}, H:${Math.round(bodyShape.height)}`;
+                        contentPos = `Left: ${Math.round(bodyShape.left)}, Top: ${Math.round(bodyShape.top)}<br>Width: ${Math.round(bodyShape.width)}, Height: ${Math.round(bodyShape.height)}`;
                     }
 
                     // Build HTML
                     let html = `
                         <div class="info-row"><span class="info-label">Master Name</span><span class="info-val">${master.name}</span></div>
                         
-                        <div class="section-title" style="margin-top:12px;">Fonts (Major / Minor)</div>
-                        <div class="info-row"><span class="info-label">Title Font</span><span class="info-val">${fonts.majorFont.latin} (${titleSize})</span></div>
-                        <div class="info-row"><span class="info-label">Body Font</span><span class="info-val">${fonts.minorFont.latin} (${bodySize})</span></div>
+                        <div class="section-title" style="margin-top:12px;">Fonts</div>
+                        <div class="info-row"><span class="info-label">Title Font</span><span class="info-val">${majorFont}</span></div>
+                        <div class="info-row"><span class="info-label">Body Font</span><span class="info-val">${minorFont}</span></div>
 
                         <div class="section-title" style="margin-top:12px;">Content Placeholder</div>
-                        <div class="info-row"><span class="info-label">Dimensions</span><span class="info-val">${contentPos}</span></div>
+                        <div class="info-row"><span class="info-label">Geometry</span><span class="info-val">${contentPos}</span></div>
+                    `;
 
+                    if(themeLoaded) {
+                        html += `
                         <div class="section-title" style="margin-top:12px;">Theme Colors</div>
                         <div class="color-grid">
                             <div class="color-swatch" style="background-color:${colors.dark1}" title="Dark 1"></div>
@@ -492,8 +481,9 @@
                             <div class="color-swatch" style="background-color:${colors.accent4}" title="Accent 4"></div>
                             <div class="color-swatch" style="background-color:${colors.accent5}" title="Accent 5"></div>
                             <div class="color-swatch" style="background-color:${colors.accent6}" title="Accent 6"></div>
-                        </div>
-                    `;
+                        </div>`;
+                    }
+
                     content.innerHTML = html;
                 });
             } catch(e) {
@@ -841,97 +831,4 @@
                 paragraphs.load('items');
                 await context.sync();
 
-                let insertedSpacer = false;
-                if(paragraphs.items.length >= 2) {
-                     paragraphs.items[1].load('text');
-                     await context.sync();
-                     const text2 = paragraphs.items[1].text.trim();
-                     
-                     if (text2.length > 0) {
-                         const p1Range = paragraphs.items[0].getRange("End");
-                         p1Range.insertParagraph("\r"); 
-                         insertedSpacer = true;
-                     }
-                } else if (paragraphs.items.length === 1) {
-                    const p1Range = paragraphs.items[0].getRange("End");
-                    p1Range.insertParagraph("\r");
-                    insertedSpacer = true;
-                }
-
-                if(insertedSpacer) {
-                    titleShape.textFrame.paragraphs.load('items');
-                    await context.sync();
-                }
-                
-                const finalParas = titleShape.textFrame.paragraphs.items;
-                for(let i=0; i<finalParas.length; i++) {
-                    const p = finalParas[i];
-                    p.font.load(['size', 'name']);
-                }
-                await context.sync();
-
-                if(themeFonts.heading) finalParas[0].font.name = themeFonts.heading;
-
-                if(finalParas.length > 1) {
-                    finalParas[1].font.size = 6;
-                    if(themeFonts.body) finalParas[1].font.name = themeFonts.body;
-                }
-
-                for(let i=2; i<finalParas.length; i++) {
-                    finalParas[i].font.size = 16;
-                    if(themeFonts.body) finalParas[i].font.name = themeFonts.body;
-                }
-
-                await context.sync();
-                showToast("Title Formatted", "success");
-            });
-        }
-
-        // --- Other Tools ---
-        function runMatchSize(dimension) {
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load(['items', 'width', 'height']);
-                await context.sync();
-                if (shapes.items.length < 2) return;
-                const tW = shapes.items[0].width;
-                const tH = shapes.items[0].height;
-                for (let i = 1; i < shapes.items.length; i++) {
-                    if (dimension === 'width') shapes.items[i].width = tW;
-                    if (dimension === 'height') shapes.items[i].height = tH;
-                }
-                await context.sync();
-                showToast("Size Matched", "success");
-            });
-        }
-
-        function runSwap() {
-             runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load(['items', 'left', 'top']);
-                await context.sync();
-                if (shapes.items.length !== 2) return;
-                const s1 = shapes.items[0], s2 = shapes.items[1];
-                const l = s1.left, t = s1.top;
-                s1.left = s2.left; s1.top = s2.top;
-                s2.left = l; s2.top = t;
-                await context.sync();
-                showToast("Swapped", "success");
-            });
-        }
-
-        function handleShortcuts(e) {
-            const mod = document.body.classList.contains('is-mac') ? e.ctrlKey : e.altKey;
-            if (!mod) return;
-            if (e.key.startsWith('Arrow')) { e.preventDefault(); runAlign(e.key.replace('Arrow','').toLowerCase()); }
-        }
-
-        function showToast(msg, type) {
-            const t = document.getElementById('statusToast');
-            t.textContent = msg;
-            t.className = `status-toast visible ${type}`;
-            setTimeout(() => t.classList.remove('visible'), 2500);
-        }
-    </script>
-</body>
-</html>
+                let insertedSpacer = false
