@@ -155,7 +155,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.8</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.10</span></h1>
         </div>
 
         <div class="tabs">
@@ -226,7 +226,7 @@
                 </button>
             </div>
 
-            <div class="section-title">Size & Arrange</div>
+            <div class="section-title">Text & Arrange</div>
             <div class="align-grid">
                 <button class="align-btn" onclick="runMatchSize('width')">
                     <i class="ms-Icon ms-Icon--FitWidth"></i><span>Width</span>
@@ -239,9 +239,12 @@
                 </button>
             </div>
             
-            <div class="align-grid" style="grid-template-columns: 1fr;">
+            <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
                 <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()">
-                    <i class="ms-Icon ms-Icon--PaddingTop"></i><span>Fix Margins (Auto)</span>
+                    <i class="ms-Icon ms-Icon--PaddingTop"></i><span>Fix Margins</span>
+                </button>
+                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixTitle()">
+                    <i class="ms-Icon ms-Icon--TextField"></i><span>Fix Title</span>
                 </button>
             </div>
 
@@ -396,6 +399,63 @@
             };
         }
 
+        // --- Helper: Get Theme Fonts ---
+        async function getThemeFonts(context) {
+            const slides = context.presentation.getSelectedSlides();
+            slides.load('items');
+            await context.sync();
+            const layout = slides.items[0].layout;
+            const shapes = layout.shapes;
+            shapes.load('items');
+            await context.sync();
+
+            let headingFont = null;
+            let bodyFont = null;
+
+            const fontItems = [];
+             for(let i=0; i<shapes.items.length; i++) {
+                const s = shapes.items[i];
+                // Check if it's a placeholder by type first to avoid loading props for everything
+                // We must load 'type' and 'textFrame' state to be safe
+                // However, we already loaded 'items' earlier. 
+                // In JS, property access triggers demand loading if not available.
+                // We'll just assume standard access pattern:
+                if (s.type === "Placeholder") {
+                    // Queue loading textFrame stuff
+                    s.load('textFrame');
+                }
+            }
+            await context.sync();
+
+            // Second pass for paragraphs
+            for(let i=0; i<shapes.items.length; i++) {
+                const s = shapes.items[i];
+                if(s.type === "Placeholder" && s.textFrame) {
+                    s.textFrame.paragraphs.load('items');
+                }
+            }
+            await context.sync();
+
+            // Third pass for fonts
+            for(let i=0; i<shapes.items.length; i++) {
+                const s = shapes.items[i];
+                if(s.type === "Placeholder" && s.textFrame && s.textFrame.paragraphs.items.length > 0) {
+                    s.load('name');
+                    s.textFrame.paragraphs.items[0].font.load('name');
+                    fontItems.push({ shape: s, font: s.textFrame.paragraphs.items[0].font });
+                }
+            }
+            if(fontItems.length > 0) await context.sync();
+
+            for(let item of fontItems) {
+                const name = item.shape.name.toLowerCase();
+                if(name.includes("title") && !headingFont) headingFont = item.font.name;
+                if((name.includes("body") || name.includes("content") || name.includes("text")) && !bodyFont) bodyFont = item.font.name;
+            }
+
+            return { heading: headingFont, body: bodyFont };
+        }
+
         // --- Wrapper ---
         async function runAction(actionFunction) {
             if (isBusy) return;
@@ -496,9 +556,8 @@
 
                         let currentLeft = bounds.left;
                         for (let i = 0; i < count; i++) {
-                            items[i].obj.width = newWidth; // Resize Width
-                            items[i].obj.left = currentLeft; // Set X
-                            // Height/Y Unchanged
+                            items[i].obj.width = newWidth; 
+                            items[i].obj.left = currentLeft;
                             currentLeft += newWidth + gutterSize;
                         }
                         showToast(`Smart Fit: Horizontal`, "success");
@@ -527,9 +586,8 @@
 
                         let currentTop = bounds.top;
                         for (let i = 0; i < count; i++) {
-                            items[i].obj.height = newHeight; // Resize Height
-                            items[i].obj.top = currentTop;   // Set Y
-                            // Width/X Unchanged
+                            items[i].obj.height = newHeight;
+                            items[i].obj.top = currentTop;
                             currentTop += newHeight + gutterSize;
                         }
                         showToast(`Smart Fit: Vertical`, "success");
@@ -548,7 +606,7 @@
             });
         }
 
-        // --- NEW: FIX MARGINS (BORDER CHECK) ---
+        // --- NEW: FIX MARGINS (STRICT BORDER CHECK) ---
         function runFixMargins() {
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
@@ -557,29 +615,123 @@
 
                 if (shapes.items.length < 1) { showToast("Select a shape", "error"); return; }
 
-                let updatedCount = 0;
-                
-                // We must load line format for each shape to check visibility
+                // Pre-load properties safely
                 for (let i = 0; i < shapes.items.length; i++) {
-                    shapes.items[i].lineFormat.load('visible');
-                    shapes.items[i].textFrame.load(['leftMargin', 'rightMargin', 'topMargin', 'bottomMargin']);
+                    shapes.items[i].load('type'); // Load type to be safe
                 }
                 await context.sync();
 
                 for (let i = 0; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
-                    // 0.1 inch = 7.2 points
-                    const margin = s.lineFormat.visible ? 7.2 : 0;
+                    // Load LineFormat for border visibility
+                    s.lineFormat.load('visible');
+                    // We attempt to load textFrame margins if it exists
+                    if (s.textFrame) {
+                        s.textFrame.load(['leftMargin', 'rightMargin', 'topMargin', 'bottomMargin']);
+                    }
+                }
+                await context.sync();
+
+                let updatedCount = 0;
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
                     
-                    s.textFrame.leftMargin = margin;
-                    s.textFrame.rightMargin = margin;
-                    s.textFrame.topMargin = margin;
-                    s.textFrame.bottomMargin = margin;
-                    updatedCount++;
+                    // Safe block for assignment
+                    try {
+                        const hasBorder = s.lineFormat.visible;
+                        const newMargin = hasBorder ? 7.2 : 0; // 0.1 inch = 7.2 points
+
+                        s.textFrame.leftMargin = newMargin;
+                        s.textFrame.rightMargin = newMargin;
+                        s.textFrame.topMargin = newMargin;
+                        s.textFrame.bottomMargin = newMargin;
+                        updatedCount++;
+                    } catch (e) {
+                        // Skip shapes without text frames or incompatible types (Group, etc)
+                    }
                 }
 
                 await context.sync();
-                showToast(`Updated margins for ${updatedCount} shapes`, "success");
+                showToast(`Margins fixed for ${updatedCount} shapes`, "success");
+            });
+        }
+
+        // --- FIX TITLE ---
+        function runFixTitle() {
+            runAction(async (context) => {
+                const slides = context.presentation.getSelectedSlides();
+                slides.load('items');
+                await context.sync();
+                const activeSlide = slides.items[0];
+
+                const shapes = activeSlide.shapes;
+                shapes.load('items');
+                await context.sync();
+
+                let titleShape = null;
+                for(let i=0; i<shapes.items.length; i++) { shapes.items[i].load(['name', 'type']); }
+                await context.sync();
+                
+                for(let i=0; i<shapes.items.length; i++) {
+                    const name = shapes.items[i].name.toLowerCase();
+                    if(name.includes("title")) {
+                        titleShape = shapes.items[i];
+                        break;
+                    }
+                }
+
+                if(!titleShape) { showToast("No Title found", "error"); return; }
+                
+                const themeFonts = await getThemeFonts(context);
+
+                const textFrame = titleShape.textFrame;
+                const paragraphs = textFrame.textRange.paragraphs;
+                paragraphs.load('items');
+                await context.sync();
+
+                let insertedSpacer = false;
+                if(paragraphs.items.length >= 2) {
+                     paragraphs.items[1].load('text');
+                     await context.sync();
+                     const text2 = paragraphs.items[1].text.trim();
+                     
+                     if (text2.length > 0) {
+                         const p1Range = paragraphs.items[0].getRange("End");
+                         p1Range.insertParagraph("\r"); 
+                         insertedSpacer = true;
+                     }
+                } else if (paragraphs.items.length === 1) {
+                    const p1Range = paragraphs.items[0].getRange("End");
+                    p1Range.insertParagraph("\r");
+                    insertedSpacer = true;
+                }
+
+                if(insertedSpacer) {
+                    titleShape.textFrame.paragraphs.load('items');
+                    await context.sync();
+                }
+                
+                const finalParas = titleShape.textFrame.paragraphs.items;
+                for(let i=0; i<finalParas.length; i++) {
+                    const p = finalParas[i];
+                    p.font.load(['size', 'name']);
+                }
+                await context.sync();
+
+                if(themeFonts.heading) finalParas[0].font.name = themeFonts.heading;
+
+                if(finalParas.length > 1) {
+                    finalParas[1].font.size = 6;
+                    if(themeFonts.body) finalParas[1].font.name = themeFonts.body;
+                }
+
+                for(let i=2; i<finalParas.length; i++) {
+                    finalParas[i].font.size = 16;
+                    if(themeFonts.body) finalParas[i].font.name = themeFonts.body;
+                }
+
+                await context.sync();
+                showToast("Title Formatted", "success");
             });
         }
 
