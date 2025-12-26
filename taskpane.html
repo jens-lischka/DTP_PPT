@@ -19,6 +19,7 @@
             --white: #ffffff;
             --radius: 4px;
             --shadow: 0 1.6px 3.6px rgba(0,0,0,0.13);
+            --modal-overlay: rgba(0, 0, 0, 0.4);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +32,7 @@
             outline: none; 
         }
 
-        .taskpane { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .taskpane { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
 
         /* --- Header & Tabs --- */
         .header {
@@ -50,6 +51,13 @@
             font-size: 10px; background: var(--neutral-light); color: var(--neutral-dark);
             padding: 2px 6px; border-radius: 10px; font-weight: normal; vertical-align: middle;
         }
+
+        .header-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            background: none; border: none; cursor: pointer; color: var(--neutral-dark);
+            padding: 4px; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn:hover { color: var(--primary); background: var(--neutral-light); border-radius: 50%; }
         
         .tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--neutral-light); }
         .tab {
@@ -139,6 +147,28 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
+        /* --- Modal Popup --- */
+        .modal {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--modal-overlay); z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: var(--white); width: 90%; max-height: 90%; overflow-y: auto;
+            border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            padding: 16px; position: relative;
+        }
+        .modal-close {
+            position: absolute; top: 12px; right: 12px; cursor: pointer; font-size: 16px; color: var(--neutral-dark);
+        }
+        .info-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f3f3f3; }
+        .info-label { font-weight: 600; color: var(--neutral-dark); font-size: 12px; }
+        .info-val { font-family: 'Consolas', monospace; font-size: 12px; text-align: right; }
+        
+        .color-grid { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+        .color-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ccc; }
+
         .mac-only { display: none; }
         body.is-mac .mac-only { display: inline; }
         body.is-mac .win-only { display: none; }
@@ -155,7 +185,12 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.10</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.11</span></h1>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="runInfo()" title="Presentation Info">
+                    <i class="ms-Icon ms-Icon--Info"></i>
+                </button>
+            </div>
         </div>
 
         <div class="tabs">
@@ -276,6 +311,16 @@
 
     </div>
 
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="document.getElementById('infoModal').classList.remove('open')">
+                <i class="ms-Icon ms-Icon--Cancel"></i>
+            </div>
+            <h2 class="section-title" style="font-size:14px; margin-bottom:12px;">Presentation Info</h2>
+            <div id="infoContent">Loading...</div>
+        </div>
+    </div>
+
     <div id="statusToast" class="status-toast"></div>
 
     <script>
@@ -332,6 +377,128 @@
                     statusEl.style.color = count > 0 ? "var(--primary)" : "var(--neutral-dark)";
                 });
             } catch (e) { console.warn(e); }
+        }
+
+        // --- INFO FEATURE (POPUP) ---
+        async function runInfo() {
+            document.getElementById('infoModal').classList.add('open');
+            const content = document.getElementById('infoContent');
+            content.innerHTML = '<div style="text-align:center; padding:20px;">Scanning Slide Master...</div>';
+
+            try {
+                await PowerPoint.run(async (context) => {
+                    // 1. Get Master and Theme
+                    const masters = context.presentation.masters;
+                    masters.load('items');
+                    await context.sync();
+                    
+                    if(masters.items.length === 0) {
+                        content.innerHTML = 'No Master found.'; return;
+                    }
+
+                    const master = masters.items[0];
+                    master.load(['name', 'shapes']);
+                    
+                    // Load Theme
+                    const theme = master.theme;
+                    theme.load(['fontScheme', 'colorScheme']);
+                    
+                    // Load Shapes to find placeholders
+                    const shapes = master.shapes;
+                    shapes.load('items');
+                    
+                    await context.sync();
+
+                    // 2. Process Fonts & Colors
+                    const fonts = theme.fontScheme;
+                    fonts.load(['majorFont', 'minorFont']);
+                    const colors = theme.colorScheme;
+                    colors.load(['accent1', 'accent2', 'accent3', 'accent4', 'accent5', 'accent6', 'dark1', 'light1']);
+                    
+                    // 3. Process Placeholders (Size & Pos)
+                    // Preload properties
+                    for(let i=0; i<shapes.items.length; i++){
+                        shapes.items[i].load(['type', 'name', 'left', 'top', 'width', 'height', 'textFrame']);
+                    }
+                    await context.sync();
+
+                    let titleSize = "N/A";
+                    let bodySize = "N/A";
+                    let contentPos = "Not Found";
+
+                    for(let i=0; i<shapes.items.length; i++){
+                        const s = shapes.items[i];
+                        if(s.type === "Placeholder") {
+                            // Check TextFrame for Font Size
+                            // Note: We need another sync to get font sizes from paragraphs
+                            // We will collect candidates and do one sync
+                        }
+                    }
+                    
+                    // To avoid complex syncing in loops for this display, we'll try to find the shapes first
+                    let titleShape = null;
+                    let bodyShape = null;
+
+                    for(let i=0; i<shapes.items.length; i++){
+                        const s = shapes.items[i];
+                        const n = s.name.toLowerCase();
+                        if(s.type === "Placeholder") {
+                            if(n.includes("title")) titleShape = s;
+                            if(n.includes("text") || n.includes("content") || n.includes("body")) bodyShape = s;
+                        }
+                    }
+
+                    // Load paragraph fonts if shapes found
+                    if(titleShape) titleShape.textFrame.paragraphs.load('items');
+                    if(bodyShape) bodyShape.textFrame.paragraphs.load('items');
+                    await context.sync();
+
+                    if(titleShape && titleShape.textFrame.paragraphs.items.length > 0) {
+                        titleShape.textFrame.paragraphs.items[0].font.load('size');
+                    }
+                    if(bodyShape && bodyShape.textFrame.paragraphs.items.length > 0) {
+                        bodyShape.textFrame.paragraphs.items[0].font.load('size');
+                    }
+                    await context.sync();
+
+                    if(titleShape && titleShape.textFrame.paragraphs.items.length > 0) {
+                        titleSize = titleShape.textFrame.paragraphs.items[0].font.size + " pt";
+                    }
+                    if(bodyShape) {
+                        if(bodyShape.textFrame.paragraphs.items.length > 0) {
+                            bodySize = bodyShape.textFrame.paragraphs.items[0].font.size + " pt";
+                        }
+                        contentPos = `L:${Math.round(bodyShape.left)}, T:${Math.round(bodyShape.top)} <br> W:${Math.round(bodyShape.width)}, H:${Math.round(bodyShape.height)}`;
+                    }
+
+                    // Build HTML
+                    let html = `
+                        <div class="info-row"><span class="info-label">Master Name</span><span class="info-val">${master.name}</span></div>
+                        
+                        <div class="section-title" style="margin-top:12px;">Fonts (Major / Minor)</div>
+                        <div class="info-row"><span class="info-label">Title Font</span><span class="info-val">${fonts.majorFont.latin} (${titleSize})</span></div>
+                        <div class="info-row"><span class="info-label">Body Font</span><span class="info-val">${fonts.minorFont.latin} (${bodySize})</span></div>
+
+                        <div class="section-title" style="margin-top:12px;">Content Placeholder</div>
+                        <div class="info-row"><span class="info-label">Dimensions</span><span class="info-val">${contentPos}</span></div>
+
+                        <div class="section-title" style="margin-top:12px;">Theme Colors</div>
+                        <div class="color-grid">
+                            <div class="color-swatch" style="background-color:${colors.dark1}" title="Dark 1"></div>
+                            <div class="color-swatch" style="background-color:${colors.light1}" title="Light 1"></div>
+                            <div class="color-swatch" style="background-color:${colors.accent1}" title="Accent 1"></div>
+                            <div class="color-swatch" style="background-color:${colors.accent2}" title="Accent 2"></div>
+                            <div class="color-swatch" style="background-color:${colors.accent3}" title="Accent 3"></div>
+                            <div class="color-swatch" style="background-color:${colors.accent4}" title="Accent 4"></div>
+                            <div class="color-swatch" style="background-color:${colors.accent5}" title="Accent 5"></div>
+                            <div class="color-swatch" style="background-color:${colors.accent6}" title="Accent 6"></div>
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                });
+            } catch(e) {
+                content.innerHTML = "Error loading info: " + e.message;
+            }
         }
 
         // --- Helper: Find Layout Content Placeholder ---
@@ -415,19 +582,12 @@
             const fontItems = [];
              for(let i=0; i<shapes.items.length; i++) {
                 const s = shapes.items[i];
-                // Check if it's a placeholder by type first to avoid loading props for everything
-                // We must load 'type' and 'textFrame' state to be safe
-                // However, we already loaded 'items' earlier. 
-                // In JS, property access triggers demand loading if not available.
-                // We'll just assume standard access pattern:
                 if (s.type === "Placeholder") {
-                    // Queue loading textFrame stuff
                     s.load('textFrame');
                 }
             }
             await context.sync();
 
-            // Second pass for paragraphs
             for(let i=0; i<shapes.items.length; i++) {
                 const s = shapes.items[i];
                 if(s.type === "Placeholder" && s.textFrame) {
@@ -436,7 +596,6 @@
             }
             await context.sync();
 
-            // Third pass for fonts
             for(let i=0; i<shapes.items.length; i++) {
                 const s = shapes.items[i];
                 if(s.type === "Placeholder" && s.textFrame && s.textFrame.paragraphs.items.length > 0) {
@@ -615,17 +774,14 @@
 
                 if (shapes.items.length < 1) { showToast("Select a shape", "error"); return; }
 
-                // Pre-load properties safely
                 for (let i = 0; i < shapes.items.length; i++) {
-                    shapes.items[i].load('type'); // Load type to be safe
+                    shapes.items[i].load('type');
                 }
                 await context.sync();
 
                 for (let i = 0; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
-                    // Load LineFormat for border visibility
                     s.lineFormat.load('visible');
-                    // We attempt to load textFrame margins if it exists
                     if (s.textFrame) {
                         s.textFrame.load(['leftMargin', 'rightMargin', 'topMargin', 'bottomMargin']);
                     }
@@ -635,8 +791,6 @@
                 let updatedCount = 0;
                 for (let i = 0; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
-                    
-                    // Safe block for assignment
                     try {
                         const hasBorder = s.lineFormat.visible;
                         const newMargin = hasBorder ? 7.2 : 0; // 0.1 inch = 7.2 points
@@ -646,9 +800,7 @@
                         s.textFrame.topMargin = newMargin;
                         s.textFrame.bottomMargin = newMargin;
                         updatedCount++;
-                    } catch (e) {
-                        // Skip shapes without text frames or incompatible types (Group, etc)
-                    }
+                    } catch (e) {}
                 }
 
                 await context.sync();
