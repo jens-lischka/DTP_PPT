@@ -155,7 +155,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.7</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.8</span></h1>
         </div>
 
         <div class="tabs">
@@ -236,6 +236,12 @@
                 </button>
                 <button class="align-btn" onclick="runSwap()">
                     <i class="ms-Icon ms-Icon--Switch"></i><span>Swap</span>
+                </button>
+            </div>
+            
+            <div class="align-grid" style="grid-template-columns: 1fr;">
+                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()">
+                    <i class="ms-Icon ms-Icon--PaddingTop"></i><span>Fix Margins (Auto)</span>
                 </button>
             </div>
 
@@ -458,7 +464,6 @@
         function runDistribute(axis) {
             const useGutter = document.getElementById('useGutter').checked;
             const useContainer = document.getElementById('alignToContainer').checked;
-            // If checked use value, else 0
             const gutterSize = useGutter ? (parseFloat(document.getElementById('gutterSize').value) || 0) : 0;
 
             runAction(async (context) => {
@@ -469,7 +474,6 @@
                 const count = shapes.items.length;
                 if (count < 2) { showToast("Select 2+ shapes", "error"); return; }
 
-                // Create sorting array
                 let items = [];
                 for(let i=0; i<count; i++) {
                     items.push({ 
@@ -480,12 +484,9 @@
                 }
 
                 if (axis === 'horizontal') {
-                    // Sort Left to Right
                     items.sort((a, b) => a.left - b.left);
 
                     if (useContainer) {
-                        // ** SMART FIT HORIZONTAL **
-                        // 1. Calculate adjusted width (keep Height same)
                         const bounds = await getReferenceBounds(context);
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.width - totalGutterSpace;
@@ -493,24 +494,17 @@
 
                         if (newWidth < 1) { showToast("Gutter too large", "error"); return; }
 
-                        // 3, 4, 5. Place items Left to Right
                         let currentLeft = bounds.left;
                         for (let i = 0; i < count; i++) {
                             items[i].obj.width = newWidth; // Resize Width
                             items[i].obj.left = currentLeft; // Set X
-                            // Height and Y (Top) remain UNCHANGED per request
+                            // Height/Y Unchanged
                             currentLeft += newWidth + gutterSize;
                         }
                         showToast(`Smart Fit: Horizontal`, "success");
                     } else {
-                        // Standard Distribute Logic (No container)
-                        // Simple equal gaps between outer elements
                         const start = items[0].left;
                         const end = items[count-1].left + items[count-1].width;
-                        const totalW = items.reduce((acc, c) => acc + c.width, 0);
-                        const span = end - start;
-                        
-                        // Distribute Centers
                         const centerStart = items[0].obj.left + items[0].obj.width/2;
                         const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
@@ -521,13 +515,9 @@
                         showToast("Distributed", "success");
                     }
                 } else {
-                    // Vertical
-                    // Sort Top to Bottom
                     items.sort((a, b) => a.top - b.top);
 
                     if (useContainer) {
-                        // ** SMART FIT VERTICAL **
-                        // 1. Calculate adjusted height (keep Width same)
                         const bounds = await getReferenceBounds(context);
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.height - totalGutterSpace;
@@ -535,17 +525,15 @@
 
                         if (newHeight < 1) { showToast("Gutter too large", "error"); return; }
 
-                        // 3, 4, 5. Place items Top to Bottom
                         let currentTop = bounds.top;
                         for (let i = 0; i < count; i++) {
                             items[i].obj.height = newHeight; // Resize Height
                             items[i].obj.top = currentTop;   // Set Y
-                            // Width and X (Left) remain UNCHANGED per request
+                            // Width/X Unchanged
                             currentTop += newHeight + gutterSize;
                         }
                         showToast(`Smart Fit: Vertical`, "success");
                     } else {
-                        // Standard Vertical Distribute
                         const centerStart = items[0].obj.top + items[0].obj.height/2;
                         const centerEnd = items[count-1].obj.top + items[count-1].obj.height/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
@@ -557,6 +545,41 @@
                     }
                 }
                 await context.sync();
+            });
+        }
+
+        // --- NEW: FIX MARGINS (BORDER CHECK) ---
+        function runFixMargins() {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+
+                if (shapes.items.length < 1) { showToast("Select a shape", "error"); return; }
+
+                let updatedCount = 0;
+                
+                // We must load line format for each shape to check visibility
+                for (let i = 0; i < shapes.items.length; i++) {
+                    shapes.items[i].lineFormat.load('visible');
+                    shapes.items[i].textFrame.load(['leftMargin', 'rightMargin', 'topMargin', 'bottomMargin']);
+                }
+                await context.sync();
+
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    // 0.1 inch = 7.2 points
+                    const margin = s.lineFormat.visible ? 7.2 : 0;
+                    
+                    s.textFrame.leftMargin = margin;
+                    s.textFrame.rightMargin = margin;
+                    s.textFrame.topMargin = margin;
+                    s.textFrame.bottomMargin = margin;
+                    updatedCount++;
+                }
+
+                await context.sync();
+                showToast(`Updated margins for ${updatedCount} shapes`, "success");
             });
         }
 
