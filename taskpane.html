@@ -185,7 +185,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.13</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v2.14</span></h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="runInfo()" title="Presentation Info">
                     <i class="ms-Icon ms-Icon--Info"></i>
@@ -379,133 +379,61 @@
             } catch (e) { console.warn(e); }
         }
 
-        // --- INFO FEATURE (POPUP) - V2.13 DEFENSIVE ---
+        // --- INFO FEATURE (POPUP) - V2.14 SIMPLE DEBUG ---
         async function runInfo() {
             document.getElementById('infoModal').classList.add('open');
             const content = document.getElementById('infoContent');
-            content.innerHTML = '<div style="text-align:center; padding:20px;">Scanning Master...</div>';
+            content.innerHTML = '<div style="text-align:center; padding:20px;">Reading Basic Info...</div>';
 
-            await PowerPoint.run(async (context) => {
-                // 1. Initial Load: Master & Shapes only (Safe)
-                const masters = context.presentation.masters;
-                masters.load('items');
-                await context.sync();
-                
-                if(masters.items.length === 0) {
-                    content.innerHTML = 'No Master found.'; return;
-                }
-
-                const master = masters.items[0];
-                master.load(['name', 'shapes']); 
-                // Do NOT load 'theme' here yet to avoid undefined errors
-                await context.sync();
-
-                // 2. Try Loading Theme (Isolated)
-                let majorFont = "N/A";
-                let minorFont = "N/A";
-                let colors = null;
-                let themeLoaded = false;
-
-                try {
-                    // Check support if possible, or just attempt load
-                    // Some builds might not return the theme property at all on the master object
-                    // We attempt to load it explicitly now.
-                    master.load('theme');
+            try {
+                await PowerPoint.run(async (context) => {
+                    // Step 1: Basic Presentation Props
+                    const presentation = context.presentation;
+                    presentation.load(['slideWidth', 'slideHeight']);
                     await context.sync();
 
-                    if(master.theme) {
-                        const theme = master.theme;
-                        theme.load(['fontScheme', 'colorScheme']);
+                    // Step 2: Masters Collection
+                    const masters = presentation.masters;
+                    masters.load('items');
+                    await context.sync();
+
+                    let masterName = "No Master Found";
+                    let shapeCount = 0;
+
+                    if (masters.items.length > 0) {
+                        const master = masters.items[0];
+                        master.load('name');
                         await context.sync();
+                        masterName = master.name;
 
-                        if(theme.fontScheme) {
-                            theme.fontScheme.load(['majorFont', 'minorFont']);
+                        // Step 3: Check Shapes (Count only)
+                        // We do this separately to see if this specific part fails
+                        try {
+                            const shapes = master.shapes;
+                            shapes.load('items');
                             await context.sync();
-                            majorFont = theme.fontScheme.majorFont.latin || "Unknown";
-                            minorFont = theme.fontScheme.minorFont.latin || "Unknown";
-                        }
-
-                        if(theme.colorScheme) {
-                            theme.colorScheme.load(['accent1','accent2','accent3','accent4','accent5','accent6','dark1','light1']);
-                            await context.sync();
-                            colors = theme.colorScheme;
-                            themeLoaded = true;
-                        }
-                    } else {
-                        console.warn("Theme object is undefined on Master.");
-                        majorFont = "Not Supported";
-                        minorFont = "Not Supported";
-                    }
-                } catch(err) {
-                    console.warn("Theme API Error:", err);
-                    majorFont = "Error";
-                    minorFont = "Error";
-                }
-
-                // 3. Process Placeholders (Isolated)
-                let contentPos = "Not Found";
-                try {
-                    const shapes = master.shapes;
-                    shapes.load('items');
-                    await context.sync();
-
-                    // Load properties for filtering
-                    // Using iteration to avoid one massive load string if shape list is huge
-                    for(let i=0; i<shapes.items.length; i++){
-                        shapes.items[i].load(['type', 'name', 'left', 'top', 'width', 'height']);
-                    }
-                    await context.sync();
-
-                    let bodyShape = null;
-                    for(let i=0; i<shapes.items.length; i++){
-                        const s = shapes.items[i];
-                        if(s.type === "Placeholder") {
-                            const n = s.name.toLowerCase();
-                            if(n.includes("text") || n.includes("content") || n.includes("body")) {
-                                bodyShape = s;
-                            }
+                            shapeCount = shapes.items.length;
+                        } catch (e) {
+                            shapeCount = "Error accessing shapes";
                         }
                     }
 
-                    if(bodyShape) {
-                        contentPos = `L:${Math.round(bodyShape.left)}, T:${Math.round(bodyShape.top)} <br> W:${Math.round(bodyShape.width)}, H:${Math.round(bodyShape.height)}`;
-                    }
-                } catch(err) {
-                    console.warn("Placeholder Geometry Error:", err);
-                    contentPos = "Error reading shapes";
-                }
-
-                // 4. Build UI
-                let html = `
-                    <div class="info-row"><span class="info-label">Master Name</span><span class="info-val">${master.name || "Unnamed"}</span></div>
+                    // Build Simple UI
+                    let html = `
+                        <div class="section-title">Presentation Basics</div>
+                        <div class="info-row"><span class="info-label">Slide Width</span><span class="info-val">${presentation.slideWidth} pt</span></div>
+                        <div class="info-row"><span class="info-label">Slide Height</span><span class="info-val">${presentation.slideHeight} pt</span></div>
+                        
+                        <div class="section-title" style="margin-top:12px;">Master Info</div>
+                        <div class="info-row"><span class="info-label">Master Name</span><span class="info-val">${masterName}</span></div>
+                        <div class="info-row"><span class="info-label">Shape Count</span><span class="info-val">${shapeCount}</span></div>
+                    `;
                     
-                    <div class="section-title" style="margin-top:12px;">Fonts</div>
-                    <div class="info-row"><span class="info-label">Title Font</span><span class="info-val">${majorFont}</span></div>
-                    <div class="info-row"><span class="info-label">Body Font</span><span class="info-val">${minorFont}</span></div>
-
-                    <div class="section-title" style="margin-top:12px;">Content Placeholder</div>
-                    <div class="info-row"><span class="info-label">Geometry</span><span class="info-val">${contentPos}</span></div>
-                `;
-
-                if(themeLoaded && colors) {
-                    html += `
-                    <div class="section-title" style="margin-top:12px;">Theme Colors</div>
-                    <div class="color-grid">
-                        <div class="color-swatch" style="background-color:${colors.dark1}" title="Dark 1"></div>
-                        <div class="color-swatch" style="background-color:${colors.light1}" title="Light 1"></div>
-                        <div class="color-swatch" style="background-color:${colors.accent1}" title="Accent 1"></div>
-                        <div class="color-swatch" style="background-color:${colors.accent2}" title="Accent 2"></div>
-                        <div class="color-swatch" style="background-color:${colors.accent3}" title="Accent 3"></div>
-                        <div class="color-swatch" style="background-color:${colors.accent4}" title="Accent 4"></div>
-                        <div class="color-swatch" style="background-color:${colors.accent5}" title="Accent 5"></div>
-                        <div class="color-swatch" style="background-color:${colors.accent6}" title="Accent 6"></div>
-                    </div>`;
-                }
-
-                content.innerHTML = html;
-            }).catch(globalErr => {
-                content.innerHTML = "Critical Error: " + globalErr.message;
-            });
+                    content.innerHTML = html;
+                });
+            } catch (e) {
+                content.innerHTML = "<b>Basic Read Error:</b> " + e.message;
+            }
         }
 
         // --- Helper: Find Layout Content Placeholder ---
