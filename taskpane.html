@@ -831,4 +831,97 @@
                 paragraphs.load('items');
                 await context.sync();
 
-                let insertedSpacer = false
+                let insertedSpacer = false;
+                if(paragraphs.items.length >= 2) {
+                     paragraphs.items[1].load('text');
+                     await context.sync();
+                     const text2 = paragraphs.items[1].text.trim();
+                     
+                     if (text2.length > 0) {
+                         const p1Range = paragraphs.items[0].getRange("End");
+                         p1Range.insertParagraph("\r"); 
+                         insertedSpacer = true;
+                     }
+                } else if (paragraphs.items.length === 1) {
+                    const p1Range = paragraphs.items[0].getRange("End");
+                    p1Range.insertParagraph("\r");
+                    insertedSpacer = true;
+                }
+
+                if(insertedSpacer) {
+                    titleShape.textFrame.paragraphs.load('items');
+                    await context.sync();
+                }
+                
+                const finalParas = titleShape.textFrame.paragraphs.items;
+                for(let i=0; i<finalParas.length; i++) {
+                    const p = finalParas[i];
+                    p.font.load(['size', 'name']);
+                }
+                await context.sync();
+
+                if(themeFonts.heading) finalParas[0].font.name = themeFonts.heading;
+
+                if(finalParas.length > 1) {
+                    finalParas[1].font.size = 6;
+                    if(themeFonts.body) finalParas[1].font.name = themeFonts.body;
+                }
+
+                for(let i=2; i<finalParas.length; i++) {
+                    finalParas[i].font.size = 16;
+                    if(themeFonts.body) finalParas[i].font.name = themeFonts.body;
+                }
+
+                await context.sync();
+                showToast("Title Formatted", "success");
+            });
+        }
+
+        // --- Other Tools ---
+        function runMatchSize(dimension) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'width', 'height']);
+                await context.sync();
+                if (shapes.items.length < 2) return;
+                const tW = shapes.items[0].width;
+                const tH = shapes.items[0].height;
+                for (let i = 1; i < shapes.items.length; i++) {
+                    if (dimension === 'width') shapes.items[i].width = tW;
+                    if (dimension === 'height') shapes.items[i].height = tH;
+                }
+                await context.sync();
+                showToast("Size Matched", "success");
+            });
+        }
+
+        function runSwap() {
+             runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top']);
+                await context.sync();
+                if (shapes.items.length !== 2) return;
+                const s1 = shapes.items[0], s2 = shapes.items[1];
+                const l = s1.left, t = s1.top;
+                s1.left = s2.left; s1.top = s2.top;
+                s2.left = l; s2.top = t;
+                await context.sync();
+                showToast("Swapped", "success");
+            });
+        }
+
+        function handleShortcuts(e) {
+            const mod = document.body.classList.contains('is-mac') ? e.ctrlKey : e.altKey;
+            if (!mod) return;
+            if (e.key.startsWith('Arrow')) { e.preventDefault(); runAlign(e.key.replace('Arrow','').toLowerCase()); }
+        }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('statusToast');
+            t.textContent = msg;
+            t.className = `status-toast visible ${type}`;
+            setTimeout(() => t.classList.remove('visible'), 2500);
+        }
+    </script>
+</body>
+</html>
