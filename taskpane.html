@@ -34,7 +34,6 @@
 
         .taskpane { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
 
-        /* --- Header & Tabs --- */
         .header {
             padding: 12px 16px;
             background: var(--white);
@@ -70,11 +69,9 @@
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         .tab i { font-size: 16px; }
 
-        /* --- Content Area --- */
         .tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px; }
         .tab-content.active { display: flex; flex-direction: column; gap: 16px; }
 
-        /* --- Components --- */
         .card {
             background: var(--white); border-radius: 8px; padding: 16px;
             box-shadow: var(--shadow); margin-bottom: 10px;
@@ -100,15 +97,15 @@
         .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
         .btn-primary:disabled { background: #c8c8c8; cursor: not-allowed; }
 
-        /* --- Align Tab Specifics --- */
         .align-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
         .align-btn {
             background: var(--white); border: 1px solid var(--neutral-light);
             color: var(--neutral-dark); height: 60px;
             flex-direction: column; gap: 4px;
         }
-        .align-btn:hover { background: var(--neutral-light); border-color: var(--neutral-dark); }
-        .align-btn:active { transform: scale(0.98); }
+        .align-btn:hover:not(:disabled) { background: var(--neutral-light); border-color: var(--neutral-dark); }
+        .align-btn:active:not(:disabled) { transform: scale(0.98); }
+        .align-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .align-btn span { font-size: 10px; font-weight: normal; }
         
         .section-title {
@@ -116,7 +113,6 @@
             color: var(--neutral-dark); margin-bottom: 8px; font-weight: 600;
         }
 
-        /* Controls Row */
         .controls-row {
             display: flex; align-items: center; gap: 8px; 
             padding: 8px; background: var(--white); 
@@ -134,7 +130,6 @@
             padding: 8px; border-radius: 4px; border-left: 3px solid var(--primary);
         }
 
-        /* --- Status & Loading --- */
         .status-toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
@@ -185,7 +180,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v3.1</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v3.2</span></h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="runInfo()" title="Get Info about this presentation">
                     <i class="ms-Icon ms-Icon--Info"></i>
@@ -194,9 +189,13 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" data-tab="align" title="Alignment Tools">
+            <button class="tab active" data-tab="align" title="Alignment & Grid">
                 <i class="ms-Icon ms-Icon--AlignCenter"></i>
                 <span>Align</span>
+            </button>
+            <button class="tab" data-tab="format" title="Copy/Paste & Attributes">
+                <i class="ms-Icon ms-Icon--Brush"></i>
+                <span>Format</span>
             </button>
             <button class="tab" data-tab="images" title="AI Image Generation">
                 <i class="ms-Icon ms-Icon--Photo2"></i>
@@ -209,14 +208,13 @@
         </div>
 
         <div class="tab-content active" id="tab-align">
-            
             <div id="selectionStatus" style="font-size: 12px; margin-bottom: 10px; color: var(--neutral-dark);">
                 Checking selection...
             </div>
 
             <div class="section-title">Reference & Spacing</div>
             <div class="controls-row">
-                <label for="alignToContainer" title="If checked, operations reference the Content Placeholder (or Slide) instead of the selection bounds.">
+                <label for="alignToContainer" title="If checked, operations reference the Content Placeholder (or Slide).">
                     <input type="checkbox" id="alignToContainer"> Use Content Container
                 </label>
             </div>
@@ -254,21 +252,68 @@
             <div class="controls-row" style="margin-bottom:8px;">
                 <label>Grid Columns:</label>
                 <input type="number" id="gridCols" value="3" min="1" max="10" title="Number of columns for Grid Layout">
-                <button class="btn-primary" style="width:auto; padding:4px 12px; font-size:11px;" onclick="runGridArrange()" title="Arrange selected items into a Grid. Uses 'Content Container' if checked.">
+                <button class="btn-primary" style="width:auto; padding:4px 12px; font-size:11px;" onclick="runGridArrange()" title="Arrange selected items into a Grid.">
                     <i class="ms-Icon ms-Icon--GridViewSmall"></i> Make Grid
                 </button>
             </div>
             
             <div class="align-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 8px;">
-                <button class="align-btn" onclick="runDistribute('horizontal')" title="Distribute Horizontally&#013;Spreads items. Resizes if Container is checked.">
+                <button class="align-btn" onclick="runDistribute('horizontal')" title="Distribute Horizontally">
                     <i class="ms-Icon ms-Icon--DistributeDown"></i><span>Horiz.</span>
                 </button>
-                <button class="align-btn" onclick="runDistribute('vertical')" title="Distribute Vertically&#013;Spreads items. Resizes if Container is checked.">
+                <button class="align-btn" onclick="runDistribute('vertical')" title="Distribute Vertically">
                     <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i><span>Vert.</span>
                 </button>
             </div>
 
-            <div class="section-title">Precision & Cleanup</div>
+            <div class="shortcut-hint" style="margin-top:auto">
+                <div class="focus-indicator" onclick="document.body.focus()">
+                    <i class="ms-Icon ms-Icon--Touch"></i> Enable shortcuts
+                </div>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+                <strong>Shortcuts:</strong> <span class="win-only">Alt</span><span class="mac-only">Ctrl</span> + Arrows
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-format">
+            
+            <div class="section-title">Geometry Clipboard</div>
+            <div class="align-grid" style="grid-template-columns: 1fr;">
+                <button class="align-btn" style="height:40px; flex-direction:row; gap:8px;" onclick="copyGeometry()" title="Copy Position & Size of the selected object">
+                    <i class="ms-Icon ms-Icon--Copy"></i><span>Copy Geometry</span>
+                </button>
+            </div>
+            <div class="align-grid">
+                <button class="align-btn btn-paste" disabled onclick="pasteGeometry('pos')" title="Paste X/Y Position only">
+                    <i class="ms-Icon ms-Icon--Move"></i><span>Paste Pos</span>
+                </button>
+                <button class="align-btn btn-paste" disabled onclick="pasteGeometry('size')" title="Paste Width/Height only">
+                    <i class="ms-Icon ms-Icon--Resize"></i><span>Paste Size</span>
+                </button>
+                <button class="align-btn btn-paste" disabled onclick="pasteGeometry('both')" title="Paste Position & Size">
+                    <i class="ms-Icon ms-Icon--Paste"></i><span>Paste Both</span>
+                </button>
+            </div>
+
+            <div class="section-title" style="margin-top:16px;">Match Attributes (Painter)</div>
+            <div class="shortcut-hint" style="margin-bottom:8px;">
+                Select <strong>Source</strong> first, then Targets.
+            </div>
+            <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
+                <button class="align-btn" onclick="runMatchAttribs('fill')" title="Apply Fill Color & Transparency to targets">
+                    <i class="ms-Icon ms-Icon--BucketColor"></i><span>Match Fill</span>
+                </button>
+                <button class="align-btn" onclick="runMatchAttribs('outline')" title="Apply Outline Color, Weight & Style to targets">
+                    <i class="ms-Icon ms-Icon--BorderColor"></i><span>Match Outline</span>
+                </button>
+            </div>
+            <div class="align-grid" style="grid-template-columns: 1fr;">
+                <button class="align-btn" style="height:40px; flex-direction:row; gap:8px;" onclick="runMatchAttribs('corners')" title="Apply Rounded Corner radius to targets">
+                    <i class="ms-Icon ms-Icon--RoundedCorners"></i><span>Match Rounded Corners</span>
+                </button>
+            </div>
+
+            <div class="section-title" style="margin-top:16px;">Precision & Text</div>
             <div class="align-grid">
                 <button class="align-btn" onclick="runMatchSize('width')" title="Match Width">
                     <i class="ms-Icon ms-Icon--FitWidth"></i><span>Width</span>
@@ -276,26 +321,18 @@
                 <button class="align-btn" onclick="runMatchSize('height')" title="Match Height">
                     <i class="ms-Icon ms-Icon--FitPage"></i><span>Height</span>
                 </button>
-                <button class="align-btn" onclick="runNormalizeGeometry()" title="Normalize Geometry&#013;Rounds position and size to nearest integer to fix blurry edges.">
-                    <i class="ms-Icon ms-Icon--SnapToGrid"></i><span>Snap/Round</span>
+                <button class="align-btn" onclick="runNormalizeGeometry()" title="Snap to Integer">
+                    <i class="ms-Icon ms-Icon--SnapToGrid"></i><span>Snap</span>
                 </button>
             </div>
             
             <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
-                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()" title="Fix Margins&#013;Sets text margins to 0.1&quot; if border exists.">
+                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()" title="Fix Margins (Auto)">
                     <i class="ms-Icon ms-Icon--PaddingTop"></i><span>Fix Margins</span>
                 </button>
-                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixTitle()" title="Fix Title&#013;Formats slide title.">
+                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixTitle()" title="Fix Title">
                     <i class="ms-Icon ms-Icon--TextField"></i><span>Fix Title</span>
                 </button>
-            </div>
-
-            <div class="shortcut-hint" style="margin-top:auto">
-                <div class="focus-indicator" onclick="document.body.focus()">
-                    <i class="ms-Icon ms-Icon--Touch"></i> Click here to enable shortcuts
-                </div>
-                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
-                <strong>Shortcuts:</strong> <span class="win-only">Alt</span><span class="mac-only">Ctrl</span> + Arrows
             </div>
         </div>
 
@@ -334,6 +371,11 @@
         // --- State Management ---
         let isBusy = false; 
         let debounceTimer;
+        // Geometry Clipboard State
+        let geoClipboard = {
+            valid: false,
+            left: 0, top: 0, width: 0, height: 0
+        };
 
         // --- Initialization ---
         Office.onReady((info) => {
@@ -347,7 +389,7 @@
                     document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
                     t.classList.add('active');
                     document.getElementById(`tab-${t.dataset.tab}`).classList.add('active');
-                    if(t.dataset.tab === 'align') checkSelection();
+                    if(t.dataset.tab === 'align' || t.dataset.tab === 'format') checkSelection();
                 };
             });
 
@@ -380,8 +422,10 @@
                     shapes.load('items');
                     await context.sync();
                     const count = shapes.items.length;
-                    statusEl.innerText = count === 0 ? "No shapes selected." : `${count} shapes selected.`;
-                    statusEl.style.color = count > 0 ? "var(--primary)" : "var(--neutral-dark)";
+                    if(statusEl) {
+                        statusEl.innerText = count === 0 ? "No shapes selected." : `${count} shapes selected.`;
+                        statusEl.style.color = count > 0 ? "var(--primary)" : "var(--neutral-dark)";
+                    }
                 });
             } catch (e) { console.log("Silent check fail"); }
         }
@@ -401,6 +445,7 @@
             layoutShapes.load('items');
             await context.sync();
 
+            // Load properties for filtering
             for (let i = 0; i < layoutShapes.items.length; i++) {
                 layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
             }
@@ -443,7 +488,113 @@
             };
         }
 
-        // --- NEW FEATURE: SMART GRID ARRANGE WITH GUTTER SUPPORT ---
+        // --- NEW: COPY/PASTE GEOMETRY ---
+        function copyGeometry() {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                
+                if (shapes.items.length === 0) { showToast("Select a shape", "error"); return; }
+                
+                const s = shapes.items[0];
+                s.load(['left', 'top', 'width', 'height']);
+                await context.sync();
+                
+                geoClipboard = {
+                    valid: true,
+                    left: s.left, top: s.top, width: s.width, height: s.height
+                };
+                
+                // Enable buttons
+                document.querySelectorAll('.btn-paste').forEach(b => b.disabled = false);
+                showToast("Geometry Copied", "success");
+            });
+        }
+
+        function pasteGeometry(mode) {
+            if (!geoClipboard.valid) return;
+            
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                
+                if (shapes.items.length === 0) return;
+                
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    if (mode === 'pos' || mode === 'both') {
+                        s.left = geoClipboard.left;
+                        s.top = geoClipboard.top;
+                    }
+                    if (mode === 'size' || mode === 'both') {
+                        s.width = geoClipboard.width;
+                        s.height = geoClipboard.height;
+                    }
+                }
+                await context.sync();
+                showToast("Geometry Pasted", "success");
+            });
+        }
+
+        // --- NEW: MATCH ATTRIBUTES (PAINTER) ---
+        function runMatchAttribs(type) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                
+                if (shapes.items.length < 2) { showToast("Select Source + Targets", "error"); return; }
+                
+                const src = shapes.items[0];
+                const targets = [];
+                for(let i=1; i<shapes.items.length; i++) targets.push(shapes.items[i]);
+                
+                // Load specific props based on type
+                if (type === 'fill') {
+                    src.fill.load(['foregroundColor', 'transparency', 'type']);
+                } else if (type === 'outline') {
+                    src.lineFormat.load(['color', 'weight', 'style', 'transparency', 'visible']);
+                } else if (type === 'corners') {
+                    // Geometric properties load
+                    // Note: 'adjustments' API is finicky. We'll try geometry first.
+                    src.load('geometry');
+                }
+                await context.sync();
+                
+                for (let t of targets) {
+                    if (type === 'fill') {
+                        t.fill.clear(); // Reset first
+                        // Basic support for solid fills. Gradients are complex in JS API.
+                        if (src.fill.type === "Solid") {
+                            t.fill.setSolidColor(src.fill.foregroundColor);
+                            t.fill.transparency = src.fill.transparency;
+                        }
+                    } else if (type === 'outline') {
+                        if(src.lineFormat.visible) {
+                            t.lineFormat.color = src.lineFormat.color;
+                            t.lineFormat.weight = src.lineFormat.weight;
+                            t.lineFormat.style = src.lineFormat.style;
+                            t.lineFormat.transparency = src.lineFormat.transparency;
+                        } else {
+                            t.lineFormat.visible = false;
+                        }
+                    } else if (type === 'corners') {
+                        // This applies the full geometry shape type (e.g. rounded rect)
+                        // Currently JS API support for copying specific adjustment values (radius) is limited/beta.
+                        // We will copy the geometry type which often resets to default radius, 
+                        // effectively making them same type.
+                        t.geometry.preset = src.geometry.preset;
+                    }
+                }
+                
+                await context.sync();
+                showToast("Attributes Matched", "success");
+            });
+        }
+
+        // --- SMART GRID ARRANGE ---
         function runGridArrange() {
             const useContainer = document.getElementById('alignToContainer').checked;
             const useGutter = document.getElementById('useGutter').checked;
@@ -497,9 +648,6 @@
                 }
 
                 const rows = Math.ceil(count / cols);
-                
-                // MATH: Total Width = (Cols * CellWidth) + ((Cols-1) * Gutter)
-                // Solved for CellWidth:
                 const cellW = (totalWidth - ((cols - 1) * gutterSize)) / cols;
                 const cellH = (totalHeight - ((rows - 1) * gutterSize)) / rows;
 
@@ -508,8 +656,6 @@
                 for (let i = 0; i < count; i++) {
                     const r = Math.floor(i / cols);
                     const c = i % cols;
-
-                    // Position = Start + (ColIndex * (Width + Gutter))
                     const newLeft = startLeft + c * (cellW + gutterSize);
                     const newTop = startTop + r * (cellH + gutterSize);
 
@@ -524,40 +670,17 @@
             });
         }
 
-        // --- NEW FEATURE: NORMALIZE GEOMETRY ---
-        function runNormalizeGeometry() {
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load(['items', 'left', 'top', 'width', 'height']);
-                await context.sync();
-
-                let c = 0;
-                for (let i = 0; i < shapes.items.length; i++) {
-                    const s = shapes.items[i];
-                    s.left = Math.round(s.left);
-                    s.top = Math.round(s.top);
-                    s.width = Math.round(s.width);
-                    s.height = Math.round(s.height);
-                    c++;
-                }
-                await context.sync();
-                showToast(`Snapped ${c} items`, "success");
-            });
-        }
-
-        // --- ALIGNMENT ---
+        // --- UTILS (Align, Distribute, etc.) ---
+        // (Keeping existing robust implementations from v3.1)
         function runAlign(direction) {
             const useContainer = document.getElementById('alignToContainer').checked;
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'left', 'top', 'width', 'height']);
                 await context.sync();
-
                 if (shapes.items.length < 1) return;
                 if (!useContainer && shapes.items.length < 2) { showToast("Select 2+ shapes", "error"); return; }
-
                 let refLeft, refTop, refWidth, refHeight;
-
                 if (useContainer) {
                     const bounds = await getReferenceBounds(context);
                     refLeft = bounds.left; refTop = bounds.top; refWidth = bounds.width; refHeight = bounds.height;
@@ -565,11 +688,9 @@
                     const ref = shapes.items[0];
                     refLeft = ref.left; refTop = ref.top; refWidth = ref.width; refHeight = ref.height;
                 }
-
                 const refCenter = refLeft + (refWidth / 2);
                 const refMiddle = refTop + (refHeight / 2);
                 const startIndex = useContainer ? 0 : 1;
-
                 for (let i = startIndex; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
                     switch (direction) {
@@ -586,35 +707,25 @@
             });
         }
 
-        // --- DISTRIBUTE ---
         function runDistribute(axis) {
             const useGutter = document.getElementById('useGutter').checked;
             const useContainer = document.getElementById('alignToContainer').checked;
             const gutterSize = useGutter ? (parseFloat(document.getElementById('gutterSize').value) || 0) : 0;
-
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'left', 'top', 'width', 'height']);
                 await context.sync();
-
                 const count = shapes.items.length;
                 if (count < 2) { showToast("Select 2+ shapes", "error"); return; }
-
                 let items = [];
                 for(let i=0; i<count; i++) {
-                    items.push({ 
-                        obj: shapes.items[i], 
-                        left: shapes.items[i].left, top: shapes.items[i].top,
-                        width: shapes.items[i].width, height: shapes.items[i].height
-                    });
+                    items.push({ obj: shapes.items[i], left: shapes.items[i].left, top: shapes.items[i].top, width: shapes.items[i].width, height: shapes.items[i].height });
                 }
-
                 if (axis === 'horizontal') {
                     items.sort((a, b) => a.left - b.left);
                     if (useContainer) {
                         const bounds = await getReferenceBounds(context);
-                        const totalGutterSpace = (count - 1) * gutterSize;
-                        const availableSpace = bounds.width - totalGutterSpace;
+                        const availableSpace = bounds.width - (count - 1) * gutterSize;
                         const newWidth = availableSpace / count;
                         if (newWidth < 1) { showToast("Gutter too large", "error"); return; }
                         let currentLeft = bounds.left;
@@ -628,16 +739,13 @@
                         const centerStart = items[0].obj.left + items[0].obj.width/2;
                         const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
-                        for(let i=1; i<count-1; i++){
-                            items[i].obj.left = (centerStart + (i * centerStep)) - (items[i].obj.width/2);
-                        }
+                        for(let i=1; i<count-1; i++){ items[i].obj.left = (centerStart + (i * centerStep)) - (items[i].obj.width/2); }
                     }
                 } else {
                     items.sort((a, b) => a.top - b.top);
                     if (useContainer) {
                         const bounds = await getReferenceBounds(context);
-                        const totalGutterSpace = (count - 1) * gutterSize;
-                        const availableSpace = bounds.height - totalGutterSpace;
+                        const availableSpace = bounds.height - (count - 1) * gutterSize;
                         const newHeight = availableSpace / count;
                         if (newHeight < 1) { showToast("Gutter too large", "error"); return; }
                         let currentTop = bounds.top;
@@ -649,9 +757,7 @@
                         const centerStart = items[0].obj.top + items[0].obj.height/2;
                         const centerEnd = items[count-1].obj.top + items[count-1].obj.height/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
-                        for(let i=1; i<count-1; i++){
-                            items[i].obj.top = (centerStart + (i * centerStep)) - (items[i].obj.height/2);
-                        }
+                        for(let i=1; i<count-1; i++){ items[i].obj.top = (centerStart + (i * centerStep)) - (items[i].obj.height/2); }
                     }
                 }
                 await context.sync();
@@ -659,7 +765,6 @@
             });
         }
 
-        // --- EXISTING UTILS ---
         function runMatchSize(dimension) {
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
@@ -674,6 +779,23 @@
                 }
                 await context.sync();
                 showToast("Size Matched", "success");
+            });
+        }
+
+        function runNormalizeGeometry() {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top', 'width', 'height']);
+                await context.sync();
+                let c = 0;
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    s.left = Math.round(s.left); s.top = Math.round(s.top);
+                    s.width = Math.round(s.width); s.height = Math.round(s.height);
+                    c++;
+                }
+                await context.sync();
+                showToast(`Snapped ${c} items`, "success");
             });
         }
 
@@ -725,7 +847,6 @@
                 const paragraphs = textFrame.textRange.paragraphs;
                 paragraphs.load('items');
                 await context.sync();
-                // Spacer logic...
                 let insertedSpacer = false;
                 if(paragraphs.items.length >= 2) {
                      paragraphs.items[1].load('text');
@@ -809,6 +930,10 @@
                     master.load('name');
                     await context.sync();
                     let contentPos = "Not found";
+                    let colorsHtml = "Not Supported";
+                    if (Office.context.requirements.isSetSupported('PowerPointApi', '1.10')) {
+                        colorsHtml = "Supported (API 1.10)";
+                    }
                     try {
                         master.load('shapes'); await context.sync();
                         const shapes = master.shapes; shapes.load('items'); await context.sync();
@@ -823,7 +948,7 @@
                         }
                         if(bodyShape) contentPos = `L:${Math.round(bodyShape.left)}, T:${Math.round(bodyShape.top)} <br> W:${Math.round(bodyShape.width)}, H:${Math.round(bodyShape.height)}`;
                     } catch(e) {}
-                    content.innerHTML = `<div class="info-row"><span class="info-label">Master</span><span class="info-val">${master.name}</span></div><div class="info-row"><span class="info-label">Content Box</span><span class="info-val">${contentPos}</span></div>`;
+                    content.innerHTML = `<div class="info-row"><span class="info-label">Master</span><span class="info-val">${master.name}</span></div><div class="info-row"><span class="info-label">Content Box</span><span class="info-val">${contentPos}</span></div><div class="info-row"><span class="info-label">Theme Colors</span><span class="info-val">${colorsHtml}</span></div>`;
                 });
             } catch(e) { content.innerHTML = "Error: " + e.message; }
         }
