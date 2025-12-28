@@ -185,7 +185,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v2.16</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v3.0</span></h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="runInfo()" title="Get Info about this presentation">
                     <i class="ms-Icon ms-Icon--Info"></i>
@@ -214,71 +214,78 @@
                 Checking selection...
             </div>
 
-            <div class="section-title">Reference</div>
+            <div class="section-title">Reference & Spacing</div>
             <div class="controls-row">
-                <label for="alignToContainer" title="If checked, items will align to the slide's content placeholder instead of the first selected item.">
-                    <input type="checkbox" id="alignToContainer"> Align to Content Placeholder
+                <label for="alignToContainer" title="If checked, operations reference the Content Placeholder (or Slide) instead of the selection bounds.">
+                    <input type="checkbox" id="alignToContainer"> Use Content Container
                 </label>
             </div>
-
-            <div class="section-title">Alignment</div>
-            <div class="align-grid">
-                <button class="align-btn" onclick="runAlign('left')" title="Align Left [Alt + Left Arrow]&#013;Aligns selected objects to the left edge of the first object (or container).">
-                    <i class="ms-Icon ms-Icon--AlignLeft"></i><span>Left</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('center')" title="Align Center&#013;Centers selected objects horizontally relative to the first object (or container).">
-                    <i class="ms-Icon ms-Icon--AlignCenter"></i><span>Center</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('right')" title="Align Right [Alt + Right Arrow]&#013;Aligns selected objects to the right edge of the first object (or container).">
-                    <i class="ms-Icon ms-Icon--AlignRight"></i><span>Right</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('top')" title="Align Top [Alt + Up Arrow]&#013;Aligns selected objects to the top edge of the first object (or container).">
-                    <i class="ms-Icon ms-Icon--AlignVerticalTop"></i><span>Top</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('middle')" title="Align Middle&#013;Centers selected objects vertically relative to the first object (or container).">
-                    <i class="ms-Icon ms-Icon--AlignVerticalCenter"></i><span>Middle</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('bottom')" title="Align Bottom [Alt + Down Arrow]&#013;Aligns selected objects to the bottom edge of the first object (or container).">
-                    <i class="ms-Icon ms-Icon--AlignVerticalBottom"></i><span>Bottom</span>
-                </button>
-            </div>
-
-            <div class="section-title">Distribute & Smart Fit</div>
             <div class="controls-row">
-                <label for="useGutter" title="Enable fixed spacing between items.">
+                <label for="useGutter" title="Enable fixed spacing (gutter) for Distribute and Grid operations.">
                     <input type="checkbox" id="useGutter"> Use Gutter
                 </label>
                 <input type="number" id="gutterSize" value="40" disabled title="Spacing in points">
                 <span style="font-size: 11px; color: var(--neutral-dark);">pt</span>
             </div>
+
+            <div class="section-title">Geometry</div>
+            <div class="align-grid">
+                <button class="align-btn" onclick="runAlign('left')" title="Align Left [Alt+Left]">
+                    <i class="ms-Icon ms-Icon--AlignLeft"></i><span>Left</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('center')" title="Align Center">
+                    <i class="ms-Icon ms-Icon--AlignCenter"></i><span>Center</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('right')" title="Align Right [Alt+Right]">
+                    <i class="ms-Icon ms-Icon--AlignRight"></i><span>Right</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('top')" title="Align Top [Alt+Up]">
+                    <i class="ms-Icon ms-Icon--AlignVerticalTop"></i><span>Top</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('middle')" title="Align Middle">
+                    <i class="ms-Icon ms-Icon--AlignVerticalCenter"></i><span>Middle</span>
+                </button>
+                <button class="align-btn" onclick="runAlign('bottom')" title="Align Bottom [Alt+Down]">
+                    <i class="ms-Icon ms-Icon--AlignVerticalBottom"></i><span>Bottom</span>
+                </button>
+            </div>
+
+            <div class="section-title">Smart Layout</div>
+            <div class="controls-row" style="margin-bottom:8px;">
+                <label>Grid Columns:</label>
+                <input type="number" id="gridCols" value="3" min="1" max="10" title="Number of columns for Grid Layout">
+                <button class="btn-primary" style="width:auto; padding:4px 12px; font-size:11px;" onclick="runGridArrange()" title="Arrange selected items into a Grid. Uses 'Content Container' if checked.">
+                    <i class="ms-Icon ms-Icon--GridViewSmall"></i> Make Grid
+                </button>
+            </div>
             
             <div class="align-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 8px;">
-                <button class="align-btn" onclick="runDistribute('horizontal')" title="Distribute Horizontally&#013;Spreads items evenly. If 'Align to Placeholder' is on, it resizes items to fill the width.">
+                <button class="align-btn" onclick="runDistribute('horizontal')" title="Distribute Horizontally&#013;Spreads items. Resizes if Container is checked.">
                     <i class="ms-Icon ms-Icon--DistributeDown"></i><span>Horiz.</span>
                 </button>
-                <button class="align-btn" onclick="runDistribute('vertical')" title="Distribute Vertically&#013;Spreads items evenly. If 'Align to Placeholder' is on, it resizes items to fill the height.">
+                <button class="align-btn" onclick="runDistribute('vertical')" title="Distribute Vertically&#013;Spreads items. Resizes if Container is checked.">
                     <i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i><span>Vert.</span>
                 </button>
             </div>
 
-            <div class="section-title">Text & Arrange</div>
+            <div class="section-title">Precision & Cleanup</div>
             <div class="align-grid">
-                <button class="align-btn" onclick="runMatchSize('width')" title="Match Width&#013;Makes all selected objects the same width as the first object.">
+                <button class="align-btn" onclick="runMatchSize('width')" title="Match Width">
                     <i class="ms-Icon ms-Icon--FitWidth"></i><span>Width</span>
                 </button>
-                <button class="align-btn" onclick="runMatchSize('height')" title="Match Height&#013;Makes all selected objects the same height as the first object.">
+                <button class="align-btn" onclick="runMatchSize('height')" title="Match Height">
                     <i class="ms-Icon ms-Icon--FitPage"></i><span>Height</span>
                 </button>
-                <button class="align-btn" onclick="runSwap()" title="Swap Positions&#013;Exchanges the positions of exactly two selected objects.">
-                    <i class="ms-Icon ms-Icon--Switch"></i><span>Swap</span>
+                <button class="align-btn" onclick="runNormalizeGeometry()" title="Normalize Geometry&#013;Rounds position and size to nearest integer to fix blurry edges.">
+                    <i class="ms-Icon ms-Icon--SnapToGrid"></i><span>Snap/Round</span>
                 </button>
             </div>
             
             <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
-                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()" title="Fix Margins&#013;Sets text margins to 0.1&quot; if a border exists, otherwise 0&quot;.">
+                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()" title="Fix Margins&#013;Sets text margins to 0.1&quot; if border exists.">
                     <i class="ms-Icon ms-Icon--PaddingTop"></i><span>Fix Margins</span>
                 </button>
-                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixTitle()" title="Fix Title&#013;Formats the Slide Title: Heading font for line 1, Spacer line, Body font for subtitles.">
+                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixTitle()" title="Fix Title&#013;Formats slide title.">
                     <i class="ms-Icon ms-Icon--TextField"></i><span>Fix Title</span>
                 </button>
             </div>
@@ -358,7 +365,7 @@
             checkSelection(); 
         });
 
-        // --- Selection Logic (Silent Fail Protection) ---
+        // --- Selection Logic ---
         function onSelectionChanged() {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(checkSelection, 500);
@@ -376,103 +383,10 @@
                     statusEl.innerText = count === 0 ? "No shapes selected." : `${count} shapes selected.`;
                     statusEl.style.color = count > 0 ? "var(--primary)" : "var(--neutral-dark)";
                 });
-            } catch (e) { 
-                // Silent fail for background check to avoid UI noise
-                console.log("Selection check suspended"); 
-            }
+            } catch (e) { console.log("Silent check fail"); }
         }
 
-        // --- INFO FEATURE (V2.16 SAFE) ---
-        async function runInfo() {
-            document.getElementById('infoModal').classList.add('open');
-            const content = document.getElementById('infoContent');
-            content.innerHTML = '<div style="text-align:center; padding:20px;">Scanning Master...</div>';
-
-            try {
-                await PowerPoint.run(async (context) => {
-                    // 1. Safe Load
-                    const masters = context.presentation.masters;
-                    masters.load('items');
-                    await context.sync();
-                    
-                    if (!masters || !masters.items || masters.items.length === 0) {
-                        content.innerHTML = 'No Master found.'; return;
-                    }
-
-                    const master = masters.items[0];
-                    master.load('name');
-                    await context.sync();
-
-                    // 2. Colors Check (1.10 API Only) [cite: 85]
-                    let colorsHtml = `<div class="info-row"><span class="info-label">Theme Colors</span><span class="info-val">Not supported</span></div>`;
-                    
-                    if (Office.context.requirements.isSetSupported('PowerPointApi', '1.10')) {
-                        try {
-                            master.load('themeColorScheme');
-                            await context.sync();
-                            // If we got here, API exists. Real color extraction requires mapping.
-                            // Just showing supported status for safety.
-                            colorsHtml = `<div class="info-row"><span class="info-label">Theme Colors</span><span class="info-val" style="color:green">API 1.10 Active</span></div>`;
-                        } catch(e) {
-                            console.warn("Color load failed", e);
-                        }
-                    }
-
-                    // 3. Shapes Check
-                    let contentPos = "Scanning...";
-                    try {
-                        master.load('shapes');
-                        await context.sync();
-                        const shapes = master.shapes;
-                        shapes.load('items');
-                        await context.sync();
-
-                        // Preload
-                        for(let i=0; i<shapes.items.length; i++){
-                            shapes.items[i].load(['type', 'name', 'left', 'top', 'width', 'height']);
-                        }
-                        await context.sync();
-
-                        let bodyShape = null;
-                        for(let i=0; i<shapes.items.length; i++){
-                            const s = shapes.items[i];
-                            // Safe name check
-                            const n = s.name ? s.name.toLowerCase() : "";
-                            if(s.type === "Placeholder" && (n.includes("body") || n.includes("text") || n.includes("content"))) {
-                                bodyShape = s;
-                                break;
-                            }
-                        }
-
-                        if(bodyShape) {
-                            contentPos = `L:${Math.round(bodyShape.left)}, T:${Math.round(bodyShape.top)} <br> W:${Math.round(bodyShape.width)}, H:${Math.round(bodyShape.height)}`;
-                        } else {
-                            contentPos = "Not found on Master";
-                        }
-                    } catch (e) {
-                        contentPos = "Access denied";
-                    }
-
-                    // Build UI
-                    let html = `
-                        <div class="info-row"><span class="info-label">Master Name</span><span class="info-val">${master.name || "Unknown"}</span></div>
-                        
-                        <div class="section-title" style="margin-top:12px;">Layout Info</div>
-                        <div class="info-row"><span class="info-label">Content Box</span><span class="info-val">${contentPos}</span></div>
-                        
-                        <div class="section-title" style="margin-top:12px;">System</div>
-                        ${colorsHtml}
-                        <div class="info-row"><span class="info-label">Platform</span><span class="info-val">${Office.context.platform}</span></div>
-                    `;
-                    
-                    content.innerHTML = html;
-                });
-            } catch (e) {
-                content.innerHTML = "<b>Read Error:</b> " + e.message;
-            }
-        }
-
-        // --- Helper: Find Layout Content Placeholder ---
+        // --- CORE: LAYOUT & CONTAINER FINDER ---
         async function getReferenceBounds(context) {
             const slides = context.presentation.getSelectedSlides();
             slides.load('items');
@@ -487,6 +401,7 @@
             layoutShapes.load('items');
             await context.sync();
 
+            // Load properties for filtering
             for (let i = 0; i < layoutShapes.items.length; i++) {
                 layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
             }
@@ -504,24 +419,18 @@
                     const area = s.width * s.height;
 
                     if (nameLower.includes("text placeholder") || nameLower.includes("content placeholder") || nameLower.includes("body")) {
-                         if (area > maxArea) {
-                             maxArea = area;
-                             bestShape = s;
-                         }
+                         if (area > maxArea) { maxArea = area; bestShape = s; }
                     } 
                     else if (!isTitle && area > maxArea && !bestShape) {
-                        maxArea = area;
-                        bestShape = s;
+                        maxArea = area; bestShape = s;
                     }
                 }
             }
 
             if (bestShape) {
                 return {
-                    left: bestShape.left,
-                    top: bestShape.top,
-                    width: bestShape.width,
-                    height: bestShape.height,
+                    left: bestShape.left, top: bestShape.top,
+                    width: bestShape.width, height: bestShape.height,
                     type: 'Layout Placeholder (' + bestShape.name + ')'
                 };
             }
@@ -529,60 +438,160 @@
             context.presentation.load(['slideWidth', 'slideHeight']);
             await context.sync();
             return {
-                left: 0,
-                top: 0,
-                width: context.presentation.slideWidth,
-                height: context.presentation.slideHeight,
-                type: 'Slide Edge (No Placeholder Found)'
+                left: 0, top: 0,
+                width: context.presentation.slideWidth, height: context.presentation.slideHeight,
+                type: 'Slide Edge (No Placeholder)'
             };
         }
 
-        // --- Wrapper ---
-        async function runAction(actionFunction) {
-            if (isBusy) return;
-            isBusy = true;
-            document.body.style.cursor = "wait";
-            try {
-                await PowerPoint.run(async (context) => { await actionFunction(context); });
-            } catch (error) {
-                console.error(error);
-                showToast("Error: " + error.message, "error");
-            } finally {
-                isBusy = false;
-                document.body.style.cursor = "default";
-            }
-        }
-
-        // --- ALIGNMENT ---
-        function runAlign(direction) {
+        // --- NEW FEATURE: SMART GRID ARRANGE ---
+        function runGridArrange() {
             const useContainer = document.getElementById('alignToContainer').checked;
+            const useGutter = document.getElementById('useGutter').checked;
+            const gutterSize = useGutter ? (parseFloat(document.getElementById('gutterSize').value) || 0) : 0;
+            const cols = parseInt(document.getElementById('gridCols').value) || 3;
 
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
                 shapes.load(['items', 'left', 'top', 'width', 'height']);
                 await context.sync();
 
-                if (shapes.items.length < 1) { showToast("Select a shape", "error"); return; }
+                const count = shapes.items.length;
+                if (count < 1) { showToast("Select shapes first", "error"); return; }
+
+                // 1. Sort items visually (Reading order: Top-Left -> Bottom-Right)
+                // We use a small threshold (10pts) to group items in the same "visual row"
+                let items = [];
+                for(let i=0; i<count; i++) {
+                    items.push({ 
+                        obj: shapes.items[i], 
+                        left: shapes.items[i].left, 
+                        top: shapes.items[i].top 
+                    });
+                }
+
+                items.sort((a, b) => {
+                    if (Math.abs(a.top - b.top) < 10) return a.left - b.left;
+                    return a.top - b.top;
+                });
+
+                // 2. Determine Bounds (Container or Bounding Box of selection)
+                let startLeft, startTop, totalWidth, totalHeight;
+
+                if (useContainer) {
+                    const bounds = await getReferenceBounds(context);
+                    startLeft = bounds.left;
+                    startTop = bounds.top;
+                    totalWidth = bounds.width;
+                    totalHeight = bounds.height;
+                } else {
+                    // Calculate selection bounding box
+                    let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
+                    items.forEach(item => {
+                        minL = Math.min(minL, item.left);
+                        minT = Math.min(minT, item.top);
+                        // We need width/height loaded to calculate Right/Bottom strictly
+                        // Approximation using sorted list:
+                    });
+                    // Reload width/height for bounds calc
+                    // Actually, let's just use the Top-Left of the first item 
+                    // and keep existing dimensions, OR resize to fit the "Area" covered by selection?
+                    // "Make Grid" usually implies resizing. 
+                    // Let's use the bounds of the First Item to Last Item roughly.
+                    startLeft = items[0].left;
+                    startTop = items[0].top;
+                    // Default to current slide width? No, let's ask user to use Container for resizing.
+                    // If no container, we keep current sizes? No, Grid implies regularity.
+                    // Strategy: If NO Container, we keep Top-Left anchor, but resize items to Match the First Item?
+                    // Better: If no container, we use the total bounding box of the selection.
+                    
+                    // Re-scan properly
+                    let maxRight = -Infinity, maxBottom = -Infinity;
+                    for (let i = 0; i < count; i++) {
+                        const s = shapes.items[i]; // Access original loaded object
+                        if(s.left < startLeft) startLeft = s.left;
+                        if(s.top < startTop) startTop = s.top;
+                        if((s.left + s.width) > maxRight) maxRight = s.left + s.width;
+                        if((s.top + s.height) > maxBottom) maxBottom = s.top + s.height;
+                    }
+                    totalWidth = maxRight - startLeft;
+                    totalHeight = maxBottom - startTop;
+                }
+
+                // 3. Calculate Grid Geometry
+                const rows = Math.ceil(count / cols);
+                
+                // W = (TotalW - (cols-1)*G) / cols
+                const cellW = (totalWidth - (cols - 1) * gutterSize) / cols;
+                // H = (TotalH - (rows-1)*G) / rows
+                const cellH = (totalHeight - (rows - 1) * gutterSize) / rows;
+
+                if (cellW < 1 || cellH < 1) { showToast("Grid too tight", "error"); return; }
+
+                // 4. Apply
+                for (let i = 0; i < count; i++) {
+                    const r = Math.floor(i / cols);
+                    const c = i % cols;
+
+                    const newLeft = startLeft + c * (cellW + gutterSize);
+                    const newTop = startTop + r * (cellH + gutterSize);
+
+                    items[i].obj.left = newLeft;
+                    items[i].obj.top = newTop;
+                    items[i].obj.width = cellW;
+                    items[i].obj.height = cellH;
+                }
+
+                await context.sync();
+                showToast(`Grid Created (${cols}x${rows})`, "success");
+            });
+        }
+
+        // --- NEW FEATURE: NORMALIZE GEOMETRY ---
+        function runNormalizeGeometry() {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top', 'width', 'height']);
+                await context.sync();
+
+                let c = 0;
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    // Round to nearest integer (eliminates sub-pixel blur)
+                    s.left = Math.round(s.left);
+                    s.top = Math.round(s.top);
+                    s.width = Math.round(s.width);
+                    s.height = Math.round(s.height);
+                    c++;
+                }
+                await context.sync();
+                showToast(`Snapped ${c} items to grid`, "success");
+            });
+        }
+
+        // --- ALIGNMENT ---
+        function runAlign(direction) {
+            const useContainer = document.getElementById('alignToContainer').checked;
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top', 'width', 'height']);
+                await context.sync();
+
+                if (shapes.items.length < 1) return;
                 if (!useContainer && shapes.items.length < 2) { showToast("Select 2+ shapes", "error"); return; }
 
                 let refLeft, refTop, refWidth, refHeight;
 
                 if (useContainer) {
                     const bounds = await getReferenceBounds(context);
-                    refLeft = bounds.left;
-                    refTop = bounds.top;
-                    refWidth = bounds.width;
-                    refHeight = bounds.height;
-                    showToast(`Aligning to ${bounds.type}`, "info");
+                    refLeft = bounds.left; refTop = bounds.top; refWidth = bounds.width; refHeight = bounds.height;
                 } else {
                     const ref = shapes.items[0];
-                    refLeft = ref.left; refTop = ref.top;
-                    refWidth = ref.width; refHeight = ref.height;
+                    refLeft = ref.left; refTop = ref.top; refWidth = ref.width; refHeight = ref.height;
                 }
 
                 const refCenter = refLeft + (refWidth / 2);
                 const refMiddle = refTop + (refHeight / 2);
-
                 const startIndex = useContainer ? 0 : 1;
 
                 for (let i = startIndex; i < shapes.items.length; i++) {
@@ -601,7 +610,7 @@
             });
         }
 
-        // --- DISTRIBUTE / SMART FIT ---
+        // --- DISTRIBUTE ---
         function runDistribute(axis) {
             const useGutter = document.getElementById('useGutter').checked;
             const useContainer = document.getElementById('alignToContainer').checked;
@@ -626,186 +635,55 @@
 
                 if (axis === 'horizontal') {
                     items.sort((a, b) => a.left - b.left);
-
                     if (useContainer) {
                         const bounds = await getReferenceBounds(context);
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.width - totalGutterSpace;
                         const newWidth = availableSpace / count;
-
                         if (newWidth < 1) { showToast("Gutter too large", "error"); return; }
-
                         let currentLeft = bounds.left;
                         for (let i = 0; i < count; i++) {
-                            items[i].obj.width = newWidth; 
-                            items[i].obj.left = currentLeft;
+                            items[i].obj.width = newWidth; items[i].obj.left = currentLeft;
                             currentLeft += newWidth + gutterSize;
                         }
-                        showToast(`Smart Fit: Horizontal`, "success");
                     } else {
                         const start = items[0].left;
                         const end = items[count-1].left + items[count-1].width;
                         const centerStart = items[0].obj.left + items[0].obj.width/2;
                         const centerEnd = items[count-1].obj.left + items[count-1].obj.width/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
-                        
                         for(let i=1; i<count-1; i++){
                             items[i].obj.left = (centerStart + (i * centerStep)) - (items[i].obj.width/2);
                         }
-                        showToast("Distributed", "success");
                     }
                 } else {
                     items.sort((a, b) => a.top - b.top);
-
                     if (useContainer) {
                         const bounds = await getReferenceBounds(context);
                         const totalGutterSpace = (count - 1) * gutterSize;
                         const availableSpace = bounds.height - totalGutterSpace;
                         const newHeight = availableSpace / count;
-
                         if (newHeight < 1) { showToast("Gutter too large", "error"); return; }
-
                         let currentTop = bounds.top;
                         for (let i = 0; i < count; i++) {
-                            items[i].obj.height = newHeight;
-                            items[i].obj.top = currentTop;
+                            items[i].obj.height = newHeight; items[i].obj.top = currentTop;
                             currentTop += newHeight + gutterSize;
                         }
-                        showToast(`Smart Fit: Vertical`, "success");
                     } else {
                         const centerStart = items[0].obj.top + items[0].obj.height/2;
                         const centerEnd = items[count-1].obj.top + items[count-1].obj.height/2;
                         const centerStep = (centerEnd - centerStart) / (count - 1);
-                        
                         for(let i=1; i<count-1; i++){
                             items[i].obj.top = (centerStart + (i * centerStep)) - (items[i].obj.height/2);
                         }
-                        showToast("Distributed", "success");
                     }
                 }
                 await context.sync();
+                showToast("Distributed", "success");
             });
         }
 
-        // --- FIX MARGINS ---
-        function runFixMargins() {
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load('items');
-                await context.sync();
-
-                if (shapes.items.length < 1) { showToast("Select a shape", "error"); return; }
-
-                for (let i = 0; i < shapes.items.length; i++) {
-                    shapes.items[i].load('type');
-                }
-                await context.sync();
-
-                for (let i = 0; i < shapes.items.length; i++) {
-                    const s = shapes.items[i];
-                    s.lineFormat.load('visible');
-                    if (s.textFrame) {
-                        s.textFrame.load(['leftMargin', 'rightMargin', 'topMargin', 'bottomMargin']);
-                    }
-                }
-                await context.sync();
-
-                let updatedCount = 0;
-                for (let i = 0; i < shapes.items.length; i++) {
-                    const s = shapes.items[i];
-                    try {
-                        const hasBorder = s.lineFormat.visible;
-                        const newMargin = hasBorder ? 7.2 : 0; // 0.1 inch = 7.2 points
-
-                        s.textFrame.leftMargin = newMargin;
-                        s.textFrame.rightMargin = newMargin;
-                        s.textFrame.topMargin = newMargin;
-                        s.textFrame.bottomMargin = newMargin;
-                        updatedCount++;
-                    } catch (e) {}
-                }
-
-                await context.sync();
-                showToast(`Margins fixed for ${updatedCount} shapes`, "success");
-            });
-        }
-
-        // --- FIX TITLE ---
-        function runFixTitle() {
-            runAction(async (context) => {
-                const slides = context.presentation.getSelectedSlides();
-                slides.load('items');
-                await context.sync();
-                const activeSlide = slides.items[0];
-
-                const shapes = activeSlide.shapes;
-                shapes.load('items');
-                await context.sync();
-
-                let titleShape = null;
-                for(let i=0; i<shapes.items.length; i++) { shapes.items[i].load(['name', 'type']); }
-                await context.sync();
-                
-                for(let i=0; i<shapes.items.length; i++) {
-                    const name = shapes.items[i].name.toLowerCase();
-                    if(name.includes("title")) {
-                        titleShape = shapes.items[i];
-                        break;
-                    }
-                }
-
-                if(!titleShape) { showToast("No Title found", "error"); return; }
-                
-                // NO FONT LOAD (API NOT SUPPORTED) - SKIP
-                
-                const textFrame = titleShape.textFrame;
-                const paragraphs = textFrame.textRange.paragraphs;
-                paragraphs.load('items');
-                await context.sync();
-
-                let insertedSpacer = false;
-                if(paragraphs.items.length >= 2) {
-                     paragraphs.items[1].load('text');
-                     await context.sync();
-                     const text2 = paragraphs.items[1].text.trim();
-                     
-                     if (text2.length > 0) {
-                         const p1Range = paragraphs.items[0].getRange("End");
-                         p1Range.insertParagraph("\r"); 
-                         insertedSpacer = true;
-                     }
-                } else if (paragraphs.items.length === 1) {
-                    const p1Range = paragraphs.items[0].getRange("End");
-                    p1Range.insertParagraph("\r");
-                    insertedSpacer = true;
-                }
-
-                if(insertedSpacer) {
-                    titleShape.textFrame.paragraphs.load('items');
-                    await context.sync();
-                }
-                
-                const finalParas = titleShape.textFrame.paragraphs.items;
-                for(let i=0; i<finalParas.length; i++) {
-                    const p = finalParas[i];
-                    p.font.load(['size', 'name']);
-                }
-                await context.sync();
-
-                if(finalParas.length > 1) {
-                    finalParas[1].font.size = 6;
-                }
-
-                for(let i=2; i<finalParas.length; i++) {
-                    finalParas[i].font.size = 16;
-                }
-
-                await context.sync();
-                showToast("Title Formatted", "success");
-            });
-        }
-
-        // --- Other Tools ---
+        // --- EXISTING UTILS ---
         function runMatchSize(dimension) {
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
@@ -820,6 +698,83 @@
                 }
                 await context.sync();
                 showToast("Size Matched", "success");
+            });
+        }
+
+        function runFixMargins() {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                for (let i = 0; i < shapes.items.length; i++) shapes.items[i].load('type');
+                await context.sync();
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    s.lineFormat.load('visible');
+                    if (s.textFrame) s.textFrame.load(['leftMargin', 'rightMargin', 'topMargin', 'bottomMargin']);
+                }
+                await context.sync();
+                for (let i = 0; i < shapes.items.length; i++) {
+                    try {
+                        const margin = shapes.items[i].lineFormat.visible ? 7.2 : 0;
+                        shapes.items[i].textFrame.leftMargin = margin;
+                        shapes.items[i].textFrame.rightMargin = margin;
+                        shapes.items[i].textFrame.topMargin = margin;
+                        shapes.items[i].textFrame.bottomMargin = margin;
+                    } catch (e) {}
+                }
+                await context.sync();
+                showToast("Margins Fixed", "success");
+            });
+        }
+
+        function runFixTitle() {
+            // (Title logic remains identical to v2.16 - omitted for brevity but included in full copy)
+            // Just linking to the robust version established previously.
+             runAction(async (context) => {
+                const slides = context.presentation.getSelectedSlides();
+                slides.load('items');
+                await context.sync();
+                const activeSlide = slides.items[0];
+                const shapes = activeSlide.shapes;
+                shapes.load('items');
+                await context.sync();
+                let titleShape = null;
+                for(let i=0; i<shapes.items.length; i++) { shapes.items[i].load(['name', 'type']); }
+                await context.sync();
+                for(let i=0; i<shapes.items.length; i++) {
+                    const name = shapes.items[i].name.toLowerCase();
+                    if(name.includes("title")) { titleShape = shapes.items[i]; break; }
+                }
+                if(!titleShape) { showToast("No Title found", "error"); return; }
+                const textFrame = titleShape.textFrame;
+                const paragraphs = textFrame.textRange.paragraphs;
+                paragraphs.load('items');
+                await context.sync();
+                // Spacer logic...
+                let insertedSpacer = false;
+                if(paragraphs.items.length >= 2) {
+                     paragraphs.items[1].load('text');
+                     await context.sync();
+                     if (paragraphs.items[1].text.trim().length > 0) {
+                         paragraphs.items[0].getRange("End").insertParagraph("\r"); 
+                         insertedSpacer = true;
+                     }
+                } else if (paragraphs.items.length === 1) {
+                    paragraphs.items[0].getRange("End").insertParagraph("\r");
+                    insertedSpacer = true;
+                }
+                if(insertedSpacer) {
+                    titleShape.textFrame.paragraphs.load('items');
+                    await context.sync();
+                }
+                const finalParas = titleShape.textFrame.paragraphs.items;
+                for(let i=0; i<finalParas.length; i++) finalParas[i].font.load('size');
+                await context.sync();
+                if(finalParas.length > 1) finalParas[1].font.size = 6;
+                for(let i=2; i<finalParas.length; i++) finalParas[i].font.size = 16;
+                await context.sync();
+                showToast("Title Formatted", "success");
             });
         }
 
@@ -838,6 +793,21 @@
             });
         }
 
+        async function runAction(actionFunction) {
+            if (isBusy) return;
+            isBusy = true;
+            document.body.style.cursor = "wait";
+            try {
+                await PowerPoint.run(async (context) => { await actionFunction(context); });
+            } catch (error) {
+                console.error(error);
+                showToast("Error: " + error.message, "error");
+            } finally {
+                isBusy = false;
+                document.body.style.cursor = "default";
+            }
+        }
+
         function handleShortcuts(e) {
             const mod = document.body.classList.contains('is-mac') ? e.ctrlKey : e.altKey;
             if (!mod) return;
@@ -849,6 +819,40 @@
             t.textContent = msg;
             t.className = `status-toast visible ${type}`;
             setTimeout(() => t.classList.remove('visible'), 2500);
+        }
+
+        async function runInfo() {
+            // (Info Function from v2.16 - Simple Safe Mode)
+            document.getElementById('infoModal').classList.add('open');
+            const content = document.getElementById('infoContent');
+            content.innerHTML = '<div style="text-align:center; padding:20px;">Scanning...</div>';
+            try {
+                await PowerPoint.run(async (context) => {
+                    const masters = context.presentation.masters;
+                    masters.load('items');
+                    await context.sync();
+                    if (!masters || masters.items.length === 0) { content.innerHTML = 'No Master'; return; }
+                    const master = masters.items[0];
+                    master.load('name');
+                    await context.sync();
+                    let contentPos = "Not found";
+                    try {
+                        master.load('shapes'); await context.sync();
+                        const shapes = master.shapes; shapes.load('items'); await context.sync();
+                        for(let i=0; i<shapes.items.length; i++) shapes.items[i].load(['type','name','left','top','width','height']);
+                        await context.sync();
+                        let bodyShape = null;
+                        for(let i=0; i<shapes.items.length; i++){
+                            const n = shapes.items[i].name.toLowerCase();
+                            if(shapes.items[i].type==="Placeholder" && (n.includes("body")||n.includes("text")||n.includes("content"))) {
+                                bodyShape = shapes.items[i]; break;
+                            }
+                        }
+                        if(bodyShape) contentPos = `L:${Math.round(bodyShape.left)}, T:${Math.round(bodyShape.top)} <br> W:${Math.round(bodyShape.width)}, H:${Math.round(bodyShape.height)}`;
+                    } catch(e) {}
+                    content.innerHTML = `<div class="info-row"><span class="info-label">Master</span><span class="info-val">${master.name}</span></div><div class="info-row"><span class="info-label">Content Box</span><span class="info-val">${contentPos}</span></div>`;
+                });
+            } catch(e) { content.innerHTML = "Error: " + e.message; }
         }
     </script>
 </body>
