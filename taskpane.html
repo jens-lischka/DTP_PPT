@@ -142,6 +142,43 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
+        /* --- 3x3 Alignment Matrix Styles --- */
+        .matrix-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 40px);
+            gap: 4px;
+            width: 128px; /* Fixed width for the grid to look square-ish */
+            margin: 0 auto 16px auto; /* Center it */
+        }
+        .matrix-btn {
+            background: var(--white);
+            border: 1px solid var(--neutral-dark);
+            border-radius: 2px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.1s;
+            position: relative;
+        }
+        /* Visual cue for anchor points inside the button */
+        .matrix-btn::after {
+            content: ''; position: absolute; width: 6px; height: 6px; background: var(--neutral-light); border-radius: 50%;
+        }
+        .matrix-btn:hover { background: var(--neutral-light); border-color: var(--primary); }
+        .matrix-btn:active { background: var(--primary); border-color: var(--primary); }
+        .matrix-btn:active::after { background: var(--white); }
+
+        /* Dot positions for the 9 buttons */
+        .m-tl::after { top: 4px; left: 4px; }
+        .m-tc::after { top: 4px; left: 50%; transform: translateX(-50%); }
+        .m-tr::after { top: 4px; right: 4px; }
+        .m-ml::after { top: 50%; left: 4px; transform: translateY(-50%); }
+        .m-mc::after { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: var(--neutral-dark); }
+        .m-mr::after { top: 50%; right: 4px; transform: translateY(-50%); }
+        .m-bl::after { bottom: 4px; left: 4px; }
+        .m-bc::after { bottom: 4px; left: 50%; transform: translateX(-50%); }
+        .m-br::after { bottom: 4px; right: 4px; }
+
         /* --- Modal Popup --- */
         .modal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -180,7 +217,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v3.2</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v3.5</span></h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="runInfo()" title="Get Info about this presentation">
                     <i class="ms-Icon ms-Icon--Info"></i>
@@ -193,9 +230,13 @@
                 <i class="ms-Icon ms-Icon--AlignCenter"></i>
                 <span>Align</span>
             </button>
-            <button class="tab" data-tab="format" title="Copy/Paste & Attributes">
+            <button class="tab" data-tab="format" title="Format Painter & Attributes">
                 <i class="ms-Icon ms-Icon--Brush"></i>
                 <span>Format</span>
+            </button>
+            <button class="tab" data-tab="tools" title="Selection & Utilities">
+                <i class="ms-Icon ms-Icon--Wrench"></i>
+                <span>Tools</span>
             </button>
             <button class="tab" data-tab="images" title="AI Image Generation">
                 <i class="ms-Icon ms-Icon--Photo2"></i>
@@ -226,26 +267,19 @@
                 <span style="font-size: 11px; color: var(--neutral-dark);">pt</span>
             </div>
 
-            <div class="section-title">Geometry</div>
-            <div class="align-grid">
-                <button class="align-btn" onclick="runAlign('left')" title="Align Left [Alt+Left]">
-                    <i class="ms-Icon ms-Icon--AlignLeft"></i><span>Left</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('center')" title="Align Center">
-                    <i class="ms-Icon ms-Icon--AlignCenter"></i><span>Center</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('right')" title="Align Right [Alt+Right]">
-                    <i class="ms-Icon ms-Icon--AlignRight"></i><span>Right</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('top')" title="Align Top [Alt+Up]">
-                    <i class="ms-Icon ms-Icon--AlignVerticalTop"></i><span>Top</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('middle')" title="Align Middle">
-                    <i class="ms-Icon ms-Icon--AlignVerticalCenter"></i><span>Middle</span>
-                </button>
-                <button class="align-btn" onclick="runAlign('bottom')" title="Align Bottom [Alt+Down]">
-                    <i class="ms-Icon ms-Icon--AlignVerticalBottom"></i><span>Bottom</span>
-                </button>
+            <div class="section-title">Alignment</div>
+            <div class="matrix-container">
+                <button class="matrix-btn m-tl" onclick="runAlign('left', 'top')" title="Top Left"></button>
+                <button class="matrix-btn m-tc" onclick="runAlign('center', 'top')" title="Top Center"></button>
+                <button class="matrix-btn m-tr" onclick="runAlign('right', 'top')" title="Top Right"></button>
+                
+                <button class="matrix-btn m-ml" onclick="runAlign('left', 'middle')" title="Middle Left"></button>
+                <button class="matrix-btn m-mc" onclick="runAlign('center', 'middle')" title="Center"></button>
+                <button class="matrix-btn m-mr" onclick="runAlign('right', 'middle')" title="Middle Right"></button>
+                
+                <button class="matrix-btn m-bl" onclick="runAlign('left', 'bottom')" title="Bottom Left"></button>
+                <button class="matrix-btn m-bc" onclick="runAlign('center', 'bottom')" title="Bottom Center"></button>
+                <button class="matrix-btn m-br" onclick="runAlign('right', 'bottom')" title="Bottom Right"></button>
             </div>
 
             <div class="section-title">Smart Layout</div>
@@ -276,7 +310,6 @@
         </div>
 
         <div class="tab-content" id="tab-format">
-            
             <div class="section-title">Geometry Clipboard</div>
             <div class="align-grid" style="grid-template-columns: 1fr;">
                 <button class="align-btn" style="height:40px; flex-direction:row; gap:8px;" onclick="copyGeometry()" title="Copy Position & Size of the selected object">
@@ -313,7 +346,7 @@
                 </button>
             </div>
 
-            <div class="section-title" style="margin-top:16px;">Precision & Text</div>
+            <div class="section-title" style="margin-top:16px;">Precision</div>
             <div class="align-grid">
                 <button class="align-btn" onclick="runMatchSize('width')" title="Match Width">
                     <i class="ms-Icon ms-Icon--FitWidth"></i><span>Width</span>
@@ -325,13 +358,54 @@
                     <i class="ms-Icon ms-Icon--SnapToGrid"></i><span>Snap</span>
                 </button>
             </div>
-            
+        </div>
+
+        <div class="tab-content" id="tab-tools">
+            <div class="section-title">Smart Selection</div>
             <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
-                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixMargins()" title="Fix Margins (Auto)">
+                <button class="align-btn" onclick="runSelectSame('style')" title="Select all shapes with matching Fill & Outline">
+                    <i class="ms-Icon ms-Icon--Color"></i><span>Select Same Style</span>
+                </button>
+                <button class="align-btn" onclick="runSelectSame('size')" title="Select all shapes with matching Width & Height">
+                    <i class="ms-Icon ms-Icon--Resize"></i><span>Select Same Size</span>
+                </button>
+            </div>
+
+            <div class="section-title" style="margin-top:16px;">Naming & Management</div>
+            <div class="card" style="padding:10px;">
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="renameInput" placeholder="New Name..." style="margin:0;">
+                    <button class="btn-primary" style="width:auto;" onclick="runRename()">Rename</button>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top:16px;">Geometry Guard (Lock-ish)</div>
+            <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
+                <button class="align-btn" onclick="runLock('save')" title="Memorize position of selected shapes">
+                    <i class="ms-Icon ms-Icon--Lock"></i><span>Lock Pos</span>
+                </button>
+                <button class="align-btn" onclick="runLock('restore')" title="Restore selected shapes to memorized position">
+                    <i class="ms-Icon ms-Icon--Undo"></i><span>Restore</span>
+                </button>
+            </div>
+
+            <div class="section-title" style="margin-top:16px;">Visual Guides</div>
+            <div class="align-grid" style="grid-template-columns: 1fr;">
+                <button class="align-btn" style="height:40px; flex-direction:row; gap:8px;" onclick="runToggleGuides()" title="Add/Remove visual guide for content area">
+                    <i class="ms-Icon ms-Icon--Ruler"></i><span>Toggle Content Guide</span>
+                </button>
+            </div>
+
+            <div class="section-title" style="margin-top:16px;">Batch Fixes</div>
+            <div class="align-grid" style="grid-template-columns: 1fr 1fr;">
+                <button class="align-btn" onclick="runFixMargins()" title="Auto-fix text margins based on border">
                     <i class="ms-Icon ms-Icon--PaddingTop"></i><span>Fix Margins</span>
                 </button>
-                <button class="align-btn" style="height: 40px; flex-direction: row; gap: 8px;" onclick="runFixTitle()" title="Fix Title">
+                <button class="align-btn" onclick="runFixTitle()" title="Format Title">
                     <i class="ms-Icon ms-Icon--TextField"></i><span>Fix Title</span>
+                </button>
+                <button class="align-btn" style="grid-column: span 2;" onclick="runFixBullets()" title="Apply Bullet style from layout">
+                    <i class="ms-Icon ms-Icon--BulletedList"></i><span>Fix Bullets</span>
                 </button>
             </div>
         </div>
@@ -371,11 +445,8 @@
         // --- State Management ---
         let isBusy = false; 
         let debounceTimer;
-        // Geometry Clipboard State
-        let geoClipboard = {
-            valid: false,
-            left: 0, top: 0, width: 0, height: 0
-        };
+        let geoClipboard = { valid: false, left: 0, top: 0, width: 0, height: 0 };
+        let lockedShapes = {}; 
 
         // --- Initialization ---
         Office.onReady((info) => {
@@ -389,7 +460,7 @@
                     document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
                     t.classList.add('active');
                     document.getElementById(`tab-${t.dataset.tab}`).classList.add('active');
-                    if(t.dataset.tab === 'align' || t.dataset.tab === 'format') checkSelection();
+                    if(['align','format','tools'].includes(t.dataset.tab)) checkSelection();
                 };
             });
 
@@ -407,7 +478,6 @@
             checkSelection(); 
         });
 
-        // --- Selection Logic ---
         function onSelectionChanged() {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(checkSelection, 500);
@@ -426,171 +496,58 @@
                         statusEl.innerText = count === 0 ? "No shapes selected." : `${count} shapes selected.`;
                         statusEl.style.color = count > 0 ? "var(--primary)" : "var(--neutral-dark)";
                     }
+                    if(count === 1) {
+                        shapes.items[0].load('name');
+                        await context.sync();
+                        const input = document.getElementById('renameInput');
+                        if(input) input.value = shapes.items[0].name;
+                    }
                 });
             } catch (e) { console.log("Silent check fail"); }
         }
 
-        // --- CORE: LAYOUT & CONTAINER FINDER ---
-        async function getReferenceBounds(context) {
-            const slides = context.presentation.getSelectedSlides();
-            slides.load('items');
-            await context.sync();
-            const slide = slides.items[0];
+        // --- UTILS (Align, Distribute, Grid) ---
+        
+        // REPLACED: NEW 2-AXIS ALIGNER
+        function runAlign(hDir, vDir) {
+            const useContainer = document.getElementById('alignToContainer').checked;
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load(['items', 'left', 'top', 'width', 'height']);
+                await context.sync();
 
-            const layout = slide.layout;
-            layout.load(['shapes', 'name']);
-            await context.sync();
+                if (shapes.items.length < 1) return;
+                if (!useContainer && shapes.items.length < 2) { showToast("Select 2+ shapes", "error"); return; }
 
-            const layoutShapes = layout.shapes;
-            layoutShapes.load('items');
-            await context.sync();
+                let refLeft, refTop, refWidth, refHeight;
 
-            // Load properties for filtering
-            for (let i = 0; i < layoutShapes.items.length; i++) {
-                layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
-            }
-            await context.sync();
-
-            let bestShape = null;
-            let maxArea = 0;
-
-            for (let i = 0; i < layoutShapes.items.length; i++) {
-                const s = layoutShapes.items[i];
-                const nameLower = s.name.toLowerCase();
-
-                if (s.type === "Placeholder") {
-                    const isTitle = nameLower.includes("title");
-                    const area = s.width * s.height;
-
-                    if (nameLower.includes("text placeholder") || nameLower.includes("content placeholder") || nameLower.includes("body")) {
-                         if (area > maxArea) { maxArea = area; bestShape = s; }
-                    } 
-                    else if (!isTitle && area > maxArea && !bestShape) {
-                        maxArea = area; bestShape = s;
-                    }
+                if (useContainer) {
+                    const bounds = await getReferenceBounds(context);
+                    refLeft = bounds.left; refTop = bounds.top; refWidth = bounds.width; refHeight = bounds.height;
+                } else {
+                    const ref = shapes.items[0];
+                    refLeft = ref.left; refTop = ref.top; refWidth = ref.width; refHeight = ref.height;
                 }
-            }
 
-            if (bestShape) {
-                return {
-                    left: bestShape.left, top: bestShape.top,
-                    width: bestShape.width, height: bestShape.height,
-                    type: 'Layout Placeholder (' + bestShape.name + ')'
-                };
-            }
+                const refCenter = refLeft + (refWidth / 2);
+                const refMiddle = refTop + (refHeight / 2);
+                const startIndex = useContainer ? 0 : 1;
 
-            context.presentation.load(['slideWidth', 'slideHeight']);
-            await context.sync();
-            return {
-                left: 0, top: 0,
-                width: context.presentation.slideWidth, height: context.presentation.slideHeight,
-                type: 'Slide Edge (No Placeholder)'
-            };
-        }
-
-        // --- NEW: COPY/PASTE GEOMETRY ---
-        function copyGeometry() {
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load('items');
-                await context.sync();
-                
-                if (shapes.items.length === 0) { showToast("Select a shape", "error"); return; }
-                
-                const s = shapes.items[0];
-                s.load(['left', 'top', 'width', 'height']);
-                await context.sync();
-                
-                geoClipboard = {
-                    valid: true,
-                    left: s.left, top: s.top, width: s.width, height: s.height
-                };
-                
-                // Enable buttons
-                document.querySelectorAll('.btn-paste').forEach(b => b.disabled = false);
-                showToast("Geometry Copied", "success");
-            });
-        }
-
-        function pasteGeometry(mode) {
-            if (!geoClipboard.valid) return;
-            
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load('items');
-                await context.sync();
-                
-                if (shapes.items.length === 0) return;
-                
-                for (let i = 0; i < shapes.items.length; i++) {
+                for (let i = startIndex; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
-                    if (mode === 'pos' || mode === 'both') {
-                        s.left = geoClipboard.left;
-                        s.top = geoClipboard.top;
-                    }
-                    if (mode === 'size' || mode === 'both') {
-                        s.width = geoClipboard.width;
-                        s.height = geoClipboard.height;
-                    }
-                }
-                await context.sync();
-                showToast("Geometry Pasted", "success");
-            });
-        }
+                    
+                    // Horizontal
+                    if (hDir === 'left') s.left = refLeft;
+                    else if (hDir === 'right') s.left = refLeft + refWidth - s.width;
+                    else if (hDir === 'center') s.left = refCenter - (s.width / 2);
 
-        // --- NEW: MATCH ATTRIBUTES (PAINTER) ---
-        function runMatchAttribs(type) {
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load('items');
-                await context.sync();
-                
-                if (shapes.items.length < 2) { showToast("Select Source + Targets", "error"); return; }
-                
-                const src = shapes.items[0];
-                const targets = [];
-                for(let i=1; i<shapes.items.length; i++) targets.push(shapes.items[i]);
-                
-                // Load specific props based on type
-                if (type === 'fill') {
-                    src.fill.load(['foregroundColor', 'transparency', 'type']);
-                } else if (type === 'outline') {
-                    src.lineFormat.load(['color', 'weight', 'style', 'transparency', 'visible']);
-                } else if (type === 'corners') {
-                    // Geometric properties load
-                    // Note: 'adjustments' API is finicky. We'll try geometry first.
-                    src.load('geometry');
+                    // Vertical
+                    if (vDir === 'top') s.top = refTop;
+                    else if (vDir === 'bottom') s.top = refTop + refHeight - s.height;
+                    else if (vDir === 'middle') s.top = refMiddle - (s.height / 2);
                 }
                 await context.sync();
-                
-                for (let t of targets) {
-                    if (type === 'fill') {
-                        t.fill.clear(); // Reset first
-                        // Basic support for solid fills. Gradients are complex in JS API.
-                        if (src.fill.type === "Solid") {
-                            t.fill.setSolidColor(src.fill.foregroundColor);
-                            t.fill.transparency = src.fill.transparency;
-                        }
-                    } else if (type === 'outline') {
-                        if(src.lineFormat.visible) {
-                            t.lineFormat.color = src.lineFormat.color;
-                            t.lineFormat.weight = src.lineFormat.weight;
-                            t.lineFormat.style = src.lineFormat.style;
-                            t.lineFormat.transparency = src.lineFormat.transparency;
-                        } else {
-                            t.lineFormat.visible = false;
-                        }
-                    } else if (type === 'corners') {
-                        // This applies the full geometry shape type (e.g. rounded rect)
-                        // Currently JS API support for copying specific adjustment values (radius) is limited/beta.
-                        // We will copy the geometry type which often resets to default radius, 
-                        // effectively making them same type.
-                        t.geometry.preset = src.geometry.preset;
-                    }
-                }
-                
-                await context.sync();
-                showToast("Attributes Matched", "success");
+                showToast("Aligned", "success");
             });
         }
 
@@ -670,43 +627,7 @@
             });
         }
 
-        // --- UTILS (Align, Distribute, etc.) ---
-        // (Keeping existing robust implementations from v3.1)
-        function runAlign(direction) {
-            const useContainer = document.getElementById('alignToContainer').checked;
-            runAction(async (context) => {
-                const shapes = context.presentation.getSelectedShapes();
-                shapes.load(['items', 'left', 'top', 'width', 'height']);
-                await context.sync();
-                if (shapes.items.length < 1) return;
-                if (!useContainer && shapes.items.length < 2) { showToast("Select 2+ shapes", "error"); return; }
-                let refLeft, refTop, refWidth, refHeight;
-                if (useContainer) {
-                    const bounds = await getReferenceBounds(context);
-                    refLeft = bounds.left; refTop = bounds.top; refWidth = bounds.width; refHeight = bounds.height;
-                } else {
-                    const ref = shapes.items[0];
-                    refLeft = ref.left; refTop = ref.top; refWidth = ref.width; refHeight = ref.height;
-                }
-                const refCenter = refLeft + (refWidth / 2);
-                const refMiddle = refTop + (refHeight / 2);
-                const startIndex = useContainer ? 0 : 1;
-                for (let i = startIndex; i < shapes.items.length; i++) {
-                    const s = shapes.items[i];
-                    switch (direction) {
-                        case 'left': s.left = refLeft; break;
-                        case 'right': s.left = refLeft + refWidth - s.width; break;
-                        case 'center': s.left = refCenter - (s.width / 2); break;
-                        case 'top': s.top = refTop; break;
-                        case 'bottom': s.top = refTop + refHeight - s.height; break;
-                        case 'middle': s.top = refMiddle - (s.height / 2); break;
-                    }
-                }
-                await context.sync();
-                showToast(`Aligned ${direction}`, "success");
-            });
-        }
-
+        // --- DISTRIBUTE ---
         function runDistribute(axis) {
             const useGutter = document.getElementById('useGutter').checked;
             const useContainer = document.getElementById('alignToContainer').checked;
@@ -718,9 +639,7 @@
                 const count = shapes.items.length;
                 if (count < 2) { showToast("Select 2+ shapes", "error"); return; }
                 let items = [];
-                for(let i=0; i<count; i++) {
-                    items.push({ obj: shapes.items[i], left: shapes.items[i].left, top: shapes.items[i].top, width: shapes.items[i].width, height: shapes.items[i].height });
-                }
+                for(let i=0; i<count; i++) items.push({ obj: shapes.items[i], left: shapes.items[i].left, top: shapes.items[i].top, width: shapes.items[i].width, height: shapes.items[i].height });
                 if (axis === 'horizontal') {
                     items.sort((a, b) => a.left - b.left);
                     if (useContainer) {
@@ -765,6 +684,266 @@
             });
         }
 
+        // --- NEW TOOLS: SELECT SAME ---
+        function runSelectSame(criteria) {
+            runAction(async (context) => {
+                const selection = context.presentation.getSelectedShapes();
+                selection.load('items');
+                await context.sync();
+                if(selection.items.length === 0) { showToast("Select a reference shape", "error"); return; }
+                const ref = selection.items[0];
+                if(criteria === 'style') { ref.fill.load(['foregroundColor', 'type']); ref.lineFormat.load(['color', 'visible']); } 
+                else { ref.load(['width', 'height']); }
+                await context.sync();
+                const slide = context.presentation.getSelectedSlides().getItemAt(0);
+                const shapes = slide.shapes;
+                shapes.load('items');
+                await context.sync();
+                for(let i=0; i<shapes.items.length; i++) {
+                    if(criteria === 'style') { shapes.items[i].fill.load(['foregroundColor', 'type']); shapes.items[i].lineFormat.load(['color', 'visible']); } 
+                    else { shapes.items[i].load(['width', 'height']); }
+                }
+                await context.sync();
+                const idsToSelect = [];
+                for(let i=0; i<shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    let match = false;
+                    if(criteria === 'style') {
+                        const fillMatch = (s.fill.type === ref.fill.type && s.fill.foregroundColor === ref.fill.foregroundColor);
+                        const lineMatch = (s.lineFormat.visible === ref.lineFormat.visible && s.lineFormat.color === ref.lineFormat.color);
+                        if(fillMatch && lineMatch) match = true;
+                    } else {
+                        if(Math.abs(s.width - ref.width) < 1 && Math.abs(s.height - ref.height) < 1) match = true;
+                    }
+                    if(match) idsToSelect.push(s.id);
+                }
+                showToast(`Found ${idsToSelect.length} matches (Selection API limited)`, "info");
+            });
+        }
+
+        function runRename() {
+            const newName = document.getElementById('renameInput').value;
+            if(!newName) return;
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                if(shapes.items.length === 0) return;
+                for(let i=0; i<shapes.items.length; i++) shapes.items[i].name = newName;
+                await context.sync();
+                showToast("Renamed", "success");
+            });
+        }
+
+        function runLock(action) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                if(shapes.items.length === 0) return;
+                for(let i=0; i<shapes.items.length; i++) shapes.items[i].load(['id', 'left', 'top', 'width', 'height']);
+                await context.sync();
+                let count = 0;
+                if(action === 'save') {
+                    for(let i=0; i<shapes.items.length; i++) {
+                        const s = shapes.items[i];
+                        lockedShapes[s.id] = { left: s.left, top: s.top, width: s.width, height: s.height };
+                        count++;
+                    }
+                    showToast(`Locked ${count} shapes`, "success");
+                } else {
+                    for(let i=0; i<shapes.items.length; i++) {
+                        const s = shapes.items[i];
+                        const saved = lockedShapes[s.id];
+                        if(saved) { s.left = saved.left; s.top = saved.top; s.width = saved.width; s.height = saved.height; count++; }
+                    }
+                    await context.sync();
+                    showToast(`Restored ${count} shapes`, "success");
+                }
+            });
+        }
+
+        function runToggleGuides() {
+            runAction(async (context) => {
+                const slide = context.presentation.getSelectedSlides().getItemAt(0);
+                const shapes = slide.shapes;
+                shapes.load('items');
+                await context.sync();
+                let guide = null;
+                for(let i=0; i<shapes.items.length; i++) shapes.items[i].load('name');
+                await context.sync();
+                for(let i=0; i<shapes.items.length; i++) {
+                    if(shapes.items[i].name === "::PPT_TOOLS_GUIDE::") { guide = shapes.items[i]; break; }
+                }
+                if(guide) {
+                    guide.delete();
+                    await context.sync();
+                    showToast("Guide Removed", "info");
+                } else {
+                    const bounds = await getReferenceBounds(context);
+                    if(bounds.width < 100) return;
+                    const g = slide.shapes.addGeometry(PowerPoint.GeometryType.rectangle);
+                    g.left = bounds.left; g.top = bounds.top; g.width = bounds.width; g.height = bounds.height;
+                    g.name = "::PPT_TOOLS_GUIDE::";
+                    g.fill.clear();
+                    g.lineFormat.color = "#FF0000"; g.lineFormat.weight = 1; g.lineFormat.dashStyle = "Dash";
+                    await context.sync();
+                    showToast("Guide Added", "success");
+                }
+            });
+        }
+
+        // --- SHARED UTILS (Copy/Paste, Match, etc.) ---
+        function copyGeometry() {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                if (shapes.items.length === 0) { showToast("Select a shape", "error"); return; }
+                const s = shapes.items[0];
+                s.load(['left', 'top', 'width', 'height']);
+                await context.sync();
+                geoClipboard = { valid: true, left: s.left, top: s.top, width: s.width, height: s.height };
+                document.querySelectorAll('.btn-paste').forEach(b => b.disabled = false);
+                showToast("Geometry Copied", "success");
+            });
+        }
+
+        function pasteGeometry(mode) {
+            if (!geoClipboard.valid) return;
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                for (let i = 0; i < shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    if (mode === 'pos' || mode === 'both') { s.left = geoClipboard.left; s.top = geoClipboard.top; }
+                    if (mode === 'size' || mode === 'both') { s.width = geoClipboard.width; s.height = geoClipboard.height; }
+                }
+                await context.sync();
+                showToast("Geometry Pasted", "success");
+            });
+        }
+
+        function runMatchAttribs(type) {
+            runAction(async (context) => {
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                if (shapes.items.length < 2) { showToast("Select Source + Targets", "error"); return; }
+                const src = shapes.items[0];
+                const targets = [];
+                for(let i=1; i<shapes.items.length; i++) targets.push(shapes.items[i]);
+                if (type === 'fill') src.fill.load(['foregroundColor', 'transparency', 'type']);
+                else if (type === 'outline') src.lineFormat.load(['color', 'weight', 'style', 'transparency', 'visible']);
+                else if (type === 'corners') src.load('geometry');
+                await context.sync();
+                for (let t of targets) {
+                    if (type === 'fill') {
+                        t.fill.clear();
+                        if (src.fill.type === "Solid") { t.fill.setSolidColor(src.fill.foregroundColor); t.fill.transparency = src.fill.transparency; }
+                    } else if (type === 'outline') {
+                        if(src.lineFormat.visible) {
+                            t.lineFormat.color = src.lineFormat.color; t.lineFormat.weight = src.lineFormat.weight;
+                            t.lineFormat.style = src.lineFormat.style; t.lineFormat.transparency = src.lineFormat.transparency;
+                        } else { t.lineFormat.visible = false; }
+                    } else if (type === 'corners') { t.geometry.preset = src.geometry.preset; }
+                }
+                await context.sync();
+                showToast("Attributes Matched", "success");
+            });
+        }
+
+        function runFixBullets() {
+            runAction(async (context) => {
+                const slides = context.presentation.getSelectedSlides();
+                slides.load('items');
+                await context.sync();
+                const layout = slides.items[0].layout;
+                layout.shapes.load('items');
+                await context.sync();
+                let refPara = null;
+                for(let i=0; i<layout.shapes.items.length; i++) {
+                    const s = layout.shapes.items[i];
+                    s.load(['type', 'name', 'textFrame']);
+                }
+                await context.sync();
+                for(let i=0; i<layout.shapes.items.length; i++) {
+                    const s = layout.shapes.items[i];
+                    if(s.type === "Placeholder") {
+                        const n = s.name.toLowerCase();
+                        if(n.includes("body") || n.includes("text") || n.includes("content")) {
+                            s.textFrame.paragraphs.load('items');
+                            await context.sync();
+                            if(s.textFrame.paragraphs.items.length > 0) {
+                                refPara = s.textFrame.paragraphs.items[0];
+                                refPara.bullet.load(['visible']);
+                                break;
+                            }
+                        }
+                    }
+                }
+                await context.sync();
+                if(!refPara) { showToast("No Layout Ref", "error"); return; }
+                const shapes = context.presentation.getSelectedShapes();
+                shapes.load('items');
+                await context.sync();
+                let count = 0;
+                for(let i=0; i<shapes.items.length; i++) shapes.items[i].load('textFrame');
+                await context.sync();
+                for(let i=0; i<shapes.items.length; i++) {
+                    const s = shapes.items[i];
+                    if(s.textFrame) {
+                        s.textFrame.paragraphs.load('items');
+                        await context.sync();
+                        for(let p of s.textFrame.paragraphs.items) p.bullet.visible = refPara.bullet.visible;
+                        count++;
+                    }
+                }
+                await context.sync();
+                showToast(`Fixed bullets (${count})`, "success");
+            });
+        }
+
+        // --- CORE: LAYOUT & CONTAINER FINDER ---
+        async function getReferenceBounds(context) {
+            const slides = context.presentation.getSelectedSlides();
+            slides.load('items');
+            await context.sync();
+            const slide = slides.items[0];
+            const layout = slide.layout;
+            layout.load(['shapes', 'name']);
+            await context.sync();
+            const layoutShapes = layout.shapes;
+            layoutShapes.load('items');
+            await context.sync();
+            for (let i = 0; i < layoutShapes.items.length; i++) {
+                layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
+            }
+            await context.sync();
+            let bestShape = null;
+            let maxArea = 0;
+            for (let i = 0; i < layoutShapes.items.length; i++) {
+                const s = layoutShapes.items[i];
+                const nameLower = s.name.toLowerCase();
+                if (s.type === "Placeholder") {
+                    const isTitle = nameLower.includes("title");
+                    const area = s.width * s.height;
+                    if (nameLower.includes("text placeholder") || nameLower.includes("content placeholder") || nameLower.includes("body")) {
+                         if (area > maxArea) { maxArea = area; bestShape = s; }
+                    } 
+                    else if (!isTitle && area > maxArea && !bestShape) { maxArea = area; bestShape = s; }
+                }
+            }
+            if (bestShape) {
+                return { left: bestShape.left, top: bestShape.top, width: bestShape.width, height: bestShape.height, type: 'Layout Placeholder (' + bestShape.name + ')' };
+            }
+            context.presentation.load(['slideWidth', 'slideHeight']);
+            await context.sync();
+            return { left: 0, top: 0, width: context.presentation.slideWidth, height: context.presentation.slideHeight, type: 'Slide Edge' };
+        }
+
+        // --- OTHER UTILS ---
         function runMatchSize(dimension) {
             runAction(async (context) => {
                 const shapes = context.presentation.getSelectedShapes();
@@ -906,7 +1085,12 @@
         function handleShortcuts(e) {
             const mod = document.body.classList.contains('is-mac') ? e.ctrlKey : e.altKey;
             if (!mod) return;
-            if (e.key.startsWith('Arrow')) { e.preventDefault(); runAlign(e.key.replace('Arrow','').toLowerCase()); }
+            // Map arrow keys to matrix logic roughly (Left = TopLeft, etc is ambiguous)
+            // Just mapping standard Align Left/Right etc
+            if (e.key === 'ArrowLeft') { e.preventDefault(); runAlign('left', null); }
+            if (e.key === 'ArrowRight') { e.preventDefault(); runAlign('right', null); }
+            if (e.key === 'ArrowUp') { e.preventDefault(); runAlign(null, 'top'); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); runAlign(null, 'bottom'); }
         }
 
         function showToast(msg, type) {
