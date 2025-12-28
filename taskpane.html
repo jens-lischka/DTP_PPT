@@ -185,7 +185,7 @@
 
     <div class="taskpane">
         <div class="header">
-            <h1>PowerPoint Tools <span class="version-badge">v3.0</span></h1>
+            <h1>PowerPoint Tools <span class="version-badge">v3.1</span></h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="runInfo()" title="Get Info about this presentation">
                     <i class="ms-Icon ms-Icon--Info"></i>
@@ -221,7 +221,7 @@
                 </label>
             </div>
             <div class="controls-row">
-                <label for="useGutter" title="Enable fixed spacing (gutter) for Distribute and Grid operations.">
+                <label for="useGutter" title="Enable fixed spacing between items.">
                     <input type="checkbox" id="useGutter"> Use Gutter
                 </label>
                 <input type="number" id="gutterSize" value="40" disabled title="Spacing in points">
@@ -401,7 +401,6 @@
             layoutShapes.load('items');
             await context.sync();
 
-            // Load properties for filtering
             for (let i = 0; i < layoutShapes.items.length; i++) {
                 layoutShapes.items[i].load(['name', 'type', 'left', 'top', 'width', 'height']);
             }
@@ -444,7 +443,7 @@
             };
         }
 
-        // --- NEW FEATURE: SMART GRID ARRANGE ---
+        // --- NEW FEATURE: SMART GRID ARRANGE WITH GUTTER SUPPORT ---
         function runGridArrange() {
             const useContainer = document.getElementById('alignToContainer').checked;
             const useGutter = document.getElementById('useGutter').checked;
@@ -459,8 +458,6 @@
                 const count = shapes.items.length;
                 if (count < 1) { showToast("Select shapes first", "error"); return; }
 
-                // 1. Sort items visually (Reading order: Top-Left -> Bottom-Right)
-                // We use a small threshold (10pts) to group items in the same "visual row"
                 let items = [];
                 for(let i=0; i<count; i++) {
                     items.push({ 
@@ -475,7 +472,6 @@
                     return a.top - b.top;
                 });
 
-                // 2. Determine Bounds (Container or Bounding Box of selection)
                 let startLeft, startTop, totalWidth, totalHeight;
 
                 if (useContainer) {
@@ -485,30 +481,12 @@
                     totalWidth = bounds.width;
                     totalHeight = bounds.height;
                 } else {
-                    // Calculate selection bounding box
-                    let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
-                    items.forEach(item => {
-                        minL = Math.min(minL, item.left);
-                        minT = Math.min(minT, item.top);
-                        // We need width/height loaded to calculate Right/Bottom strictly
-                        // Approximation using sorted list:
-                    });
-                    // Reload width/height for bounds calc
-                    // Actually, let's just use the Top-Left of the first item 
-                    // and keep existing dimensions, OR resize to fit the "Area" covered by selection?
-                    // "Make Grid" usually implies resizing. 
-                    // Let's use the bounds of the First Item to Last Item roughly.
                     startLeft = items[0].left;
                     startTop = items[0].top;
-                    // Default to current slide width? No, let's ask user to use Container for resizing.
-                    // If no container, we keep current sizes? No, Grid implies regularity.
-                    // Strategy: If NO Container, we keep Top-Left anchor, but resize items to Match the First Item?
-                    // Better: If no container, we use the total bounding box of the selection.
                     
-                    // Re-scan properly
                     let maxRight = -Infinity, maxBottom = -Infinity;
                     for (let i = 0; i < count; i++) {
-                        const s = shapes.items[i]; // Access original loaded object
+                        const s = shapes.items[i]; 
                         if(s.left < startLeft) startLeft = s.left;
                         if(s.top < startTop) startTop = s.top;
                         if((s.left + s.width) > maxRight) maxRight = s.left + s.width;
@@ -518,21 +496,20 @@
                     totalHeight = maxBottom - startTop;
                 }
 
-                // 3. Calculate Grid Geometry
                 const rows = Math.ceil(count / cols);
                 
-                // W = (TotalW - (cols-1)*G) / cols
-                const cellW = (totalWidth - (cols - 1) * gutterSize) / cols;
-                // H = (TotalH - (rows-1)*G) / rows
-                const cellH = (totalHeight - (rows - 1) * gutterSize) / rows;
+                // MATH: Total Width = (Cols * CellWidth) + ((Cols-1) * Gutter)
+                // Solved for CellWidth:
+                const cellW = (totalWidth - ((cols - 1) * gutterSize)) / cols;
+                const cellH = (totalHeight - ((rows - 1) * gutterSize)) / rows;
 
                 if (cellW < 1 || cellH < 1) { showToast("Grid too tight", "error"); return; }
 
-                // 4. Apply
                 for (let i = 0; i < count; i++) {
                     const r = Math.floor(i / cols);
                     const c = i % cols;
 
+                    // Position = Start + (ColIndex * (Width + Gutter))
                     const newLeft = startLeft + c * (cellW + gutterSize);
                     const newTop = startTop + r * (cellH + gutterSize);
 
@@ -557,7 +534,6 @@
                 let c = 0;
                 for (let i = 0; i < shapes.items.length; i++) {
                     const s = shapes.items[i];
-                    // Round to nearest integer (eliminates sub-pixel blur)
                     s.left = Math.round(s.left);
                     s.top = Math.round(s.top);
                     s.width = Math.round(s.width);
@@ -565,7 +541,7 @@
                     c++;
                 }
                 await context.sync();
-                showToast(`Snapped ${c} items to grid`, "success");
+                showToast(`Snapped ${c} items`, "success");
             });
         }
 
@@ -729,8 +705,6 @@
         }
 
         function runFixTitle() {
-            // (Title logic remains identical to v2.16 - omitted for brevity but included in full copy)
-            // Just linking to the robust version established previously.
              runAction(async (context) => {
                 const slides = context.presentation.getSelectedSlides();
                 slides.load('items');
@@ -822,7 +796,6 @@
         }
 
         async function runInfo() {
-            // (Info Function from v2.16 - Simple Safe Mode)
             document.getElementById('infoModal').classList.add('open');
             const content = document.getElementById('infoContent');
             content.innerHTML = '<div style="text-align:center; padding:20px;">Scanning...</div>';
