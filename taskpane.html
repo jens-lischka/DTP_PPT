@@ -8,6 +8,9 @@
     <!-- Office.js -->
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     
+    <!-- Icon Styles Configuration -->
+    <script src="icon-styles.js"></script>
+    
     <!-- Fluent UI Icons -->
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
     
@@ -526,26 +529,7 @@
             <div class="prompt-section">
                 <label>Select Style</label>
                 <div class="icon-style-grid" id="iconStyleGrid">
-                    <div class="icon-style-card selected" data-style="1">
-                        <div class="icon-style-preview" style="background: #FFFFFF; border: 2px solid #000B39;">✏️</div>
-                        <div class="icon-style-name">Style 1</div>
-                        <div class="icon-style-desc">Spot Illustration</div>
-                    </div>
-                    <div class="icon-style-card" data-style="2">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #000F47, #001a5c);">🏺</div>
-                        <div class="icon-style-name">Style 2</div>
-                        <div class="icon-style-desc">3D Clay</div>
-                    </div>
-                    <div class="icon-style-card" data-style="3">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #f5f5f5, #e0e0e0);">📷</div>
-                        <div class="icon-style-name">Style 3</div>
-                        <div class="icon-style-desc">Photo Realism</div>
-                    </div>
-                    <div class="icon-style-card" data-style="4">
-                        <div class="icon-style-preview" style="background: linear-gradient(135deg, #ff7043, #ff5722);">💥</div>
-                        <div class="icon-style-name">Style 4</div>
-                        <div class="icon-style-desc">Exploded</div>
-                    </div>
+                    <!-- Dynamically populated from icon-styles.js -->
                 </div>
             </div>
 
@@ -734,7 +718,6 @@
             shapeInfo: document.getElementById('shapeInfo'),
             shapeInfoText: document.getElementById('shapeInfoText'),
             iconSubjectInput: document.getElementById('iconSubjectInput'),
-            iconStyleGrid: document.querySelectorAll('#iconStyleGrid .icon-style-card'),
             iconQualitySelect: document.getElementById('iconQualitySelect'),
             btnGenerateIcon: document.getElementById('btnGenerateIcon'),
             iconStatusMessage: document.getElementById('iconStatusMessage'),
@@ -823,8 +806,35 @@
                 state.history = [];
             }
 
+            // Render icon styles from external config
+            renderIconStyles();
+
             setupEventListeners();
             updateGenerateButtons();
+        }
+
+        // Render icon styles from external configuration
+        function renderIconStyles() {
+            const grid = document.getElementById('iconStyleGrid');
+            if (!grid || typeof ICON_STYLES === 'undefined') {
+                console.warn('Icon styles not available');
+                return;
+            }
+
+            grid.innerHTML = '';
+            
+            Object.keys(ICON_STYLES).forEach((styleNum, index) => {
+                const style = ICON_STYLES[styleNum];
+                const card = document.createElement('div');
+                card.className = 'icon-style-card' + (index === 0 ? ' selected' : '');
+                card.dataset.style = styleNum;
+                card.innerHTML = `
+                    <div class="icon-style-preview" style="${style.previewStyle}">${style.emoji}</div>
+                    <div class="icon-style-name">Style ${styleNum}</div>
+                    <div class="icon-style-desc">${style.name}</div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
         function setupEventListeners() {
@@ -854,10 +864,12 @@
             elements.iconSubjectInput.addEventListener('input', updateGenerateButtons);
             elements.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
             elements.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
-            elements.iconStyleGrid.forEach(card => {
+            
+            // Attach click handlers to dynamically created style cards
+            document.querySelectorAll('#iconStyleGrid .icon-style-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const styleNum = parseInt(card.dataset.style);
-                    elements.iconStyleGrid.forEach(c => c.classList.remove('selected'));
+                    document.querySelectorAll('#iconStyleGrid .icon-style-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     state.iconStyleNumber = styleNum;
                 });
@@ -997,74 +1009,8 @@
                 const subject = elements.iconSubjectInput.value.trim();
                 const styleNum = state.iconStyleNumber;
 
-                if (styleNum === 1) {
-                    const jsonPrompt = {
-                        "object": "spot_illustration",
-                        "task_type": "generation",
-                        "priority": { "primary": "flat 2D illustration in the Oliver Wyman brand style", "secondary": "strict separation between outline-only and fill-only elements" },
-                        "subject": { "type": subject, "description": "simplified geometric representation" },
-                        "parameters": {
-                            "structure_rules": {
-                                "outline_elements": { "usage": "outline_only", "line_color": "#000B39", "line_weight": "thin", "no_fill": true },
-                                "filled_elements": { "usage": "fill_only", "fill_colors": ["#000B39", "#FFBF00", "#C4C4C4"], "no_outline": true },
-                                "rule_description": "each element must be either pure outline OR pure fill; never combine both in one shape"
-                            },
-                            "illustration_style": { "geometry": "simplified_geometric", "dimensionality": "flat_2D", "avoid_detail": true },
-                            "color_usage": { "primary": "#000B39", "highlight": "#FFBF00", "contrast": "#C4C4C4", "exclude": ["Sky Blue", "#FFFFFF in objects"] },
-                            "background": { "type": "transparent" }
-                        },
-                        "constraints": { "avoid": ["mixing fill and outline in a single shape", "3D shading", "gradients", "textures", "organic curves", "realistic detail", "Sky Blue"], "ensure": ["all outlines are #000B39 only", "all filled shapes have NO outline", "clean geometric reduction", "balanced composition"] },
-                        "output_specs": { "file_type": "png", "quality": "high", "transparent_background": true }
-                    };
-                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
-                } else if (styleNum === 2) {
-                    const jsonPrompt = {
-                        "object": subject,
-                        "task_type": "generation",
-                        "priority": { "primary": "create a photorealistic 3D render of the object with no texture", "secondary": "preserve the object's silhouette and physical accuracy" },
-                        "material": { "type": "untextured_3d_clay", "properties": { "color": "#000F47", "finish": "matte", "surface": "clean and uniform with no visible texture", "details": "subtle highlights and soft shading to define the object's shape" } },
-                        "subject": { "description": "the object rendered as an untextured dark-blue clay-style 3D model", "attributes": { "form": "precise and accurate to the object's silhouette", "texture": "none", "pose": "studio product angle" } },
-                        "environment": { "background": "transparent", "lighting": { "type": "soft studio", "direction": "front", "quality": "diffused with gentle highlights on the dark surface" } },
-                        "style": { "artistic": "photorealistic 3D render", "camera": { "angle": "eye_level", "lens": "normal", "aperture": "shallow_depth_of_field" }, "mood": "minimalistic and clean" },
-                        "technical": { "resolution": "high", "aspect_ratio": "1:1", "quality": "maximum" },
-                        "constraints": { "avoid": ["colors besides the dark clay tone", "textures", "metallic reflections", "cartoon look"], "ensure": ["clean clay look", "object silhouette clear and readable"] },
-                        "output_specs": { "file_type": "high_resolution_image", "transparent_background": true }
-                    };
-                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
-                } else if (styleNum === 3) {
-                    const jsonPrompt = {
-                        "scene": { "type": "product_studio", "environment": "neutral", "background": { "type": "transparent", "color": null, "alpha": 0, "note": "canvas is transparent; object lighting and shadows are baked into pixels" } },
-                        "subject": { "type": subject, "description": ["hyperrealistic", "isolated", "centered", "fully visible", "never cropped"], "surface_integrity": "clean", "edges": "sharp" },
-                        "style": { "category": "photorealistic_product", "rendering": "high_fidelity", "material_accuracy": "high", "no_stylization": true },
-                        "camera": { "angle": "front_three_quarter", "position": "fixed", "distance": "consistent", "lens_effects": { "distortion": "none", "depth_of_field": "minimal" } },
-                        "lighting": { "setup": "studio_softbox", "key_light": { "position": "top_front_right", "intensity": "medium", "diffusion": "high" }, "fill_light": { "position": "front", "intensity": "low" }, "rim_light": { "enabled": false } },
-                        "shadow": { "enabled": true, "type": "soft_contact_shadow", "direction": "left_back", "length": "short", "opacity": 0.2, "note": "shadow should remain visible on transparent background" },
-                        "composition": { "layout": "single_object", "alignment": "center", "surrounding_elements": "none", "safe_padding_ratio": 0.15 },
-                        "text_rules": { "allowed": true, "constraint": "only_if_physically_part_of_object", "external_text": false, "labels_or_overlays": false },
-                        "output": { "format": "png", "transparent_background": true, "recommended_resolution": "2048x2048", "color_profile": "sRGB" }
-                    };
-                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
-                } else if (styleNum === 4) {
-                    const jsonPrompt = {
-                        "object": { "name": subject, "category_inference": { "enabled": true, "derive_from_object_name": true, "restrict_to_category": true } },
-                        "task_type": "generation",
-                        "decomposition_intent": { "type": "exploded_view", "abstraction_level": "system_level", "definition": "Systems are the largest real-world functional or structural assemblies that are commonly recognized as discrete units in the object's overall architecture.", "forbid_recursive_decomposition": true, "stop_condition": "do_not_decompose_systems_into_subsystems_or_parts" },
-                        "pipeline": {
-                            "stage_1": { "name": "system_identification", "description": "Identify only the top-level real-world systems that define the object's architecture", "rules": { "component_granularity": "system_level", "infer_systems_from_real_world_design": true, "limit_to_major_architectural_units": true, "forbid_part_level_and_subsystem_level_outputs": true, "validate_systems_against_object_category": true } },
-                            "stage_2": { "name": "system_exploded_view_generation", "description": "Generate an exploded view using only the systems identified in stage_1", "rules": { "no_new_systems_allowed": true, "preserve_real_world_scale_and_proportions": true, "maintain_realistic_spatial_relationships": true, "do_not_explode_internal_structure_of_systems": true } }
-                        },
-                        "exploded_view": { "enabled": true, "layout": { "type": "object_primary_axis_based", "infer_axis_from_object_geometry": true, "spacing": "clear_but_realistic", "preserve_relative_positions": true }, "system_relationships": { "show_hierarchy": true, "show_interfaces_between_systems": true, "hide_internal_connections_and_parts": true } },
-                        "component_constraints": { "allowed_components": "only_major_system_level_assemblies", "explicitly_disallowed": ["fasteners", "wiring", "hoses", "bolts", "screws", "clips", "springs", "gears", "microelectronics", "internal_mechanisms", "decorative_or_cosmetic_parts"], "validation": { "reject_if_component_is_smaller_than_system_level": true } },
-                        "environment": { "setting": "isolated studio void", "background": { "type": "transparent", "color": null, "alpha": 0 }, "lighting": { "type": "photographic_studio", "setup": "controlled_three_point", "key_light": { "direction": "soft_directional", "intensity": "moderate" }, "fill_light": { "intensity": "low_to_medium" }, "rim_light": { "enabled": true, "intensity": "subtle" }, "cast_shadows": false, "contact_shadows": { "enabled": true, "style": "very_soft", "opacity": 0.15 }, "ambient_occlusion": { "enabled": true, "scope": "intra_system_only", "strength": "subtle" } } },
-                        "style": { "rendering": "photorealistic_product_visualization", "material_response": { "enable_specular_highlights": true, "micro_contrast": "natural", "surface_roughness_variation": true }, "camera": { "angle": "three_quarter_or_isometric", "lens": "neutral_product_standard", "depth_of_field": "deep", "distortion": "none" }, "mood": "architectural_and_instructional" },
-                        "technical": { "resolution": "high", "aspect_ratio": "1:1", "quality": "maximum", "noise": "minimal", "sharpening": "natural" },
-                        "constraints": { "avoid": ["component_level_explosion", "mechanical_teardown_visuals", "illustrative_flat_shading", "diagrammatic_line_art", "ground_planes", "background_shadows"], "ensure": ["system_level_abstraction_only", "object_architecture_is_clearly_readable", "realistic_system_scale_and_alignment", "transparent_background", "no_internal_part_visibility"] },
-                        "output_specs": { "file_type": "high_resolution_png", "transparent_background": true, "include_synthid": true }
-                    };
-                    prompt = "Create an image:\n" + JSON.stringify(jsonPrompt, null, 2);
-                } else {
-                    prompt = `Icon of ${subject}, clean simple design, centered, high quality`;
-                }
+                // Use external icon-styles.js configuration
+                prompt = generateIconPrompt(styleNum, subject);
 
                 quality = elements.iconQualitySelect.value;
                 statusEl = elements.iconStatusMessage;
