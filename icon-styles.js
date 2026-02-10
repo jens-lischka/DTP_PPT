@@ -4,79 +4,84 @@
  */
 
 const ICON_STYLES = {
-    1: {
-        name: "Spot Illustration",
-        emoji: "✏️",
-        description: "Flat 2D geometric",
-        previewStyle: "background: #FFFFFF; border: 2px solid #000B39;",
-        
-        generatePrompt: function(subject) {
-            return {
-                "object": "spot_illustration",
-                "task_type": "generation",
-                "priority": {
-                    "primary": "flat 2D illustration in the Oliver Wyman brand style",
-                    "secondary": "strict separation between outline-only and fill-only elements"
-                },
-                "subject": {
-                    "type": subject,
-                    "description": "simplified geometric representation"
-                },
-                "parameters": {
-                    "structure_rules": {
-                        "outline_elements": {
-                            "usage": "outline_only",
-                            "line_color": "#000B39",
-                            "line_weight": "thin",
-                            "no_fill": true
-                        },
-                        "filled_elements": {
-                            "usage": "fill_only",
-                            "fill_colors": ["#000B39", "#FFBF00", "#C4C4C4"],
-                            "no_outline": true
-                        },
-                        "rule_description": "each element must be either pure outline OR pure fill; never combine both in one shape"
-                    },
-                    "illustration_style": {
-                        "geometry": "simplified_geometric",
-                        "dimensionality": "flat_2D",
-                        "avoid_detail": true
-                    },
-                    "color_usage": {
-                        "primary": "#000B39",
-                        "highlight": "#FFBF00",
-                        "contrast": "#C4C4C4",
-                        "exclude": ["Sky Blue", "#FFFFFF in objects"]
-                    },
-                    "background": {
-                        "type": "transparent"
-                    }
-                },
-                "constraints": {
-                    "avoid": [
-                        "mixing fill and outline in a single shape",
-                        "3D shading",
-                        "gradients",
-                        "textures",
-                        "organic curves",
-                        "realistic detail",
-                        "Sky Blue"
-                    ],
-                    "ensure": [
-                        "all outlines are #000B39 only",
-                        "all filled shapes have NO outline",
-                        "clean geometric reduction",
-                        "balanced composition"
-                    ]
-                },
-                "output_specs": {
-                    "file_type": "png",
-                    "quality": "high",
-                    "transparent_background": true
-                }
-            };
+  1: {
+    name: "Liquid Metal Matte",
+    emoji: "🪙",
+    description: "Photorealistic matte metal",
+    previewStyle: "background: linear-gradient(135deg, #f5f5f5, #d9d9d9);",
+
+    generatePrompt: function (subject) {
+      return {
+        "object": subject,
+        "task_type": "generation",
+        "priority": {
+          "primary": "create a photorealistic rendition of the object made from liquid metal with a matte surface",
+          "secondary": "preserve the object's recognizable functionality and silhouette"
+        },
+        "material": {
+          "type": "liquid metal",
+          "variants": ["aluminum", "lead"],
+          "properties": {
+            "viscosity": "thick and smooth",
+            "finish": "matte metallic (low reflectivity, soft specular only)",
+            "surface_behavior": "fluid contours with realistic weight, stabilized into the final form",
+            "color": "silver-metallic"
+          }
+        },
+        "subject": {
+          "description": "the object sculpted from liquid metal with a matte metallic surface",
+          "attributes": {
+            "form": "faithful to the original object's shape",
+            "texture": "matte metallic liquid surface (no mirror reflections)",
+            "pose": "studio product angle"
+          }
+        },
+        "environment": {
+          "background": "transparent",
+          "lighting": {
+            "type": "soft studio",
+            "direction": "front",
+            "quality": "diffused with clean, subtle highlights (no harsh reflections)"
+          }
+        },
+        "style": {
+          "artistic": "photorealistic",
+          "camera": {
+            "angle": "eye_level",
+            "lens": "normal",
+            "aperture": "shallow_depth_of_field"
+          },
+          "mood": "sleek and modern"
+        },
+        "technical": {
+          "resolution": "high",
+          "aspect_ratio": "1:1",
+          "quality": "maximum"
+        },
+        "constraints": {
+          "avoid": [
+            "cartoon look",
+            "distorted shapes",
+            "melting or collapsing form",
+            "mirror-like reflections",
+            "high-gloss finish",
+            "busy background"
+          ],
+          "ensure": [
+            "recognizable object shape",
+            "realistic metal behavior",
+            "matte metallic surface",
+            "transparent background"
+          ]
+        },
+        "output_specs": {
+          "file_type": "png",
+          "transparent_background": true,
+          "quality": "high"
         }
-    },
+      };
+    }
+  },
 
     2: {
         name: "3D Clay",
