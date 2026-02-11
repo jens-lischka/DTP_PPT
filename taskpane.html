@@ -444,6 +444,34 @@
         /* Style card disabled state */
         .icon-style-card.disabled { opacity: 0.5; cursor: not-allowed; }
         .icon-style-card.disabled:hover { border-color: var(--neutral-light); }
+
+        /* Background Color Buttons */
+        .background-color-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .background-color-btn {
+            aspect-ratio: 1;
+            border: 3px solid var(--neutral-light);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            min-height: 60px;
+        }
+        .background-color-btn:hover { border-color: var(--primary); transform: scale(1.05); }
+        .background-color-btn.selected { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+        .background-color-btn .color-check {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            color: white;
+            font-size: 20px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .background-color-btn.selected .color-check { display: block; }
+        .background-color-btn[data-color="#fff3da"] .color-check,
+        .background-color-btn[data-color="#ceecff"] .color-check,
+        .background-color-btn[data-color="#f7f3ee"] .color-check { color: var(--neutral-darker); text-shadow: none; }
     </style>
 </head>
 <body>
@@ -461,6 +489,7 @@
         <div class="tabs">
             <button class="tab active" data-tab="images"><i class="ms-Icon ms-Icon--Photo2"></i><span>Images</span></button>
             <button class="tab" data-tab="icons"><i class="ms-Icon ms-Icon--AppIconDefaultList"></i><span>Icons</span></button>
+            <button class="tab" data-tab="background"><i class="ms-Icon ms-Icon--Color"></i><span>Background</span></button>
             <button class="tab" data-tab="align"><i class="ms-Icon ms-Icon--AlignCenter"></i><span>Align</span></button>
             <button class="tab" data-tab="feedback"><i class="ms-Icon ms-Icon--Feedback"></i><span>More</span></button>
         </div>
@@ -597,6 +626,41 @@
                     <button class="btn-action btn-regenerate" id="btnRegenerateIcon"><i class="ms-Icon ms-Icon--Refresh"></i>Regenerate</button>
                     <button class="btn-action btn-insert" id="btnInsertIcon"><i class="ms-Icon ms-Icon--CheckMark"></i>Insert</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ==================== BACKGROUND TAB ==================== -->
+        <div class="tab-content" id="tab-background">
+            <div class="prompt-section">
+                <h2 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--neutral-darker);">Slide Background Color</h2>
+                <p style="font-size: 13px; color: var(--neutral-dark); margin-bottom: 16px;">Change the fill color of the 'dynamic-background' shape on the current slide.</p>
+                
+                <div class="background-color-grid">
+                    <button class="background-color-btn" data-color="#000f47" style="background-color: #000f47;" title="Dark Blue (#000f47)">
+                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
+                    </button>
+                    <button class="background-color-btn" data-color="#fff3da" style="background-color: #fff3da;" title="Warm Cream (#fff3da)">
+                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
+                    </button>
+                    <button class="background-color-btn" data-color="#ceecff" style="background-color: #ceecff;" title="Light Blue (#ceecff)">
+                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
+                    </button>
+                    <button class="background-color-btn" data-color="#f7f3ee" style="background-color: #f7f3ee;" title="Soft White (#f7f3ee)">
+                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="backgroundStatusMessage" class="status-message">
+                <i class="ms-Icon"></i><span></span>
+            </div>
+
+            <div class="feedback-info" style="margin-top: 16px;">
+                <h3>💡 How it works</h3>
+                <p style="font-size: 12px; color: var(--neutral-dark); line-height: 1.6;">
+                    Click a color to change the fill of the shape named <code>dynamic-background</code> on the current slide.<br><br>
+                    Make sure the shape exists and is named exactly <code>dynamic-background</code> in the Selection Pane.
+                </p>
             </div>
         </div>
 
@@ -982,6 +1046,14 @@
             elements.btnCenterOnSlide.addEventListener('click', centerOnSlide);
 
             elements.btnSubmitFeedback.addEventListener('click', submitFeedback);
+
+            // Background color buttons
+            document.querySelectorAll('.background-color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const color = btn.dataset.color;
+                    changeBackgroundColor(color);
+                });
+            });
 
             detectSelectedShape();
             setInterval(detectSelectedShape, 1000);
@@ -1562,6 +1634,61 @@
             console.log('Feedback submitted:', { type, feedback });
             alert('Thank you for your feedback! 🎉');
             elements.feedbackText.value = '';
+        }
+
+        // ======================
+        // Background Color
+        // ======================
+        function showBackgroundStatus(message, type) {
+            const statusEl = document.getElementById('backgroundStatusMessage');
+            if (!statusEl) return;
+            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
+            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
+            statusEl.className = `status-message visible ${type}`;
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
+        }
+
+        async function changeBackgroundColor(hexColor) {
+            showBackgroundStatus('Changing background color...', 'info');
+            
+            try {
+                await PowerPoint.run(async (context) => {
+                    const slide = context.presentation.getSelectedSlides().getItemAt(0);
+                    const shapes = slide.shapes;
+                    shapes.load('items/name');
+                    await context.sync();
+                    
+                    // Find the shape named 'dynamic-background'
+                    let targetShape = null;
+                    for (let i = 0; i < shapes.items.length; i++) {
+                        if (shapes.items[i].name === 'dynamic-background') {
+                            targetShape = shapes.items[i];
+                            break;
+                        }
+                    }
+                    
+                    if (!targetShape) {
+                        showBackgroundStatus("Shape 'dynamic-background' not found on current slide", 'error');
+                        return;
+                    }
+                    
+                    // Change the fill color
+                    targetShape.fill.setSolidColor(hexColor);
+                    await context.sync();
+                    
+                    // Update button selection state
+                    document.querySelectorAll('.background-color-btn').forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.color === hexColor);
+                    });
+                    
+                    showBackgroundStatus(`Background changed to ${hexColor}`, 'success');
+                });
+            } catch (error) {
+                console.error('Error changing background:', error);
+                showBackgroundStatus('Failed to change background: ' + error.message, 'error');
+            }
         }
 
         // ======================
