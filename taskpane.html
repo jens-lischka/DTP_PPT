@@ -633,7 +633,7 @@
         <div class="tab-content" id="tab-background">
             <div class="prompt-section">
                 <h2 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--neutral-darker);">Slide Background Color</h2>
-                <p style="font-size: 13px; color: var(--neutral-dark); margin-bottom: 16px;">Change the fill color of the 'dynamic-background' shape on the current slide.</p>
+                <p style="font-size: 13px; color: var(--neutral-dark); margin-bottom: 16px;">Change the fill color of the 'dynamic-background' shape on the slide layout.</p>
                 
                 <div class="background-color-grid">
                     <button class="background-color-btn" data-color="#000f47" style="background-color: #000f47;" title="Dark Blue (#000f47)">
@@ -658,8 +658,8 @@
             <div class="feedback-info" style="margin-top: 16px;">
                 <h3>💡 How it works</h3>
                 <p style="font-size: 12px; color: var(--neutral-dark); line-height: 1.6;">
-                    Click a color to change the fill of the shape named <code>dynamic-background</code> on the current slide.<br><br>
-                    Make sure the shape exists and is named exactly <code>dynamic-background</code> in the Selection Pane.
+                    Click a color to change the fill of the shape named <code>dynamic-background</code> on the current slide's layout.<br><br>
+                    Make sure the shape exists on the slide layout and is named exactly <code>dynamic-background</code>.
                 </p>
             </div>
         </div>
@@ -1656,11 +1656,16 @@
             try {
                 await PowerPoint.run(async (context) => {
                     const slide = context.presentation.getSelectedSlides().getItemAt(0);
-                    const shapes = slide.shapes;
+                    slide.load('layout');
+                    await context.sync();
+                    
+                    // Access the slide's layout
+                    const layout = slide.layout;
+                    const shapes = layout.shapes;
                     shapes.load('items/name');
                     await context.sync();
                     
-                    // Find the shape named 'dynamic-background'
+                    // Find the shape named 'dynamic-background' on the layout
                     let targetShape = null;
                     for (let i = 0; i < shapes.items.length; i++) {
                         if (shapes.items[i].name === 'dynamic-background') {
@@ -1670,7 +1675,7 @@
                     }
                     
                     if (!targetShape) {
-                        showBackgroundStatus("Shape 'dynamic-background' not found on current slide", 'error');
+                        showBackgroundStatus("Shape 'dynamic-background' not found on slide layout", 'error');
                         return;
                     }
                     
