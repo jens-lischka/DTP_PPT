@@ -79,73 +79,74 @@ const ICON_STYLES = {
     },
 
     2: {
-        name: "3D Clay",
-        emoji: "🏺",
-        description: "Dark blue matte",
-        previewStyle: "background: linear-gradient(135deg, #000F47, #001a5c);",
+        name: "Spot (White BG)",
+        emoji: "⬜",
+        description: "Flat 2D, white bg",
+        previewStyle: "background: #FFFFFF; border: 2px solid #FFBF00;",
         
         generatePrompt: function(subject) {
             return {
-                "object": subject,
+                "object": "spot_illustration",
                 "task_type": "generation",
                 "priority": {
-                    "primary": "create a photorealistic 3D render of the object with no texture",
-                    "secondary": "preserve the object's silhouette and physical accuracy"
-                },
-                "material": {
-                    "type": "untextured_3d_clay",
-                    "properties": {
-                        "color": "#000F47",
-                        "finish": "matte",
-                        "surface": "clean and uniform with no visible texture",
-                        "details": "subtle highlights and soft shading to define the object's shape"
-                    }
+                    "primary": "flat 2D illustration in the Oliver Wyman brand style",
+                    "secondary": "strict separation between outline-only and fill-only elements"
                 },
                 "subject": {
-                    "description": "the object rendered as an untextured dark-blue clay-style 3D model",
-                    "attributes": {
-                        "form": "precise and accurate to the object's silhouette",
-                        "texture": "none",
-                        "pose": "studio product angle"
-                    }
+                    "type": subject,
+                    "description": "simplified geometric representation"
                 },
-                "environment": {
-                    "background": "transparent",
-                    "lighting": {
-                        "type": "soft studio",
-                        "direction": "front",
-                        "quality": "diffused with gentle highlights on the dark surface"
-                    }
-                },
-                "style": {
-                    "artistic": "photorealistic 3D render",
-                    "camera": {
-                        "angle": "eye_level",
-                        "lens": "normal",
-                        "aperture": "shallow_depth_of_field"
+                "parameters": {
+                    "structure_rules": {
+                        "outline_elements": {
+                            "usage": "outline_only",
+                            "line_color": "#000B39",
+                            "line_weight": "thin",
+                            "no_fill": true
+                        },
+                        "filled_elements": {
+                            "usage": "fill_only",
+                            "fill_colors": ["#000B39", "#FFBF00", "#C4C4C4"],
+                            "no_outline": true
+                        },
+                        "rule_description": "each element must be either pure outline OR pure fill; never combine both in one shape"
                     },
-                    "mood": "minimalistic and clean"
-                },
-                "technical": {
-                    "resolution": "high",
-                    "aspect_ratio": "1:1",
-                    "quality": "maximum"
+                    "illustration_style": {
+                        "geometry": "simplified_geometric",
+                        "dimensionality": "flat_2D",
+                        "avoid_detail": true
+                    },
+                    "color_usage": {
+                        "primary": "#000B39",
+                        "highlight": "#FFBF00",
+                        "contrast": "#C4C4C4",
+                        "exclude": ["Sky Blue", "#FFFFFF in objects"]
+                    },
+                    "background": {
+                        "color": "#FFFFFF",
+                        "type": "solid"
+                    }
                 },
                 "constraints": {
                     "avoid": [
-                        "colors besides the dark clay tone",
+                        "mixing fill and outline in a single shape",
+                        "3D shading",
+                        "gradients",
                         "textures",
-                        "metallic reflections",
-                        "cartoon look"
+                        "organic curves",
+                        "realistic detail",
+                        "Sky Blue"
                     ],
                     "ensure": [
-                        "clean clay look",
-                        "object silhouette clear and readable"
+                        "all outlines are #000B39 only",
+                        "all filled shapes have NO outline",
+                        "clean geometric reduction",
+                        "balanced composition"
                     ]
                 },
                 "output_specs": {
-                    "file_type": "high_resolution_image",
-                    "transparent_background": true
+                    "file_type": "png",
+                    "quality": "high"
                 }
             };
         }
