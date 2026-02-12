@@ -783,6 +783,44 @@
             background: var(--gray-200);
             margin: 4px 0;
         }
+
+        /* Usage Stats */
+        .usage-stats {
+            margin-top: 16px;
+        }
+        .usage-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .usage-row:last-child {
+            border-bottom: none;
+        }
+        .usage-label {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+        .usage-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--black);
+            font-variant-numeric: tabular-nums;
+        }
+        .usage-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 8px 0;
+        }
+        .usage-total .usage-label {
+            font-weight: 600;
+            color: var(--black);
+        }
+        .usage-total .usage-value {
+            font-size: 16px;
+            color: var(--black);
+        }
     </style>
 </head>
 <body>
@@ -1034,6 +1072,33 @@
                 </div>
             </div>
 
+            <div class="api-key-section">
+                <div class="api-key-header">
+                    <label>Session Usage</label>
+                    <button class="btn-clear-history" id="btnResetUsage">Reset</button>
+                </div>
+                <div class="usage-stats">
+                    <div class="usage-row">
+                        <span class="usage-label">Images generated</span>
+                        <span class="usage-value" id="usageImages">0</span>
+                    </div>
+                    <div class="usage-row">
+                        <span class="usage-label">Input tokens</span>
+                        <span class="usage-value" id="usageInputTokens">0</span>
+                    </div>
+                    <div class="usage-row">
+                        <span class="usage-label">Output tokens</span>
+                        <span class="usage-value" id="usageOutputTokens">0</span>
+                    </div>
+                    <div class="usage-divider"></div>
+                    <div class="usage-row usage-total">
+                        <span class="usage-label">Estimated cost</span>
+                        <span class="usage-value" id="usageCost">$0.00</span>
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: #9898a8; margin-top: 12px;">Based on $5/1M input + $10/1M output tokens</p>
+            </div>
+
             <div class="feedback-section">
                 <h2>Send Feedback</h2>
                 <p>Help us improve this add-in! Share your thoughts, report bugs, or request features.</p>
@@ -1079,7 +1144,20 @@
             iconStyleNumber: 1,
             iconImageBase64: null,
             imageStyleNumber: 1,
-            useImageStyle: false
+            useImageStyle: false,
+            // Usage tracking
+            usage: {
+                totalInputTokens: 0,
+                totalOutputTokens: 0,
+                totalImages: 0,
+                sessionStart: new Date().toISOString()
+            }
+        };
+
+        // Pricing per 1M tokens (USD)
+        const PRICING = {
+            inputPerMillion: 5.00,
+            outputPerMillion: 10.00
         };
 
         // ======================
@@ -1135,7 +1213,13 @@
             btnCenterOnSlide: document.getElementById('btnCenterOnSlide'),
             feedbackText: document.getElementById('feedbackText'),
             feedbackType: document.getElementById('feedbackType'),
-            btnSubmitFeedback: document.getElementById('btnSubmitFeedback')
+            btnSubmitFeedback: document.getElementById('btnSubmitFeedback'),
+            // Usage tracking elements
+            usageImages: document.getElementById('usageImages'),
+            usageInputTokens: document.getElementById('usageInputTokens'),
+            usageOutputTokens: document.getElementById('usageOutputTokens'),
+            usageCost: document.getElementById('usageCost'),
+            btnResetUsage: document.getElementById('btnResetUsage')
         };
 
         // ======================
@@ -1521,6 +1605,15 @@
                 const data = await response.json();
                 const base64Data = data.data[0].b64_json;
                 const imageUrl = `data:image/png;base64,${base64Data}`;
+
+                // Track usage if available
+                if (data.usage) {
+                    state.usage.totalInputTokens += data.usage.input_tokens || 0;
+                    state.usage.totalOutputTokens += data.usage.output_tokens || 0;
+                    state.usage.totalImages += 1;
+                    updateUsageDisplay();
+                    saveUsageToStorage();
+                }
 
                 if (tab === 'images') {
                     state.currentImageUrl = imageUrl;
@@ -2023,6 +2116,84 @@
             if (type === 'success' || type === 'info') {
                 setTimeout(() => statusEl.classList.remove('visible'), 3000);
             }
+        }
+
+        // ======================
+        // Usage Tracking
+        // ======================
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        function calculateCost() {
+            const inputCost = (state.usage.totalInputTokens / 1000000) * PRICING.inputPerMillion;
+            const outputCost = (state.usage.totalOutputTokens / 1000000) * PRICING.outputPerMillion;
+            return inputCost + outputCost;
+        }
+
+        function updateUsageDisplay() {
+            if (elements.usageImages) {
+                elements.usageImages.textContent = formatNumber(state.usage.totalImages);
+            }
+            if (elements.usageInputTokens) {
+                elements.usageInputTokens.textContent = formatNumber(state.usage.totalInputTokens);
+            }
+            if (elements.usageOutputTokens) {
+                elements.usageOutputTokens.textContent = formatNumber(state.usage.totalOutputTokens);
+            }
+            if (elements.usageCost) {
+                const cost = calculateCost();
+                elements.usageCost.textContent = '$' + cost.toFixed(4);
+            }
+        }
+
+        function saveUsageToStorage() {
+            try {
+                localStorage.setItem('aiImageGenerator_usage', JSON.stringify(state.usage));
+            } catch (e) {
+                console.log('Could not save usage to storage');
+            }
+        }
+
+        function loadUsageFromStorage() {
+            try {
+                const saved = localStorage.getItem('aiImageGenerator_usage');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.usage = {
+                        totalInputTokens: parsed.totalInputTokens || 0,
+                        totalOutputTokens: parsed.totalOutputTokens || 0,
+                        totalImages: parsed.totalImages || 0,
+                        sessionStart: parsed.sessionStart || new Date().toISOString()
+                    };
+                }
+            } catch (e) {
+                console.log('Could not load usage from storage');
+            }
+            updateUsageDisplay();
+        }
+
+        function resetUsage() {
+            state.usage = {
+                totalInputTokens: 0,
+                totalOutputTokens: 0,
+                totalImages: 0,
+                sessionStart: new Date().toISOString()
+            };
+            saveUsageToStorage();
+            updateUsageDisplay();
+        }
+
+        // Initialize usage tracking
+        loadUsageFromStorage();
+
+        // Reset usage button listener
+        if (elements.btnResetUsage) {
+            elements.btnResetUsage.addEventListener('click', () => {
+                if (confirm('Reset all usage statistics?')) {
+                    resetUsage();
+                }
+            });
         }
     </script>
 </body>
