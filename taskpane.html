@@ -51,41 +51,12 @@
 
         .taskpane { display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* Header - Large expressive */
-        .header {
-            padding: 24px 20px 20px;
-            background: var(--white);
-        }
-
-        .header-icon { display: none; }
-
-        .header-text h1 { 
-            font-size: 28px; 
-            font-weight: 700; 
-            color: var(--black);
-            letter-spacing: -0.5px;
-            line-height: 1.1;
-        }
-        .header-text h1 span {
-            display: block;
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--gray-400);
-            margin-top: 4px;
-            letter-spacing: 0;
-        }
-        .header-text p { 
-            font-size: 13px; 
-            color: var(--gray-500); 
-            margin-top: 4px;
-        }
-
         /* Tabs - Minimal underline style */
         .tabs {
             display: flex;
             background: var(--white);
             border-bottom: 1px solid var(--gray-200);
-            padding: 0 16px;
+            padding: 16px 16px 0;
             gap: 4px;
         }
 
@@ -617,17 +588,17 @@
             border: 1px solid var(--gray-200); 
         }
 
-        /* Icon/Image Style Grid */
+        /* Icon/Image Style Grid - 4 columns, compact */
         .icon-style-grid { 
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            margin-top: 12px; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; 
+            margin-bottom: 16px; 
         }
         .icon-style-card { 
             border: 2px solid var(--gray-200); 
-            border-radius: var(--radius-sm); 
-            padding: 16px 12px; 
+            border-radius: var(--radius-btn); 
+            padding: 10px 6px; 
             text-align: center; 
             cursor: pointer; 
             transition: all 0.2s; 
@@ -636,25 +607,16 @@
         .icon-style-card:hover { border-color: var(--gray-400); }
         .icon-style-card.selected { 
             border-color: var(--black); 
+            background: var(--gray-50);
         }
-        .icon-style-preview { 
-            width: 44px; 
-            height: 44px; 
-            border-radius: 8px; 
-            margin: 0 auto 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 22px;
-            background: var(--gray-100);
-        }
+        .icon-style-preview { display: none; }
         .icon-style-name { 
-            font-size: 12px; 
+            font-size: 10px; 
             font-weight: 600; 
             color: var(--black);
-            margin-bottom: 2px;
+            line-height: 1.3;
         }
-        .icon-style-desc { font-size: 11px; color: var(--gray-500); }
+        .icon-style-desc { display: none; }
 
         /* Alignment Tab */
         .align-selection-info { 
@@ -825,14 +787,6 @@
 </head>
 <body>
     <div class="taskpane">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-icon"><i class="ms-Icon ms-Icon--ImagePixel"></i></div>
-            <div class="header-text">
-                <h1>AI Image<br>Generator <span>v2.2 · gpt-image-1.5</span></h1>
-            </div>
-        </div>
-
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" data-tab="images"><i class="ms-Icon ms-Icon--Photo2"></i><span>Images</span></button>
@@ -844,32 +798,12 @@
 
         <!-- ==================== IMAGES TAB ==================== -->
         <div class="tab-content active" id="tab-images">
-            <div class="api-key-section">
-                <div class="api-key-header">
-                    <label>OpenAI API Key</label>
-                    <span id="apiKeyStatus" class="api-key-status disconnected">Not Set</span>
-                </div>
-                <div class="api-key-input-wrapper">
-                    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
-                    <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
-                </div>
-            </div>
-
             <div class="prompt-section">
-                <label>Image Style (Optional)</label>
-                <div class="style-toggle">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="useImageStyle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span id="styleToggleLabel" style="font-size: 13px; color: #6b6b7b;">Use style preset</span>
-                </div>
-                <div class="icon-style-grid" id="imageStyleGrid" style="display: none;">
+                <label>Style</label>
+                <div class="icon-style-grid" id="imageStyleGrid">
                     <!-- Dynamically populated from image-styles.js -->
                 </div>
-            </div>
 
-            <div class="prompt-section">
                 <label for="promptInput">Describe your image</label>
                 <textarea id="promptInput" class="prompt-textarea" placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."></textarea>
                 <div class="options-row">
@@ -1089,6 +1023,17 @@
 
         <!-- ==================== FEEDBACK TAB ==================== -->
         <div class="tab-content" id="tab-feedback">
+            <div class="api-key-section">
+                <div class="api-key-header">
+                    <label>OpenAI API Key</label>
+                    <span id="apiKeyStatus" class="api-key-status disconnected">Not Set</span>
+                </div>
+                <div class="api-key-input-wrapper">
+                    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+                    <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
+                </div>
+            </div>
+
             <div class="feedback-section">
                 <h2>Send Feedback</h2>
                 <p>Help us improve this add-in! Share your thoughts, report bugs, or request features.</p>
@@ -1112,7 +1057,7 @@
 
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
-                <p><strong>AI Image Generator</strong> v2.2<br><br>Generate AI images and icons using OpenAI's gpt-image-1.5 and insert them directly into your PowerPoint slides.<br><br>Made with ❤️</p>
+                <p><strong>AI Image Generator</strong><br>Version 2.2 · gpt-image-1.5<br><br>Generate AI images and icons and insert them directly into your PowerPoint slides.<br><br>Made with ❤️</p>
             </div>
         </div>
     </div>
