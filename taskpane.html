@@ -582,7 +582,35 @@
             border: 5px solid transparent;
             border-top-color: var(--black);
         }
-        .style-card:hover .style-tooltip { display: block; }
+        .style-card:hover .style-tooltip,
+        .style-card:focus .style-tooltip { display: block; }
+
+        /* Focus styles */
+        .tab:focus-visible,
+        .style-card:focus-visible,
+        .insert-option:focus-visible,
+        .history-item:focus-visible,
+        .btn-generate:focus-visible,
+        .btn-action:focus-visible,
+        .btn-save-key:focus-visible,
+        .btn-clear-history:focus-visible,
+        .btn-submit-feedback:focus-visible {
+            outline: 2px solid var(--black);
+            outline-offset: 2px;
+        }
+
+        /* Screen reader only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
 
         /* Usage Stats */
         .usage-stats { margin-top: 16px; }
@@ -620,17 +648,17 @@
 <body>
     <div class="taskpane">
         <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab active" data-tab="images"><i class="ms-Icon ms-Icon--Photo2"></i><span>Images</span></button>
-            <button class="tab" data-tab="icons"><i class="ms-Icon ms-Icon--AppIconDefaultList"></i><span>Icons</span></button>
-            <button class="tab" data-tab="more"><i class="ms-Icon ms-Icon--Feedback"></i><span>More</span></button>
+        <div class="tabs" role="tablist" aria-label="Main navigation">
+            <button class="tab active" data-tab="images" role="tab" aria-selected="true" aria-controls="tab-images" id="tabBtn-images"><i class="ms-Icon ms-Icon--Photo2" aria-hidden="true"></i><span>Images</span></button>
+            <button class="tab" data-tab="icons" role="tab" aria-selected="false" aria-controls="tab-icons" id="tabBtn-icons"><i class="ms-Icon ms-Icon--AppIconDefaultList" aria-hidden="true"></i><span>Icons</span></button>
+            <button class="tab" data-tab="more" role="tab" aria-selected="false" aria-controls="tab-more" id="tabBtn-more"><i class="ms-Icon ms-Icon--Feedback" aria-hidden="true"></i><span>More</span></button>
         </div>
 
         <!-- ==================== IMAGES TAB ==================== -->
-        <div class="tab-content active" id="tab-images">
+        <div class="tab-content active" id="tab-images" role="tabpanel" aria-labelledby="tabBtn-images">
             <div class="prompt-section">
                 <label class="section-label">Style</label>
-                <div class="style-grid" id="imageStyleGrid"></div>
+                <div class="style-grid" id="imageStyleGrid" role="radiogroup" aria-label="Image style"></div>
 
                 <label class="section-label" for="promptInput">Describe your image</label>
                 <textarea id="promptInput" class="prompt-textarea" placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."></textarea>
@@ -653,8 +681,8 @@
                         </select>
                     </div>
                 </div>
-                <div id="shapeInfo" class="shape-info">
-                    <i class="ms-Icon ms-Icon--RectangleShape"></i>
+                <div id="shapeInfo" class="shape-info" aria-live="polite">
+                    <i class="ms-Icon ms-Icon--RectangleShape" aria-hidden="true"></i>
                     <span id="shapeInfoText">No shape selected - will use size setting</span>
                 </div>
                 <button class="btn-generate" id="btnGenerate" disabled>
@@ -662,25 +690,25 @@
                 </button>
             </div>
 
-            <div id="statusMessage" class="status-message"><i class="ms-Icon"></i><span></span></div>
+            <div id="statusMessage" class="status-message" role="status" aria-live="polite"><i class="ms-Icon" aria-hidden="true"></i><span></span></div>
 
             <div id="previewSection" class="preview-section">
                 <div class="preview-header"><h2 class="section-label" style="margin-bottom:0">Generated Image</h2></div>
                 <div class="preview-image-container">
-                    <div id="previewLoading" class="preview-loading">
-                        <div class="spinner-large"></div>
+                    <div id="previewLoading" class="preview-loading" role="status" aria-label="Generating image">
+                        <div class="spinner-large" aria-hidden="true"></div>
                         <p>Generating your image...</p>
                     </div>
                     <img id="previewImage" class="preview-image" alt="Generated image preview">
                 </div>
-                <div class="insert-options">
-                    <div class="insert-option selected" data-mode="auto"><i class="ms-Icon ms-Icon--AutoFit"></i><span>Auto Detect</span></div>
-                    <div class="insert-option" data-mode="slide"><i class="ms-Icon ms-Icon--Presentation"></i><span>On Slide</span></div>
-                    <div class="insert-option" data-mode="fill"><i class="ms-Icon ms-Icon--RectangleShape"></i><span>Fill Shape</span></div>
+                <div class="insert-options" role="radiogroup" aria-label="Insert mode">
+                    <div class="insert-option selected" data-mode="auto" role="radio" aria-checked="true" tabindex="0"><i class="ms-Icon ms-Icon--AutoFit" aria-hidden="true"></i><span>Auto Detect</span></div>
+                    <div class="insert-option" data-mode="slide" role="radio" aria-checked="false" tabindex="0"><i class="ms-Icon ms-Icon--Presentation" aria-hidden="true"></i><span>On Slide</span></div>
+                    <div class="insert-option" data-mode="fill" role="radio" aria-checked="false" tabindex="0"><i class="ms-Icon ms-Icon--RectangleShape" aria-hidden="true"></i><span>Fill Shape</span></div>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn-action btn-regenerate" id="btnRegenerate"><i class="ms-Icon ms-Icon--Refresh"></i>Regenerate</button>
-                    <button class="btn-action btn-insert" id="btnInsert"><i class="ms-Icon ms-Icon--CheckMark"></i>Insert</button>
+                    <button class="btn-action btn-regenerate" id="btnRegenerate"><i class="ms-Icon ms-Icon--Refresh" aria-hidden="true"></i>Regenerate</button>
+                    <button class="btn-action btn-insert" id="btnInsert"><i class="ms-Icon ms-Icon--CheckMark" aria-hidden="true"></i>Insert</button>
                 </div>
             </div>
 
@@ -696,10 +724,10 @@
         </div>
 
         <!-- ==================== ICONS TAB ==================== -->
-        <div class="tab-content" id="tab-icons">
+        <div class="tab-content" id="tab-icons" role="tabpanel" aria-labelledby="tabBtn-icons">
             <div class="prompt-section">
                 <label class="section-label">Select Style</label>
-                <div class="style-grid" id="iconStyleGrid"></div>
+                <div class="style-grid" id="iconStyleGrid" role="radiogroup" aria-label="Icon style"></div>
             </div>
 
             <div class="prompt-section">
@@ -721,20 +749,20 @@
                 </button>
             </div>
 
-            <div id="iconStatusMessage" class="status-message"><i class="ms-Icon"></i><span></span></div>
+            <div id="iconStatusMessage" class="status-message" role="status" aria-live="polite"><i class="ms-Icon" aria-hidden="true"></i><span></span></div>
 
             <div id="iconPreviewSection" class="preview-section">
                 <div class="preview-header"><h2 class="section-label" style="margin-bottom:0">Generated Icon</h2></div>
                 <div class="preview-image-container">
-                    <div id="iconPreviewLoading" class="preview-loading">
-                        <div class="spinner-large"></div>
+                    <div id="iconPreviewLoading" class="preview-loading" role="status" aria-label="Generating icon">
+                        <div class="spinner-large" aria-hidden="true"></div>
                         <p>Generating your icon...</p>
                     </div>
                     <img id="iconPreviewImage" class="preview-image" alt="Generated icon preview">
                 </div>
                 <div class="action-buttons">
-                    <button class="btn-action btn-regenerate" id="btnRegenerateIcon"><i class="ms-Icon ms-Icon--Refresh"></i>Regenerate</button>
-                    <button class="btn-action btn-insert" id="btnInsertIcon"><i class="ms-Icon ms-Icon--CheckMark"></i>Insert</button>
+                    <button class="btn-action btn-regenerate" id="btnRegenerateIcon"><i class="ms-Icon ms-Icon--Refresh" aria-hidden="true"></i>Regenerate</button>
+                    <button class="btn-action btn-insert" id="btnInsertIcon"><i class="ms-Icon ms-Icon--CheckMark" aria-hidden="true"></i>Insert</button>
                 </div>
             </div>
 
@@ -750,7 +778,7 @@
         </div>
 
         <!-- ==================== MORE TAB ==================== -->
-        <div class="tab-content" id="tab-more">
+        <div class="tab-content" id="tab-more" role="tabpanel" aria-labelledby="tabBtn-more">
             <div class="api-key-section">
                 <div class="api-key-header">
                     <label class="section-label" style="margin-bottom:0">OpenAI API Key</label>
@@ -998,7 +1026,11 @@
         // ======================
         function switchTab(tabName) {
             state.activeTab = tabName;
-            el.tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabName));
+            el.tabs.forEach(tab => {
+                const isActive = tab.dataset.tab === tabName;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
             el.tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
         }
 
@@ -1013,15 +1045,22 @@
             Object.keys(styles).forEach((styleNum, index) => {
                 const style = styles[styleNum];
                 const isDisabled = style.comingSoon === true;
+                const isSelected = index === 0;
                 const card = document.createElement('div');
-                card.className = 'style-card' + (index === 0 ? ' selected' : '') + (isDisabled ? ' disabled' : '');
+                card.className = 'style-card' + (isSelected ? ' selected' : '') + (isDisabled ? ' disabled' : '');
                 card.dataset.style = styleNum;
+                card.setAttribute('role', 'radio');
+                card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                card.setAttribute('aria-label', style.name + ' \u2013 ' + style.description);
+                card.tabIndex = isDisabled ? -1 : 0;
+
                 // Avatar image
                 if (style.avatar) {
                     const img = document.createElement('img');
                     img.className = 'style-card-avatar';
                     img.src = style.avatar;
-                    img.alt = style.name;
+                    img.alt = '';
+                    img.setAttribute('aria-hidden', 'true');
                     card.appendChild(img);
                 }
 
@@ -1034,14 +1073,27 @@
                 // Custom tooltip
                 const tooltip = document.createElement('div');
                 tooltip.className = 'style-tooltip';
+                tooltip.setAttribute('aria-hidden', 'true');
                 tooltip.textContent = style.name + ' \u2013 ' + style.description;
                 card.appendChild(tooltip);
 
-                card.addEventListener('click', () => {
+                function selectCard() {
                     if (isDisabled) return;
-                    grid.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+                    grid.querySelectorAll('.style-card').forEach(c => {
+                        c.classList.remove('selected');
+                        c.setAttribute('aria-checked', 'false');
+                    });
                     card.classList.add('selected');
+                    card.setAttribute('aria-checked', 'true');
                     onSelect(parseInt(styleNum));
+                }
+
+                card.addEventListener('click', selectCard);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectCard();
+                    }
                 });
 
                 grid.appendChild(card);
@@ -1073,10 +1125,21 @@
             el.btnInsert.addEventListener('click', () => insertImage('images'));
 
             el.insertOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    el.insertOptions.forEach(o => o.classList.remove('selected'));
+                function selectOption() {
+                    el.insertOptions.forEach(o => {
+                        o.classList.remove('selected');
+                        o.setAttribute('aria-checked', 'false');
+                    });
                     option.classList.add('selected');
+                    option.setAttribute('aria-checked', 'true');
                     state.insertMode = option.dataset.mode;
+                }
+                option.addEventListener('click', selectOption);
+                option.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectOption();
+                    }
                 });
             });
 
@@ -1342,11 +1405,17 @@
                 div.className = 'history-item';
                 div.dataset.index = i;
                 div.title = item.prompt || '';
+                div.tabIndex = 0;
+                div.setAttribute('role', 'button');
+                div.setAttribute('aria-label', 'Load image: ' + (item.prompt || 'untitled'));
                 const img = document.createElement('img');
                 img.src = item.url;
-                img.alt = 'Generated image';
+                img.alt = '';
                 div.appendChild(img);
                 div.addEventListener('click', () => loadFromHistory(i));
+                div.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadFromHistory(i); }
+                });
                 el.historyGrid.appendChild(div);
             });
         }
@@ -1410,11 +1479,17 @@
                 div.className = 'history-item';
                 div.dataset.index = i;
                 div.title = item.prompt || '';
+                div.tabIndex = 0;
+                div.setAttribute('role', 'button');
+                div.setAttribute('aria-label', 'Load icon: ' + (item.prompt || 'untitled'));
                 const img = document.createElement('img');
                 img.src = item.url;
-                img.alt = 'Generated icon';
+                img.alt = '';
                 div.appendChild(img);
                 div.addEventListener('click', () => loadFromIconHistory(i));
+                div.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadFromIconHistory(i); }
+                });
                 el.iconHistoryGrid.appendChild(div);
             });
         }
