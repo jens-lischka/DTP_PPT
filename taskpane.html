@@ -4,19 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Image Generator</title>
-    
-    <!-- Office.js -->
+
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-    
-    <!-- Icon Styles Configuration -->
     <script src="icon-styles.js"></script>
-    
-    <!-- Image Styles Configuration -->
     <script src="image-styles.js"></script>
-    
-    <!-- Fluent UI Icons -->
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
-    
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
 
@@ -51,7 +44,7 @@
 
         .taskpane { display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* Tabs - Minimal underline style */
+        /* Tabs */
         .tabs {
             display: flex;
             background: var(--white);
@@ -80,8 +73,8 @@
 
         .tab i { font-size: 18px; }
         .tab:hover { color: var(--gray-600); }
-        .tab.active { 
-            color: var(--black); 
+        .tab.active {
+            color: var(--black);
             border-bottom-color: var(--black);
             font-weight: 600;
         }
@@ -90,7 +83,7 @@
         .tab-content { display: none; flex: 1; overflow-y: auto; padding: 20px; }
         .tab-content.active { display: flex; flex-direction: column; gap: 16px; }
 
-        /* Cards - Clean white with subtle shadow */
+        /* Cards */
         .card {
             background: var(--white);
             border-radius: var(--radius);
@@ -106,7 +99,18 @@
             margin-bottom: 16px;
         }
 
-        /* API Key Section */
+        /* Section Label (shared) */
+        .section-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        /* API Key */
         .api-key-section {
             background: var(--white);
             border-radius: var(--radius);
@@ -118,14 +122,6 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 16px;
-        }
-
-        .api-key-header label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray-400);
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .api-key-status {
@@ -140,7 +136,7 @@
 
         .api-key-input-wrapper { display: flex; gap: 12px; align-items: flex-end; }
 
-        /* Underlined Input Style */
+        /* Input (underline style) */
         .input-underline {
             flex: 1;
             padding: 12px 0;
@@ -149,33 +145,15 @@
             font-family: 'Noto Sans', sans-serif;
             font-size: 14px;
             background: transparent;
-            transition: all 0.2s;
+            transition: border-color 0.2s;
         }
 
-        .input-underline:focus { 
-            outline: none; 
+        .input-underline:focus {
+            outline: none;
             border-bottom-color: var(--black);
         }
 
         .input-underline::placeholder { color: var(--gray-400); }
-
-        .api-key-input-wrapper input {
-            flex: 1;
-            padding: 12px 0;
-            border: none;
-            border-bottom: 1px solid var(--gray-300);
-            font-family: 'Noto Sans', sans-serif;
-            font-size: 14px;
-            background: transparent;
-            transition: all 0.2s;
-        }
-
-        .api-key-input-wrapper input:focus { 
-            outline: none; 
-            border-bottom-color: var(--black);
-        }
-
-        .api-key-input-wrapper input::placeholder { color: var(--gray-400); }
 
         .btn-save-key {
             padding: 10px 20px;
@@ -187,7 +165,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s;
             white-space: nowrap;
         }
 
@@ -200,16 +178,6 @@
             padding: 20px;
         }
 
-        .prompt-section > label:first-child {
-            display: block;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray-400);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-
         .prompt-textarea {
             width: 100%;
             min-height: 100px;
@@ -220,30 +188,33 @@
             font-size: 14px;
             line-height: 1.6;
             resize: none;
-            transition: all 0.2s;
+            transition: border-color 0.2s;
             background: transparent;
         }
 
-        .prompt-textarea:focus { 
-            outline: none; 
+        .prompt-textarea:focus {
+            outline: none;
             border-bottom-color: var(--black);
         }
+
         .prompt-textarea::placeholder { color: var(--gray-400); }
 
         /* Options Row */
-        .options-row { 
-            display: flex; 
-            gap: 24px; 
+        .options-row {
+            display: flex;
+            gap: 24px;
             margin-top: 20px;
             padding-top: 16px;
             border-top: 1px solid var(--gray-100);
         }
+
         .option-group { flex: 1; }
-        .option-group label { 
-            font-size: 11px; 
-            font-weight: 500; 
-            color: var(--gray-400); 
-            margin-bottom: 8px; 
+
+        .option-group label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--gray-400);
+            margin-bottom: 8px;
             display: block;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -251,27 +222,23 @@
 
         .option-group select {
             width: 100%;
-            padding: 10px 0;
+            padding: 10px 20px 10px 0;
             border: none;
             border-bottom: 1px solid var(--gray-300);
             font-family: 'Noto Sans', sans-serif;
             font-size: 14px;
-            background: transparent;
+            background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239898a8' d='M5 6L0 0h10z'/%3E%3C/svg%3E") no-repeat right center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: border-color 0.2s;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239898a8' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0 center;
-            padding-right: 20px;
         }
 
-        .option-group select:focus { 
-            outline: none; 
+        .option-group select:focus {
+            outline: none;
             border-bottom-color: var(--black);
         }
 
-        /* Primary Button - Dark with arrow */
+        /* Generate Button */
         .btn-generate {
             width: 100%;
             padding: 16px 24px;
@@ -287,27 +254,19 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: all 0.2s;
+            transition: background 0.2s;
             margin-top: 20px;
-            position: relative;
         }
 
         .btn-generate::after {
-            content: '→';
+            content: '\2192';
             font-size: 16px;
             transition: transform 0.2s;
         }
 
-        .btn-generate:hover:not(:disabled) { 
-            background: var(--dark);
-        }
-        .btn-generate:hover:not(:disabled)::after {
-            transform: translateX(4px);
-        }
-        .btn-generate:disabled { 
-            background: var(--gray-300); 
-            cursor: not-allowed; 
-        }
+        .btn-generate:hover:not(:disabled) { background: var(--dark); }
+        .btn-generate:hover:not(:disabled)::after { transform: translateX(4px); }
+        .btn-generate:disabled { background: var(--gray-300); cursor: not-allowed; }
         .btn-generate:disabled::after { display: none; }
 
         .btn-generate .spinner {
@@ -335,9 +294,7 @@
             border-top: 1px solid var(--gray-100);
         }
 
-        .shape-info.detected { 
-            color: var(--black);
-        }
+        .shape-info.detected { color: var(--black); }
         .shape-info i { font-size: 16px; color: var(--gray-400); }
         .shape-info.detected i { color: var(--black); }
 
@@ -356,18 +313,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .preview-header { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-bottom: 16px; 
-        }
-        .preview-header h2 { 
-            font-size: 11px; 
-            font-weight: 600; 
-            color: var(--gray-400);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
 
         .preview-image-container {
@@ -420,19 +370,17 @@
             transition: all 0.2s;
         }
 
-        .btn-regenerate { 
-            background: var(--white); 
-            border: 1px solid var(--gray-200); 
-            color: var(--gray-600); 
+        .btn-regenerate {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            color: var(--gray-600);
         }
-        .btn-regenerate:hover { 
-            background: var(--gray-50); 
-            border-color: var(--gray-300);
-        }
-        .btn-insert { 
-            background: var(--black); 
-            border: 1px solid var(--black); 
-            color: var(--white); 
+        .btn-regenerate:hover { background: var(--gray-50); border-color: var(--gray-300); }
+
+        .btn-insert {
+            background: var(--black);
+            border: 1px solid var(--black);
+            color: var(--white);
         }
         .btn-insert:hover { background: var(--dark); border-color: var(--dark); }
 
@@ -451,16 +399,8 @@
         }
 
         .insert-option:hover { background: var(--gray-100); }
-        .insert-option.selected { 
-            border-color: var(--black); 
-            background: var(--white);
-        }
-        .insert-option i { 
-            display: block; 
-            font-size: 20px; 
-            margin-bottom: 6px; 
-            color: var(--gray-400); 
-        }
+        .insert-option.selected { border-color: var(--black); background: var(--white); }
+        .insert-option i { display: block; font-size: 20px; margin-bottom: 6px; color: var(--gray-400); }
         .insert-option.selected i { color: var(--black); }
         .insert-option span { font-size: 11px; color: var(--gray-500); font-weight: 500; }
         .insert-option.selected span { color: var(--black); }
@@ -481,313 +421,130 @@
         .status-message.error { background: #ffebee; color: var(--error); }
         .status-message.info { background: var(--gray-100); color: var(--gray-600); }
 
-        /* History Section */
-        .history-section { 
-            margin-top: auto; 
-            padding-top: 20px; 
+        /* History */
+        .history-section { margin-top: auto; padding-top: 20px; }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
         }
-        .history-header { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-bottom: 12px; 
-        }
-        .history-header h3 { 
-            font-size: 11px; 
-            font-weight: 600; 
-            color: var(--gray-400); 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-        }
-        .btn-clear-history { 
-            font-size: 12px; 
-            color: var(--gray-400); 
-            background: none; 
-            border: none; 
+
+        .btn-clear-history {
+            font-size: 12px;
+            color: var(--gray-400);
+            background: none;
+            border: none;
             cursor: pointer;
             font-family: 'Noto Sans', sans-serif;
             font-weight: 500;
         }
         .btn-clear-history:hover { color: var(--black); }
+
         .history-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .history-item { 
-            aspect-ratio: 1; 
-            border-radius: var(--radius-sm); 
-            overflow: hidden; 
-            cursor: pointer; 
-            border: 2px solid transparent; 
-            transition: all 0.2s; 
+
+        .history-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
         }
         .history-item:hover { border-color: var(--black); }
         .history-item img { width: 100%; height: 100%; object-fit: cover; }
+
         .history-empty { text-align: center; padding: 24px; color: var(--gray-400); font-size: 13px; }
 
-        /* Feedback Section */
-        .feedback-section { 
-            background: var(--white); 
-            border-radius: var(--radius); 
-            padding: 20px; 
+        /* Feedback / More Tab */
+        .feedback-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
         }
-        .feedback-section h2 { 
-            font-size: 18px; 
-            font-weight: 700; 
-            margin-bottom: 6px; 
-            color: var(--black); 
-        }
+        .feedback-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--black); }
         .feedback-section p { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; }
-        .feedback-textarea { 
-            width: 100%; 
-            min-height: 120px; 
-            padding: 0 0 12px 0; 
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 0 0 12px 0;
             border: none;
-            border-bottom: 1px solid var(--gray-300); 
+            border-bottom: 1px solid var(--gray-300);
             font-family: 'Noto Sans', sans-serif;
-            font-size: 14px; 
-            resize: none; 
+            font-size: 14px;
+            resize: none;
             margin-bottom: 20px;
             background: transparent;
         }
-        .feedback-textarea:focus { 
-            outline: none; 
-            border-bottom-color: var(--black);
-        }
-        .btn-submit-feedback { 
-            width: 100%; 
-            padding: 16px 24px; 
-            background: var(--black); 
-            color: var(--white); 
-            border: none; 
-            border-radius: var(--radius-btn); 
+        .feedback-textarea:focus { outline: none; border-bottom-color: var(--black); }
+
+        .btn-submit-feedback {
+            width: 100%;
+            padding: 16px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-btn);
             font-family: 'Noto Sans', sans-serif;
-            font-size: 14px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s; 
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
         }
         .btn-submit-feedback:hover { background: var(--dark); }
-        .feedback-info { 
-            margin-top: 24px; 
-            padding: 16px; 
-            background: var(--gray-50); 
+
+        .feedback-info {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--gray-50);
             border-radius: var(--radius-sm);
         }
-        .feedback-info h3 { 
-            font-size: 14px; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: var(--black); 
-        }
+        .feedback-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--black); }
         .feedback-info p { margin-bottom: 0; font-size: 12px; line-height: 1.7; }
         .feedback-info a { color: var(--black); text-decoration: underline; }
-        .feedback-info code { 
-            background: var(--white); 
-            padding: 2px 8px; 
-            border-radius: 4px; 
-            font-family: 'Noto Sans Mono', monospace; 
-            font-size: 11px; 
-            border: 1px solid var(--gray-200); 
+        .feedback-info code {
+            background: var(--white);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Noto Sans Mono', monospace;
+            font-size: 11px;
+            border: 1px solid var(--gray-200);
         }
 
-        /* Icon/Image Style Grid - 4 columns, compact */
-        .icon-style-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 8px; 
-            margin-bottom: 16px; 
+        /* Style Grid */
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
         }
-        .icon-style-card { 
-            border: 2px solid var(--gray-200); 
-            border-radius: var(--radius-btn); 
-            padding: 10px 6px; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            background: var(--white); 
+
+        .style-card {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-btn);
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--white);
         }
-        .icon-style-card:hover { border-color: var(--gray-400); }
-        .icon-style-card.selected { 
-            border-color: var(--black); 
-            background: var(--gray-50);
-        }
-        .icon-style-preview { display: none; }
-        .icon-style-name { 
-            font-size: 10px; 
-            font-weight: 600; 
+        .style-card:hover { border-color: var(--gray-400); }
+        .style-card.selected { border-color: var(--black); background: var(--gray-50); }
+        .style-card.disabled { opacity: 0.4; cursor: not-allowed; }
+        .style-card.disabled:hover { border-color: var(--gray-200); }
+
+        .style-card-name {
+            font-size: 10px;
+            font-weight: 600;
             color: var(--black);
             line-height: 1.3;
         }
-        .icon-style-desc { display: none; }
-
-        /* Alignment Tab */
-        .align-selection-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            padding: 14px 16px; 
-            background: var(--gray-100); 
-            border-radius: var(--radius-sm); 
-            margin-bottom: 20px; 
-            font-size: 13px; 
-            color: var(--gray-600);
-        }
-        .align-selection-info.success { 
-            background: #e8f5e9; 
-            color: var(--success);
-        }
-        .align-selection-info i { font-size: 18px; }
-        .align-section { margin-bottom: 24px; }
-        .align-section-title { 
-            font-size: 11px; 
-            font-weight: 600; 
-            color: var(--gray-400); 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            margin-bottom: 12px; 
-        }
-        .align-button-row { display: flex; gap: 8px; }
-        .align-btn { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-            padding: 14px 10px; 
-            background: var(--white); 
-            border: 1px solid var(--gray-200); 
-            border-radius: var(--radius-btn); 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            min-height: 64px; 
-        }
-        .align-btn:hover { 
-            background: var(--gray-50); 
-            border-color: var(--gray-300); 
-        }
-        .align-btn:active { 
-            background: var(--gray-100); 
-            transform: scale(0.98); 
-        }
-        .align-btn i { font-size: 18px; color: var(--black); }
-        .align-btn span { font-size: 10px; font-weight: 500; color: var(--gray-500); }
-        .align-btn.wide { flex: 1; }
-        .align-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .align-btn:disabled:hover { 
-            background: var(--white); 
-            border-color: var(--gray-200); 
-            transform: none; 
-        }
-
-        /* Platform-specific keyboard shortcuts */
-        .shortcut-mac { display: none; }
-        .shortcut-win { display: inline; }
-        body.is-mac .shortcut-mac { display: inline; }
-        body.is-mac .shortcut-win { display: none; }
-
-        /* Toggle Switch */
-        .style-toggle { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            margin-bottom: 4px; 
-        }
-        .toggle-switch { 
-            position: relative; 
-            display: inline-block; 
-            width: 44px; 
-            height: 24px; 
-        }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider { 
-            position: absolute; 
-            cursor: pointer; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background-color: var(--gray-200); 
-            transition: 0.3s; 
-            border-radius: 24px; 
-        }
-        .toggle-slider:before { 
-            position: absolute; 
-            content: ""; 
-            height: 18px; 
-            width: 18px; 
-            left: 3px; 
-            bottom: 3px; 
-            background-color: var(--white); 
-            transition: 0.3s; 
-            border-radius: 50%; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-        }
-        .toggle-switch input:checked + .toggle-slider { background-color: var(--black); }
-        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
-
-        /* Style card disabled state */
-        .icon-style-card.disabled { opacity: 0.4; cursor: not-allowed; }
-        .icon-style-card.disabled:hover { border-color: var(--gray-200); }
-
-        /* Background Color Buttons */
-        .background-color-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-        }
-        .background-color-btn {
-            aspect-ratio: 1;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            min-height: 56px;
-        }
-        .background-color-btn:hover { 
-            border-color: var(--black); 
-        }
-        .background-color-btn.selected { 
-            border-color: var(--black); 
-            box-shadow: inset 0 0 0 2px var(--black); 
-        }
-        .background-color-btn .color-check {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-            color: white;
-            font-size: 18px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        .background-color-btn.selected .color-check { display: block; }
-        .background-color-btn[data-color="#fff3da"] .color-check,
-        .background-color-btn[data-color="#ceecff"] .color-check,
-        .background-color-btn[data-color="#f7f3ee"] .color-check { 
-            color: var(--black); 
-            text-shadow: none; 
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--gray-300); 
-            border-radius: 2px; 
-        }
-        ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
-
-        /* Section divider */
-        .section-divider {
-            height: 1px;
-            background: var(--gray-200);
-            margin: 4px 0;
-        }
 
         /* Usage Stats */
-        .usage-stats {
-            margin-top: 16px;
-        }
+        .usage-stats { margin-top: 16px; }
+
         .usage-row {
             display: flex;
             justify-content: space-between;
@@ -795,32 +552,27 @@
             padding: 8px 0;
             border-bottom: 1px solid var(--gray-100);
         }
-        .usage-row:last-child {
-            border-bottom: none;
-        }
-        .usage-label {
-            font-size: 13px;
-            color: var(--gray-500);
-        }
+        .usage-row:last-child { border-bottom: none; }
+
+        .usage-label { font-size: 13px; color: var(--gray-500); }
+
         .usage-value {
             font-size: 13px;
             font-weight: 600;
             color: var(--black);
             font-variant-numeric: tabular-nums;
         }
-        .usage-divider {
-            height: 1px;
-            background: var(--gray-200);
-            margin: 8px 0;
-        }
-        .usage-total .usage-label {
-            font-weight: 600;
-            color: var(--black);
-        }
-        .usage-total .usage-value {
-            font-size: 16px;
-            color: var(--black);
-        }
+
+        .usage-divider { height: 1px; background: var(--gray-200); margin: 8px 0; }
+
+        .usage-total .usage-label { font-weight: 600; color: var(--black); }
+        .usage-total .usage-value { font-size: 16px; color: var(--black); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
     </style>
 </head>
 <body>
@@ -829,29 +581,25 @@
         <div class="tabs">
             <button class="tab active" data-tab="images"><i class="ms-Icon ms-Icon--Photo2"></i><span>Images</span></button>
             <button class="tab" data-tab="icons"><i class="ms-Icon ms-Icon--AppIconDefaultList"></i><span>Icons</span></button>
-            <button class="tab" data-tab="background"><i class="ms-Icon ms-Icon--Color"></i><span>Background</span></button>
-            <button class="tab" data-tab="align"><i class="ms-Icon ms-Icon--AlignCenter"></i><span>Align</span></button>
-            <button class="tab" data-tab="feedback"><i class="ms-Icon ms-Icon--Feedback"></i><span>More</span></button>
+            <button class="tab" data-tab="more"><i class="ms-Icon ms-Icon--Feedback"></i><span>More</span></button>
         </div>
 
         <!-- ==================== IMAGES TAB ==================== -->
         <div class="tab-content active" id="tab-images">
             <div class="prompt-section">
-                <label>Style</label>
-                <div class="icon-style-grid" id="imageStyleGrid">
-                    <!-- Dynamically populated from image-styles.js -->
-                </div>
+                <label class="section-label">Style</label>
+                <div class="style-grid" id="imageStyleGrid"></div>
 
-                <label for="promptInput">Describe your image</label>
+                <label class="section-label" for="promptInput">Describe your image</label>
                 <textarea id="promptInput" class="prompt-textarea" placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."></textarea>
                 <div class="options-row">
                     <div class="option-group">
                         <label>Size</label>
                         <select id="sizeSelect">
                             <option value="auto">Auto (from selection)</option>
-                            <option value="1024x1024">Square (1024×1024)</option>
-                            <option value="1536x1024">Landscape (1536×1024)</option>
-                            <option value="1024x1536">Portrait (1024×1536)</option>
+                            <option value="1024x1024">Square (1024x1024)</option>
+                            <option value="1536x1024">Landscape (1536x1024)</option>
+                            <option value="1024x1536">Portrait (1024x1536)</option>
                         </select>
                     </div>
                     <div class="option-group">
@@ -875,7 +623,7 @@
             <div id="statusMessage" class="status-message"><i class="ms-Icon"></i><span></span></div>
 
             <div id="previewSection" class="preview-section">
-                <div class="preview-header"><h2>Generated Image</h2></div>
+                <div class="preview-header"><h2 class="section-label" style="margin-bottom:0">Generated Image</h2></div>
                 <div class="preview-image-container">
                     <div id="previewLoading" class="preview-loading">
                         <div class="spinner-large"></div>
@@ -896,26 +644,26 @@
 
             <div class="history-section">
                 <div class="history-header">
-                    <h3>Recent Images</h3>
+                    <h3 class="section-label" style="margin-bottom:0">Recent Images</h3>
                     <button class="btn-clear-history" id="btnClearHistory">Clear</button>
                 </div>
-                <div id="historyGrid" class="history-grid"><div class="history-empty">No images generated yet</div></div>
+                <div id="historyGrid" class="history-grid">
+                    <div class="history-empty">No images generated yet</div>
+                </div>
             </div>
         </div>
 
         <!-- ==================== ICONS TAB ==================== -->
         <div class="tab-content" id="tab-icons">
             <div class="prompt-section">
-                <label>Select Style</label>
-                <div class="icon-style-grid" id="iconStyleGrid">
-                    <!-- Dynamically populated from icon-styles.js -->
-                </div>
+                <label class="section-label">Select Style</label>
+                <div class="style-grid" id="iconStyleGrid"></div>
             </div>
 
             <div class="prompt-section">
-                <label for="iconSubjectInput">Enter Subject</label>
-                <input type="text" id="iconSubjectInput" class="prompt-textarea" placeholder="play button, house, car, lightbulb..." style="font-size: 14px; min-height: 40px; padding: 10px 12px;">
-                <p style="font-size: 11px; color: #9898a8; margin-top: 6px;">Enter a simple object or symbol. The selected style will be applied automatically.</p>
+                <label class="section-label" for="iconSubjectInput">Enter Subject</label>
+                <input type="text" id="iconSubjectInput" class="input-underline" placeholder="play button, house, car, lightbulb..." style="width:100%">
+                <p style="font-size: 11px; color: var(--gray-400); margin-top: 6px;">Enter a simple object or symbol. The selected style will be applied automatically.</p>
                 <div class="options-row" style="margin-top: 12px;">
                     <div class="option-group">
                         <label>Quality</label>
@@ -934,7 +682,7 @@
             <div id="iconStatusMessage" class="status-message"><i class="ms-Icon"></i><span></span></div>
 
             <div id="iconPreviewSection" class="preview-section">
-                <div class="preview-header"><h2>Generated Icon</h2></div>
+                <div class="preview-header"><h2 class="section-label" style="margin-bottom:0">Generated Icon</h2></div>
                 <div class="preview-image-container">
                     <div id="iconPreviewLoading" class="preview-loading">
                         <div class="spinner-large"></div>
@@ -949,132 +697,22 @@
             </div>
         </div>
 
-        <!-- ==================== BACKGROUND TAB ==================== -->
-        <div class="tab-content" id="tab-background">
-            <div class="prompt-section">
-                <h2 style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: #9898a8;">Slide Background Color</h2>
-                <p style="font-size: 13px; color: #6b6b7b; margin-bottom: 20px;">Change the fill color of the 'dynamic-background' shape on the slide layout.</p>
-                
-                <div class="background-color-grid">
-                    <button class="background-color-btn" data-color="#000f47" style="background-color: #000f47;" title="Dark Blue (#000f47)">
-                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
-                    </button>
-                    <button class="background-color-btn" data-color="#fff3da" style="background-color: #fff3da;" title="Warm Cream (#fff3da)">
-                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
-                    </button>
-                    <button class="background-color-btn" data-color="#ceecff" style="background-color: #ceecff;" title="Light Blue (#ceecff)">
-                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
-                    </button>
-                    <button class="background-color-btn" data-color="#f7f3ee" style="background-color: #f7f3ee;" title="Soft White (#f7f3ee)">
-                        <span class="color-check"><i class="ms-Icon ms-Icon--CheckMark"></i></span>
-                    </button>
-                </div>
-            </div>
-
-            <div id="backgroundStatusMessage" class="status-message">
-                <i class="ms-Icon"></i><span></span>
-            </div>
-
-            <div class="feedback-info" style="margin-top: 16px;">
-                <h3>💡 How it works</h3>
-                <p style="font-size: 12px; color: #6b6b7b; line-height: 1.6;">
-                    Click a color to change the fill of the shape named <code>dynamic-background</code> on the current slide's layout.<br><br>
-                    Make sure the shape exists on the slide layout and is named exactly <code>dynamic-background</code>.
-                </p>
-            </div>
-        </div>
-
-        <!-- ==================== ALIGN TAB ==================== -->
-        <div class="tab-content" id="tab-align">
-            <div class="align-selection-info" id="alignSelectionInfo">
-                <i class="ms-Icon ms-Icon--Info"></i>
-                <span>Select 2 or more shapes to use alignment tools</span>
-            </div>
-
-            <div class="align-section">
-                <h3 class="align-section-title">Horizontal Alignment</h3>
-                <div class="align-button-row">
-                    <button class="align-btn" id="btnAlignLeft" title="Align Left"><i class="ms-Icon ms-Icon--AlignLeft"></i><span>Left</span></button>
-                    <button class="align-btn" id="btnAlignCenter" title="Align Center"><i class="ms-Icon ms-Icon--AlignCenter"></i><span>Center</span></button>
-                    <button class="align-btn" id="btnAlignRight" title="Align Right"><i class="ms-Icon ms-Icon--AlignRight"></i><span>Right</span></button>
-                </div>
-            </div>
-
-            <div class="align-section">
-                <h3 class="align-section-title">Vertical Alignment</h3>
-                <div class="align-button-row">
-                    <button class="align-btn" id="btnAlignTop" title="Align Top"><i class="ms-Icon ms-Icon--AlignVerticalTop"></i><span>Top</span></button>
-                    <button class="align-btn" id="btnAlignMiddle" title="Align Middle"><i class="ms-Icon ms-Icon--AlignVerticalCenter"></i><span>Middle</span></button>
-                    <button class="align-btn" id="btnAlignBottom" title="Align Bottom"><i class="ms-Icon ms-Icon--AlignVerticalBottom"></i><span>Bottom</span></button>
-                </div>
-            </div>
-
-            <div class="align-section">
-                <h3 class="align-section-title">Distribute</h3>
-                <div class="align-button-row">
-                    <button class="align-btn wide" id="btnDistributeH" title="Distribute Horizontally"><i class="ms-Icon ms-Icon--DistributeDown"></i><span>Horizontally</span></button>
-                    <button class="align-btn wide" id="btnDistributeV" title="Distribute Vertically"><i class="ms-Icon ms-Icon--DistributeDown" style="transform: rotate(90deg);"></i><span>Vertically</span></button>
-                </div>
-            </div>
-
-            <div class="align-section">
-                <h3 class="align-section-title">Match Size</h3>
-                <div class="align-button-row">
-                    <button class="align-btn" id="btnMatchWidth" title="Match Width"><i class="ms-Icon ms-Icon--FitWidth"></i><span>Width</span></button>
-                    <button class="align-btn" id="btnMatchHeight" title="Match Height"><i class="ms-Icon ms-Icon--FitPage"></i><span>Height</span></button>
-                    <button class="align-btn" id="btnMatchBoth" title="Match Both"><i class="ms-Icon ms-Icon--Resize"></i><span>Both</span></button>
-                </div>
-            </div>
-
-            <div class="align-section">
-                <h3 class="align-section-title">Arrange</h3>
-                <div class="align-button-row">
-                    <button class="align-btn wide" id="btnSwapPositions" title="Swap Positions"><i class="ms-Icon ms-Icon--Switch"></i><span>Swap Positions</span></button>
-                    <button class="align-btn wide" id="btnCenterOnSlide" title="Center on Slide"><i class="ms-Icon ms-Icon--PictureCenter"></i><span>Center on Slide</span></button>
-                </div>
-            </div>
-
-            <div id="alignStatusMessage" class="status-message"><i class="ms-Icon"></i><span></span></div>
-
-            <div class="feedback-info" style="margin-top: 16px;">
-                <h3>⌨️ Keyboard Shortcuts</h3>
-                <p style="font-size: 11px; color: #6b6b7b; line-height: 1.8;">
-                    <strong>Align to first selected shape:</strong><br>
-                    <span class="shortcut-win"><code>Alt + ←↑↓→</code></span>
-                    <span class="shortcut-mac"><code>⌥ Option + ←↑↓→</code></span><br><br>
-                    <strong>Align to content placeholder:</strong><br>
-                    <span class="shortcut-win"><code>Alt + Shift + ←↑↓→</code></span>
-                    <span class="shortcut-mac"><code>⌥⇧ Option + Shift + ←↑↓→</code></span>
-                </p>
-            </div>
-
-            <div class="feedback-info" style="margin-top: 12px;">
-                <h3>💡 Tips</h3>
-                <p style="font-size: 12px; color: #6b6b7b; line-height: 1.6;">
-                    • <strong>Align:</strong> Uses the first selected shape as reference<br>
-                    • <strong>Distribute:</strong> Requires 3+ shapes for even spacing<br>
-                    • <strong>Match Size:</strong> Uses the first selected shape's dimensions<br>
-                    • <strong>Swap:</strong> Works with exactly 2 shapes
-                </p>
-            </div>
-        </div>
-
-        <!-- ==================== FEEDBACK TAB ==================== -->
-        <div class="tab-content" id="tab-feedback">
+        <!-- ==================== MORE TAB ==================== -->
+        <div class="tab-content" id="tab-more">
             <div class="api-key-section">
                 <div class="api-key-header">
-                    <label>OpenAI API Key</label>
+                    <label class="section-label" style="margin-bottom:0">OpenAI API Key</label>
                     <span id="apiKeyStatus" class="api-key-status disconnected">Not Set</span>
                 </div>
                 <div class="api-key-input-wrapper">
-                    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+                    <input type="password" id="apiKeyInput" class="input-underline" placeholder="sk-..." autocomplete="off">
                     <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
                 </div>
             </div>
 
             <div class="api-key-section">
                 <div class="api-key-header">
-                    <label>Session Usage</label>
+                    <label class="section-label" style="margin-bottom:0">Session Usage</label>
                     <button class="btn-clear-history" id="btnResetUsage">Reset</button>
                 </div>
                 <div class="usage-stats">
@@ -1096,7 +734,7 @@
                         <span class="usage-value" id="usageCost">$0.00</span>
                     </div>
                 </div>
-                <p style="font-size: 11px; color: #9898a8; margin-top: 12px;">Based on $5/1M input + $10/1M output tokens</p>
+                <p style="font-size: 11px; color: var(--gray-400); margin-top: 12px;">Based on $5/1M input + $10/1M output tokens</p>
             </div>
 
             <div class="feedback-section">
@@ -1106,10 +744,10 @@
                 <div class="option-group" style="margin-bottom: 12px;">
                     <label>Feedback Type</label>
                     <select id="feedbackType">
-                        <option value="suggestion">💡 Suggestion</option>
-                        <option value="bug">🐛 Bug Report</option>
-                        <option value="feature">✨ Feature Request</option>
-                        <option value="other">💬 Other</option>
+                        <option value="suggestion">Suggestion</option>
+                        <option value="bug">Bug Report</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
                 <button class="btn-submit-feedback" id="btnSubmitFeedback">Send Feedback</button>
@@ -1122,18 +760,32 @@
 
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
-                <p><strong>AI Image Generator</strong><br>Version 2.2 · gpt-image-1.5<br><br>Generate AI images and icons and insert them directly into your PowerPoint slides.<br><br>Made with ❤️</p>
+                <p><strong>AI Image Generator</strong><br>Version 2.2<br><br>Generate AI images and icons and insert them directly into your PowerPoint slides.</p>
             </div>
         </div>
     </div>
 
     <script>
+    (function() {
+        'use strict';
+
         // ======================
-        // State Management
+        // Constants
+        // ======================
+        const PRICING = { inputPerMillion: 5.00, outputPerMillion: 10.00 };
+        const MAX_HISTORY = 4;
+        const THUMBNAIL_SIZE = 80;
+        const STORAGE_KEYS = {
+            apiKey: 'openai_api_key',
+            history: 'image_history',
+            usage: 'aiImageGenerator_usage'
+        };
+
+        // ======================
+        // State
         // ======================
         const state = {
             apiKey: '',
-            currentImageUrl: null,
             currentImageBase64: null,
             currentImageSize: '1024x1024',
             insertMode: 'auto',
@@ -1144,8 +796,6 @@
             iconStyleNumber: 1,
             iconImageBase64: null,
             imageStyleNumber: 1,
-            useImageStyle: false,
-            // Usage tracking
             usage: {
                 totalInputTokens: 0,
                 totalOutputTokens: 0,
@@ -1154,287 +804,130 @@
             }
         };
 
-        // Pricing per 1M tokens (USD)
-        const PRICING = {
-            inputPerMillion: 5.00,
-            outputPerMillion: 10.00
+        // ======================
+        // DOM Cache
+        // ======================
+        const $ = (id) => document.getElementById(id);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const el = {
+            get tabs() { return $$('.tab'); },
+            get tabContents() { return $$('.tab-content'); },
+            apiKeyInput: $('apiKeyInput'),
+            apiKeyStatus: $('apiKeyStatus'),
+            btnSaveKey: $('btnSaveKey'),
+            promptInput: $('promptInput'),
+            sizeSelect: $('sizeSelect'),
+            qualitySelect: $('qualitySelect'),
+            btnGenerate: $('btnGenerate'),
+            statusMessage: $('statusMessage'),
+            previewSection: $('previewSection'),
+            previewLoading: $('previewLoading'),
+            previewImage: $('previewImage'),
+            btnRegenerate: $('btnRegenerate'),
+            btnInsert: $('btnInsert'),
+            historyGrid: $('historyGrid'),
+            btnClearHistory: $('btnClearHistory'),
+            get insertOptions() { return $$('.insert-option'); },
+            shapeInfo: $('shapeInfo'),
+            shapeInfoText: $('shapeInfoText'),
+            iconSubjectInput: $('iconSubjectInput'),
+            iconQualitySelect: $('iconQualitySelect'),
+            btnGenerateIcon: $('btnGenerateIcon'),
+            iconStatusMessage: $('iconStatusMessage'),
+            iconPreviewSection: $('iconPreviewSection'),
+            iconPreviewLoading: $('iconPreviewLoading'),
+            iconPreviewImage: $('iconPreviewImage'),
+            btnRegenerateIcon: $('btnRegenerateIcon'),
+            btnInsertIcon: $('btnInsertIcon'),
+            feedbackText: $('feedbackText'),
+            feedbackType: $('feedbackType'),
+            btnSubmitFeedback: $('btnSubmitFeedback'),
+            usageImages: $('usageImages'),
+            usageInputTokens: $('usageInputTokens'),
+            usageOutputTokens: $('usageOutputTokens'),
+            usageCost: $('usageCost'),
+            btnResetUsage: $('btnResetUsage')
         };
 
         // ======================
-        // DOM Elements
+        // Storage Helpers
         // ======================
-        const elements = {
-            tabs: document.querySelectorAll('.tab'),
-            tabContents: document.querySelectorAll('.tab-content'),
-            apiKeyInput: document.getElementById('apiKeyInput'),
-            apiKeyStatus: document.getElementById('apiKeyStatus'),
-            btnSaveKey: document.getElementById('btnSaveKey'),
-            promptInput: document.getElementById('promptInput'),
-            sizeSelect: document.getElementById('sizeSelect'),
-            qualitySelect: document.getElementById('qualitySelect'),
-            btnGenerate: document.getElementById('btnGenerate'),
-            statusMessage: document.getElementById('statusMessage'),
-            previewSection: document.getElementById('previewSection'),
-            previewLoading: document.getElementById('previewLoading'),
-            previewImage: document.getElementById('previewImage'),
-            btnRegenerate: document.getElementById('btnRegenerate'),
-            btnInsert: document.getElementById('btnInsert'),
-            historyGrid: document.getElementById('historyGrid'),
-            btnClearHistory: document.getElementById('btnClearHistory'),
-            insertOptions: document.querySelectorAll('.insert-option'),
-            shapeInfo: document.getElementById('shapeInfo'),
-            shapeInfoText: document.getElementById('shapeInfoText'),
-            useImageStyle: document.getElementById('useImageStyle'),
-            imageStyleGrid: document.getElementById('imageStyleGrid'),
-            styleToggleLabel: document.getElementById('styleToggleLabel'),
-            iconSubjectInput: document.getElementById('iconSubjectInput'),
-            iconQualitySelect: document.getElementById('iconQualitySelect'),
-            btnGenerateIcon: document.getElementById('btnGenerateIcon'),
-            iconStatusMessage: document.getElementById('iconStatusMessage'),
-            iconPreviewSection: document.getElementById('iconPreviewSection'),
-            iconPreviewLoading: document.getElementById('iconPreviewLoading'),
-            iconPreviewImage: document.getElementById('iconPreviewImage'),
-            btnRegenerateIcon: document.getElementById('btnRegenerateIcon'),
-            btnInsertIcon: document.getElementById('btnInsertIcon'),
-            alignSelectionInfo: document.getElementById('alignSelectionInfo'),
-            alignStatusMessage: document.getElementById('alignStatusMessage'),
-            btnAlignLeft: document.getElementById('btnAlignLeft'),
-            btnAlignCenter: document.getElementById('btnAlignCenter'),
-            btnAlignRight: document.getElementById('btnAlignRight'),
-            btnAlignTop: document.getElementById('btnAlignTop'),
-            btnAlignMiddle: document.getElementById('btnAlignMiddle'),
-            btnAlignBottom: document.getElementById('btnAlignBottom'),
-            btnDistributeH: document.getElementById('btnDistributeH'),
-            btnDistributeV: document.getElementById('btnDistributeV'),
-            btnMatchWidth: document.getElementById('btnMatchWidth'),
-            btnMatchHeight: document.getElementById('btnMatchHeight'),
-            btnMatchBoth: document.getElementById('btnMatchBoth'),
-            btnSwapPositions: document.getElementById('btnSwapPositions'),
-            btnCenterOnSlide: document.getElementById('btnCenterOnSlide'),
-            feedbackText: document.getElementById('feedbackText'),
-            feedbackType: document.getElementById('feedbackType'),
-            btnSubmitFeedback: document.getElementById('btnSubmitFeedback'),
-            // Usage tracking elements
-            usageImages: document.getElementById('usageImages'),
-            usageInputTokens: document.getElementById('usageInputTokens'),
-            usageOutputTokens: document.getElementById('usageOutputTokens'),
-            usageCost: document.getElementById('usageCost'),
-            btnResetUsage: document.getElementById('btnResetUsage')
-        };
+        function storageGet(key) {
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        function storageSet(key, value) {
+            try { localStorage.setItem(key, value); } catch (e) { /* quota exceeded */ }
+        }
+
+        function storageRemove(key) {
+            try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+        }
 
         // ======================
-        // Office.js Initialization
+        // Initialization
         // ======================
-        Office.onReady((info) => {
-            console.log('Office ready:', info.host);
-            initializeApp();
-        });
+        let initialized = false;
+
+        Office.onReady(() => { initializeApp(); });
 
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if (!state.apiKey && !elements.btnSaveKey._listenerAdded) {
-                    console.log('Fallback initialization');
-                    initializeApp();
-                }
-            }, 1000);
+            setTimeout(() => { if (!initialized) initializeApp(); }, 1000);
         });
 
         function initializeApp() {
-            if (elements.btnSaveKey._listenerAdded) return;
-            elements.btnSaveKey._listenerAdded = true;
+            if (initialized) return;
+            initialized = true;
 
-            // Detect Mac for keyboard shortcuts
-            if (navigator.platform.toUpperCase().indexOf('MAC') >= 0 || navigator.userAgent.toUpperCase().indexOf('MAC') >= 0) {
-                document.body.classList.add('is-mac');
+            // Clear oversized history
+            const historyData = storageGet(STORAGE_KEYS.history);
+            if (historyData && historyData.length > 50000) {
+                storageRemove(STORAGE_KEYS.history);
             }
 
-            // Clear oversized data
-            try {
-                const historySize = (localStorage.getItem('image_history') || '').length;
-                if (historySize > 50000) {
-                    localStorage.removeItem('image_history');
-                    console.log('Cleared oversized history');
-                }
-            } catch (e) {
-                try { localStorage.clear(); } catch(e2) {}
-            }
-
-            // Load saved API key
-            try {
-                const savedKey = localStorage.getItem('openai_api_key');
-                if (savedKey) {
-                    state.apiKey = savedKey;
-                    elements.apiKeyInput.value = '••••••••••••••••';
-                    updateApiKeyStatus(true);
-                }
-            } catch (e) {
-                console.warn('Could not load API key from storage');
-            }
-
-            // Load history
-            try {
-                const savedHistory = localStorage.getItem('image_history');
-                if (savedHistory) {
-                    state.history = JSON.parse(savedHistory);
-                    renderHistory();
-                }
-            } catch (e) {
-                state.history = [];
-            }
-
-            // Render icon styles from external config
+            loadApiKey();
+            loadHistory();
+            loadUsage();
             renderIconStyles();
-
-            // Render image styles from external config
             renderImageStyles();
-
             setupEventListeners();
+            updateGenerateButtons();
+            detectSelectedShape();
+            setInterval(detectSelectedShape, 1000);
+        }
+
+        // ======================
+        // API Key
+        // ======================
+        function loadApiKey() {
+            const savedKey = storageGet(STORAGE_KEYS.apiKey);
+            if (savedKey) {
+                state.apiKey = savedKey;
+                el.apiKeyInput.value = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+                setApiKeyStatus(true);
+            }
+        }
+
+        function saveApiKey() {
+            const key = el.apiKeyInput.value.trim();
+            if (!key || key.includes('\u2022')) return;
+
+            state.apiKey = key;
+            el.apiKeyInput.value = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+            setApiKeyStatus(true);
+
+            storageRemove(STORAGE_KEYS.history);
+            state.history = [];
+            renderHistory();
+            storageSet(STORAGE_KEYS.apiKey, key);
+            showStatus('API key saved!', 'success', 'images');
             updateGenerateButtons();
         }
 
-        // Render icon styles from external configuration
-        function renderIconStyles() {
-            const grid = document.getElementById('iconStyleGrid');
-            if (!grid || typeof ICON_STYLES === 'undefined') {
-                console.warn('Icon styles not available');
-                return;
-            }
-
-            grid.innerHTML = '';
-            
-            Object.keys(ICON_STYLES).forEach((styleNum, index) => {
-                const style = ICON_STYLES[styleNum];
-                const card = document.createElement('div');
-                card.className = 'icon-style-card' + (index === 0 ? ' selected' : '');
-                card.dataset.style = styleNum;
-                card.innerHTML = `
-                    <div class="icon-style-preview" style="${style.previewStyle}">${style.emoji}</div>
-                    <div class="icon-style-name">Style ${styleNum}</div>
-                    <div class="icon-style-desc">${style.name}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // Render image styles from external configuration
-        function renderImageStyles() {
-            const grid = document.getElementById('imageStyleGrid');
-            if (!grid || typeof IMAGE_STYLES === 'undefined') {
-                console.warn('Image styles not available');
-                return;
-            }
-
-            grid.innerHTML = '';
-            
-            Object.keys(IMAGE_STYLES).forEach((styleNum, index) => {
-                const style = IMAGE_STYLES[styleNum];
-                const isDisabled = style.comingSoon === true;
-                const card = document.createElement('div');
-                card.className = 'icon-style-card' + (index === 0 ? ' selected' : '') + (isDisabled ? ' disabled' : '');
-                card.dataset.style = styleNum;
-                card.innerHTML = `
-                    <div class="icon-style-preview" style="${style.previewStyle}">${style.emoji}</div>
-                    <div class="icon-style-name">Style ${styleNum}</div>
-                    <div class="icon-style-desc">${style.name}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function setupEventListeners() {
-            elements.tabs.forEach(tab => {
-                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-            });
-
-            elements.btnSaveKey.addEventListener('click', saveApiKey);
-            elements.apiKeyInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') saveApiKey();
-            });
-
-            elements.btnGenerate.addEventListener('click', () => generateImage('images'));
-            elements.promptInput.addEventListener('input', updateGenerateButtons);
-            elements.btnRegenerate.addEventListener('click', () => generateImage('images'));
-            elements.btnInsert.addEventListener('click', () => insertImage('images'));
-            elements.insertOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    elements.insertOptions.forEach(o => o.classList.remove('selected'));
-                    option.classList.add('selected');
-                    state.insertMode = option.dataset.mode;
-                });
-            });
-            elements.btnClearHistory.addEventListener('click', clearHistory);
-
-            elements.btnGenerateIcon.addEventListener('click', () => generateImage('icons'));
-            elements.iconSubjectInput.addEventListener('input', updateGenerateButtons);
-            elements.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
-            elements.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
-            
-            // Attach click handlers to dynamically created style cards
-            document.querySelectorAll('#iconStyleGrid .icon-style-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const styleNum = parseInt(card.dataset.style);
-                    document.querySelectorAll('#iconStyleGrid .icon-style-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    state.iconStyleNumber = styleNum;
-                });
-            });
-
-            // Image style toggle
-            elements.useImageStyle.addEventListener('change', () => {
-                state.useImageStyle = elements.useImageStyle.checked;
-                const grid = document.getElementById('imageStyleGrid');
-                const label = document.getElementById('styleToggleLabel');
-                if (state.useImageStyle) {
-                    grid.style.display = 'grid';
-                    label.textContent = 'Style preset enabled';
-                } else {
-                    grid.style.display = 'none';
-                    label.textContent = 'Use style preset';
-                }
-            });
-
-            // Attach click handlers to dynamically created image style cards
-            document.querySelectorAll('#imageStyleGrid .icon-style-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const styleNum = parseInt(card.dataset.style);
-                    const style = IMAGE_STYLES[styleNum];
-                    if (style && style.comingSoon) {
-                        alert('This style is coming soon!');
-                        return;
-                    }
-                    document.querySelectorAll('#imageStyleGrid .icon-style-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    state.imageStyleNumber = styleNum;
-                });
-            });
-
-            elements.btnAlignLeft.addEventListener('click', () => alignShapes('left'));
-            elements.btnAlignCenter.addEventListener('click', () => alignShapes('center'));
-            elements.btnAlignRight.addEventListener('click', () => alignShapes('right'));
-            elements.btnAlignTop.addEventListener('click', () => alignShapes('top'));
-            elements.btnAlignMiddle.addEventListener('click', () => alignShapes('middle'));
-            elements.btnAlignBottom.addEventListener('click', () => alignShapes('bottom'));
-            elements.btnDistributeH.addEventListener('click', () => distributeShapes('horizontal'));
-            elements.btnDistributeV.addEventListener('click', () => distributeShapes('vertical'));
-            elements.btnMatchWidth.addEventListener('click', () => matchSize('width'));
-            elements.btnMatchHeight.addEventListener('click', () => matchSize('height'));
-            elements.btnMatchBoth.addEventListener('click', () => matchSize('both'));
-            elements.btnSwapPositions.addEventListener('click', swapPositions);
-            elements.btnCenterOnSlide.addEventListener('click', centerOnSlide);
-
-            elements.btnSubmitFeedback.addEventListener('click', submitFeedback);
-
-            // Background color buttons
-            document.querySelectorAll('.background-color-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const color = btn.dataset.color;
-                    changeBackgroundColor(color);
-                });
-            });
-
-            detectSelectedShape();
-            setInterval(detectSelectedShape, 1000);
-            document.addEventListener('keydown', handleAlignmentShortcuts);
+        function setApiKeyStatus(isSet) {
+            el.apiKeyStatus.textContent = isSet ? 'Connected' : 'Not Set';
+            el.apiKeyStatus.className = 'api-key-status ' + (isSet ? 'connected' : 'disconnected');
         }
 
         // ======================
@@ -1442,45 +935,81 @@
         // ======================
         function switchTab(tabName) {
             state.activeTab = tabName;
-            elements.tabs.forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-            elements.tabContents.forEach(content => {
-                content.classList.toggle('active', content.id === `tab-${tabName}`);
-            });
+            el.tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabName));
+            el.tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
         }
 
         // ======================
-        // API Key Management
+        // Style Rendering
         // ======================
-        function saveApiKey() {
-            const key = elements.apiKeyInput.value.trim();
-            if (key && key !== '••••••••••••••••') {
-                state.apiKey = key;
-                elements.apiKeyInput.value = '••••••••••••••••';
-                updateApiKeyStatus(true);
-                try {
-                    localStorage.removeItem('image_history');
-                    state.history = [];
-                    renderHistory();
-                    localStorage.setItem('openai_api_key', key);
-                    showStatus('API key saved!', 'success', 'images');
-                } catch (e) {
-                    console.warn('Could not persist API key to localStorage:', e);
-                    showStatus('API key set for this session', 'info', 'images');
-                }
-            }
-            updateGenerateButtons();
+        function renderStyleGrid(gridId, styles, onSelect) {
+            const grid = $(gridId);
+            if (!grid || !styles) return;
+
+            grid.innerHTML = '';
+            Object.keys(styles).forEach((styleNum, index) => {
+                const style = styles[styleNum];
+                const isDisabled = style.comingSoon === true;
+                const card = document.createElement('div');
+                card.className = 'style-card' + (index === 0 ? ' selected' : '') + (isDisabled ? ' disabled' : '');
+                card.dataset.style = styleNum;
+                card.innerHTML = '<div class="style-card-name">Style ' + styleNum + '</div>';
+
+                card.addEventListener('click', () => {
+                    if (isDisabled) return;
+                    grid.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    onSelect(parseInt(styleNum));
+                });
+
+                grid.appendChild(card);
+            });
         }
 
-        function updateApiKeyStatus(isSet) {
-            if (isSet) {
-                elements.apiKeyStatus.textContent = 'Connected';
-                elements.apiKeyStatus.className = 'api-key-status connected';
-            } else {
-                elements.apiKeyStatus.textContent = 'Not Set';
-                elements.apiKeyStatus.className = 'api-key-status disconnected';
-            }
+        function renderIconStyles() {
+            if (typeof ICON_STYLES === 'undefined') return;
+            renderStyleGrid('iconStyleGrid', ICON_STYLES, (num) => { state.iconStyleNumber = num; });
+        }
+
+        function renderImageStyles() {
+            if (typeof IMAGE_STYLES === 'undefined') return;
+            renderStyleGrid('imageStyleGrid', IMAGE_STYLES, (num) => { state.imageStyleNumber = num; });
+        }
+
+        // ======================
+        // Event Listeners
+        // ======================
+        function setupEventListeners() {
+            el.tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+
+            el.btnSaveKey.addEventListener('click', saveApiKey);
+            el.apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKey(); });
+
+            el.btnGenerate.addEventListener('click', () => generateImage('images'));
+            el.promptInput.addEventListener('input', updateGenerateButtons);
+            el.btnRegenerate.addEventListener('click', () => generateImage('images'));
+            el.btnInsert.addEventListener('click', () => insertImage('images'));
+
+            el.insertOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    el.insertOptions.forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    state.insertMode = option.dataset.mode;
+                });
+            });
+
+            el.btnClearHistory.addEventListener('click', clearHistory);
+
+            el.btnGenerateIcon.addEventListener('click', () => generateImage('icons'));
+            el.iconSubjectInput.addEventListener('input', updateGenerateButtons);
+            el.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
+            el.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
+
+            el.btnSubmitFeedback.addEventListener('click', submitFeedback);
+
+            el.btnResetUsage.addEventListener('click', () => {
+                if (confirm('Reset all usage statistics?')) resetUsage();
+            });
         }
 
         // ======================
@@ -1495,7 +1024,7 @@
 
                     if (shapes.items.length > 0) {
                         const shape = shapes.items[0];
-                        shape.load(['width', 'height', 'name', 'type']);
+                        shape.load(['width', 'height', 'name']);
                         await context.sync();
 
                         state.selectedShape = {
@@ -1506,15 +1035,15 @@
                         };
 
                         const dalleSize = getBestDalleSize(state.selectedShape.aspectRatio);
-                        elements.shapeInfo.classList.add('detected');
-                        elements.shapeInfoText.textContent = `${shape.name} (${Math.round(shape.width)}×${Math.round(shape.height)}pt) → ${dalleSize}`;
+                        el.shapeInfo.classList.add('detected');
+                        el.shapeInfoText.textContent = shape.name + ' (' + Math.round(shape.width) + '\u00d7' + Math.round(shape.height) + 'pt) \u2192 ' + dalleSize;
                     } else {
                         state.selectedShape = null;
-                        elements.shapeInfo.classList.remove('detected');
-                        elements.shapeInfoText.textContent = 'No shape selected - will use size setting';
+                        el.shapeInfo.classList.remove('detected');
+                        el.shapeInfoText.textContent = 'No shape selected - will use size setting';
                     }
                 });
-            } catch (error) {
+            } catch (e) {
                 state.selectedShape = null;
             }
         }
@@ -1526,50 +1055,43 @@
         }
 
         function getGenerationSize() {
-            const selectedSize = elements.sizeSelect.value;
-            if (selectedSize === 'auto') {
+            const selected = el.sizeSelect.value;
+            if (selected === 'auto') {
                 return state.selectedShape ? getBestDalleSize(state.selectedShape.aspectRatio) : '1024x1024';
             }
-            return selectedSize;
+            return selected;
         }
 
         // ======================
         // Image Generation
         // ======================
         async function generateImage(tab) {
+            const isImages = tab === 'images';
             let prompt, quality, statusEl, previewSection, previewLoading, previewImage;
 
-            if (tab === 'images') {
-                let userPrompt = elements.promptInput.value.trim();
-                
-                // Apply image style if enabled
-                if (state.useImageStyle && typeof generateImagePrompt === 'function') {
-                    prompt = generateImagePrompt(state.imageStyleNumber, userPrompt);
-                } else {
-                    prompt = userPrompt;
-                }
-                
-                quality = elements.qualitySelect.value;
-                statusEl = elements.statusMessage;
-                previewSection = elements.previewSection;
-                previewLoading = elements.previewLoading;
-                previewImage = elements.previewImage;
-            } else if (tab === 'icons') {
-                const subject = elements.iconSubjectInput.value.trim();
-                const styleNum = state.iconStyleNumber;
-
-                // Use external icon-styles.js configuration
-                prompt = generateIconPrompt(styleNum, subject);
-
-                quality = elements.iconQualitySelect.value;
-                statusEl = elements.iconStatusMessage;
-                previewSection = elements.iconPreviewSection;
-                previewLoading = elements.iconPreviewLoading;
-                previewImage = elements.iconPreviewImage;
+            if (isImages) {
+                const userPrompt = el.promptInput.value.trim();
+                prompt = (typeof generateImagePrompt === 'function')
+                    ? generateImagePrompt(state.imageStyleNumber, userPrompt)
+                    : userPrompt;
+                quality = el.qualitySelect.value;
+                statusEl = el.statusMessage;
+                previewSection = el.previewSection;
+                previewLoading = el.previewLoading;
+                previewImage = el.previewImage;
+            } else {
+                const subject = el.iconSubjectInput.value.trim();
+                prompt = (typeof generateIconPrompt === 'function')
+                    ? generateIconPrompt(state.iconStyleNumber, subject)
+                    : 'Icon of ' + subject;
+                quality = el.iconQualitySelect.value;
+                statusEl = el.iconStatusMessage;
+                previewSection = el.iconPreviewSection;
+                previewLoading = el.iconPreviewLoading;
+                previewImage = el.iconPreviewImage;
             }
 
-            const apiKey = state.apiKey || window._openaiApiKey;
-            if (!prompt || !apiKey || state.isGenerating) return;
+            if (!prompt || !state.apiKey || state.isGenerating) return;
 
             state.isGenerating = true;
             updateGenerateButtons();
@@ -1578,15 +1100,15 @@
             previewLoading.style.display = 'flex';
             previewImage.style.display = 'none';
 
-            const size = tab === 'images' ? getGenerationSize() : '1024x1024';
-            showStatus(`Generating ${size} image...`, 'info', tab);
+            const size = isImages ? getGenerationSize() : '1024x1024';
+            showStatus('Generating ' + size + ' image...', 'info', tab);
 
             try {
                 const response = await fetch('https://api.openai.com/v1/images/generations', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
+                        'Authorization': 'Bearer ' + state.apiKey
                     },
                     body: JSON.stringify({
                         model: 'gpt-image-1.5',
@@ -1604,33 +1126,29 @@
 
                 const data = await response.json();
                 const base64Data = data.data[0].b64_json;
-                const imageUrl = `data:image/png;base64,${base64Data}`;
+                const imageUrl = 'data:image/png;base64,' + base64Data;
 
-                // Track usage if available
                 if (data.usage) {
                     state.usage.totalInputTokens += data.usage.input_tokens || 0;
                     state.usage.totalOutputTokens += data.usage.output_tokens || 0;
                     state.usage.totalImages += 1;
                     updateUsageDisplay();
-                    saveUsageToStorage();
+                    saveUsage();
                 }
 
-                if (tab === 'images') {
-                    state.currentImageUrl = imageUrl;
+                if (isImages) {
                     state.currentImageBase64 = base64Data;
                     state.currentImageSize = size;
-                    addToHistory(imageUrl, elements.promptInput.value.trim(), size);
-                } else if (tab === 'icons') {
+                    addToHistory(imageUrl, el.promptInput.value.trim(), size);
+                } else {
                     state.iconImageBase64 = base64Data;
                 }
 
                 previewImage.src = imageUrl;
                 previewImage.style.display = 'block';
                 previewLoading.style.display = 'none';
-
                 showStatus('Image generated successfully!', 'success', tab);
             } catch (error) {
-                console.error('Generation error:', error);
                 showStatus(error.message || 'Failed to generate image', 'error', tab);
                 previewLoading.style.display = 'none';
             } finally {
@@ -1642,14 +1160,8 @@
         // ======================
         // Insert Image
         // ======================
-        async function insertImage(tab) {
-            let base64Data;
-            if (tab === 'images') {
-                base64Data = state.currentImageBase64;
-            } else if (tab === 'icons') {
-                base64Data = state.iconImageBase64;
-            }
-
+        function insertImage(tab) {
+            const base64Data = tab === 'images' ? state.currentImageBase64 : state.iconImageBase64;
             if (!base64Data) {
                 showStatus('No image to insert', 'error', tab);
                 return;
@@ -1657,17 +1169,14 @@
 
             showStatus('Inserting image...', 'info', tab);
 
-            const imgWidth = tab === 'images' && state.selectedShape ? state.selectedShape.width : 300;
-            const imgHeight = tab === 'images' && state.selectedShape ? state.selectedShape.height : 300;
+            const useShape = tab === 'images' && state.selectedShape;
+            const imgWidth = useShape ? state.selectedShape.width : 300;
+            const imgHeight = useShape ? state.selectedShape.height : 300;
 
             Office.context.document.setSelectedDataAsync(
                 base64Data,
-                {
-                    coercionType: Office.CoercionType.Image,
-                    imageWidth: imgWidth,
-                    imageHeight: imgHeight
-                },
-                function(result) {
+                { coercionType: Office.CoercionType.Image, imageWidth: imgWidth, imageHeight: imgHeight },
+                (result) => {
                     if (result.status === Office.AsyncResultStatus.Succeeded) {
                         showStatus('Image inserted!', 'success', tab);
                     } else {
@@ -1678,22 +1187,26 @@
         }
 
         // ======================
-        // History Management
+        // History
         // ======================
-        function addToHistory(imageUrl, prompt, size = '1024x1024') {
-            try {
-                createThumbnail(imageUrl, 80, (thumbnailUrl) => {
-                    state.history.unshift({ url: thumbnailUrl, fullUrl: imageUrl, prompt: prompt, size: size, timestamp: Date.now() });
-                    if (state.history.length > 4) {
-                        state.history = state.history.slice(0, 4);
-                    }
-                    try {
-                        const historyToSave = state.history.map(item => ({ url: item.url, prompt: item.prompt, size: item.size }));
-                        localStorage.setItem('image_history', JSON.stringify(historyToSave));
-                    } catch (e) {}
-                    renderHistory();
-                });
-            } catch (e) {}
+        function loadHistory() {
+            const saved = storageGet(STORAGE_KEYS.history);
+            if (saved) {
+                try { state.history = JSON.parse(saved); } catch (e) { state.history = []; }
+                renderHistory();
+            }
+        }
+
+        function addToHistory(imageUrl, prompt, size) {
+            createThumbnail(imageUrl, THUMBNAIL_SIZE, (thumbnailUrl) => {
+                state.history.unshift({ url: thumbnailUrl, fullUrl: imageUrl, prompt: prompt, size: size });
+                if (state.history.length > MAX_HISTORY) {
+                    state.history = state.history.slice(0, MAX_HISTORY);
+                }
+                const toSave = state.history.map(item => ({ url: item.url, prompt: item.prompt, size: item.size }));
+                storageSet(STORAGE_KEYS.history, JSON.stringify(toSave));
+                renderHistory();
+            });
         }
 
         function createThumbnail(dataUrl, maxSize, callback) {
@@ -1701,16 +1214,12 @@
             img.onload = function() {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                let width = img.width;
-                let height = img.height;
-                if (width > height) {
-                    if (width > maxSize) { height = height * (maxSize / width); width = maxSize; }
-                } else {
-                    if (height > maxSize) { width = width * (maxSize / height); height = maxSize; }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
+                let w = img.width, h = img.height;
+                if (w > h) { if (w > maxSize) { h = h * (maxSize / w); w = maxSize; } }
+                else { if (h > maxSize) { w = w * (maxSize / h); h = maxSize; } }
+                canvas.width = w;
+                canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
                 callback(canvas.toDataURL('image/jpeg', 0.6));
             };
             img.onerror = function() { callback(dataUrl); };
@@ -1719,458 +1228,75 @@
 
         function renderHistory() {
             if (state.history.length === 0) {
-                elements.historyGrid.innerHTML = '<div class="history-empty">No images generated yet</div>';
+                el.historyGrid.innerHTML = '<div class="history-empty">No images generated yet</div>';
                 return;
             }
-            elements.historyGrid.innerHTML = state.history.map((item, index) => `<div class="history-item" data-index="${index}" title="${item.prompt}"><img src="${item.url}" alt="Generated image"></div>`).join('');
-            document.querySelectorAll('.history-item').forEach(item => {
+            el.historyGrid.innerHTML = state.history.map((item, i) =>
+                '<div class="history-item" data-index="' + i + '" title="' + (item.prompt || '') + '"><img src="' + item.url + '" alt="Generated image"></div>'
+            ).join('');
+
+            el.historyGrid.querySelectorAll('.history-item').forEach(item => {
                 item.addEventListener('click', () => loadFromHistory(parseInt(item.dataset.index)));
             });
         }
 
         function loadFromHistory(index) {
             const item = state.history[index];
-            if (item) {
-                const imageUrl = item.fullUrl || item.url;
-                state.currentImageUrl = imageUrl;
-                state.currentImageBase64 = imageUrl.split(',')[1];
-                state.currentImageSize = item.size || '1024x1024';
-                elements.previewImage.src = imageUrl;
-                elements.previewImage.style.display = 'block';
-                elements.previewLoading.style.display = 'none';
-                elements.previewSection.classList.add('visible');
-                elements.promptInput.value = item.prompt;
-                showStatus('Image loaded from history', 'info', 'images');
-            }
+            if (!item) return;
+
+            const imageUrl = item.fullUrl || item.url;
+            state.currentImageBase64 = imageUrl.split(',')[1];
+            state.currentImageSize = item.size || '1024x1024';
+
+            el.previewImage.src = imageUrl;
+            el.previewImage.style.display = 'block';
+            el.previewLoading.style.display = 'none';
+            el.previewSection.classList.add('visible');
+            el.promptInput.value = item.prompt;
+            showStatus('Image loaded from history', 'info', 'images');
         }
 
         function clearHistory() {
             state.history = [];
-            localStorage.removeItem('image_history');
+            storageRemove(STORAGE_KEYS.history);
             renderHistory();
             showStatus('History cleared', 'info', 'images');
-        }
-
-        // ======================
-        // ALIGNMENT FUNCTIONS (Queue-based for reliability)
-        // ======================
-        const PLACEHOLDER_BOUNDS = { left: 50, top: 100, right: 910, bottom: 490 };
-        const SLIDE_WIDTH = 960;
-        const SLIDE_HEIGHT = 540;
-
-        // Operation queue - prevents concurrent PowerPoint.run calls
-        let operationQueue = Promise.resolve();
-        let lastOperationTime = 0;
-        const MIN_OPERATION_DELAY = 100;
-
-        function showAlignStatus(message, type) {
-            try {
-                const statusEl = elements.alignStatusMessage;
-                if (!statusEl) return;
-                const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
-                statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-                statusEl.className = `status-message visible ${type}`;
-                if (type === 'success' || type === 'info') {
-                    setTimeout(() => statusEl.classList.remove('visible'), 3000);
-                }
-            } catch (e) {}
-        }
-
-        function queueOperation(operation) {
-            operationQueue = operationQueue
-                .then(() => {
-                    const now = Date.now();
-                    const timeSinceLast = now - lastOperationTime;
-                    if (timeSinceLast < MIN_OPERATION_DELAY) {
-                        return new Promise(resolve => setTimeout(resolve, MIN_OPERATION_DELAY - timeSinceLast));
-                    }
-                })
-                .then(() => {
-                    lastOperationTime = Date.now();
-                    return operation();
-                })
-                .catch(err => {
-                    console.error('Operation error:', err);
-                    showAlignStatus('Operation failed - try again', 'error');
-                });
-        }
-
-        // Keyboard shortcuts
-        let lastShortcutTime = 0;
-        function handleAlignmentShortcuts(e) {
-            if (!e.altKey) return;
-            const arrowKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-            if (!arrowKeys.includes(e.key)) return;
-            
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const now = Date.now();
-            if (now - lastShortcutTime < 300) return;
-            lastShortcutTime = now;
-            
-            const directionMap = { 'ArrowLeft': 'left', 'ArrowRight': 'right', 'ArrowUp': 'top', 'ArrowDown': 'bottom' };
-            const direction = directionMap[e.key];
-            
-            if (e.shiftKey) {
-                alignToPlaceholder(direction);
-            } else {
-                alignShapes(direction);
-            }
-        }
-
-        // Helper: Load shapes with properties
-        async function getShapesWithProperties(context, properties) {
-            const selection = context.presentation.getSelectedShapes();
-            selection.load('items');
-            await context.sync();
-            
-            if (!selection.items || selection.items.length === 0) return null;
-            
-            const items = selection.items;
-            for (let i = 0; i < items.length; i++) {
-                items[i].load(properties);
-            }
-            await context.sync();
-            return items;
-        }
-
-        // Align to content placeholder
-        function alignToPlaceholder(edge) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    if (!items) { showAlignStatus('Select at least 1 shape', 'error'); return; }
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        const shape = items[i];
-                        const width = shape.width;
-                        const height = shape.height;
-                        switch (edge) {
-                            case 'left': shape.left = PLACEHOLDER_BOUNDS.left; break;
-                            case 'right': shape.left = PLACEHOLDER_BOUNDS.right - width; break;
-                            case 'top': shape.top = PLACEHOLDER_BOUNDS.top; break;
-                            case 'bottom': shape.top = PLACEHOLDER_BOUNDS.bottom - height; break;
-                        }
-                    }
-                    await context.sync();
-                    showAlignStatus(`Aligned to ${edge}`, 'success');
-                });
-            });
-        }
-
-        // Align shapes to first selected
-        function alignShapes(direction) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    if (!items || items.length < 2) { showAlignStatus('Select at least 2 shapes', 'error'); return; }
-                    
-                    const refLeft = items[0].left;
-                    const refTop = items[0].top;
-                    const refWidth = items[0].width;
-                    const refHeight = items[0].height;
-                    
-                    for (let i = 1; i < items.length; i++) {
-                        const shape = items[i];
-                        const shapeWidth = shape.width;
-                        const shapeHeight = shape.height;
-                        switch (direction) {
-                            case 'left': shape.left = refLeft; break;
-                            case 'center': shape.left = refLeft + (refWidth - shapeWidth) / 2; break;
-                            case 'right': shape.left = refLeft + refWidth - shapeWidth; break;
-                            case 'top': shape.top = refTop; break;
-                            case 'middle': shape.top = refTop + (refHeight - shapeHeight) / 2; break;
-                            case 'bottom': shape.top = refTop + refHeight - shapeHeight; break;
-                        }
-                    }
-                    await context.sync();
-                    showAlignStatus(`Aligned ${items.length} shapes`, 'success');
-                });
-            });
-        }
-
-        // Distribute shapes
-        function distributeShapes(direction) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    if (!items || items.length < 3) { showAlignStatus('Select at least 3 shapes', 'error'); return; }
-                    
-                    const shapes = [];
-                    for (let i = 0; i < items.length; i++) {
-                        shapes.push({ item: items[i], left: items[i].left, top: items[i].top, width: items[i].width, height: items[i].height });
-                    }
-                    
-                    const count = shapes.length;
-                    if (direction === 'horizontal') {
-                        shapes.sort((a, b) => a.left - b.left);
-                        const first = shapes[0];
-                        const last = shapes[count - 1];
-                        const totalSpan = (last.left + last.width) - first.left;
-                        const totalShapeWidth = shapes.reduce((sum, s) => sum + s.width, 0);
-                        const gap = (totalSpan - totalShapeWidth) / (count - 1);
-                        let pos = first.left + first.width + gap;
-                        for (let i = 1; i < count - 1; i++) {
-                            shapes[i].item.left = pos;
-                            pos += shapes[i].width + gap;
-                        }
-                    } else {
-                        shapes.sort((a, b) => a.top - b.top);
-                        const first = shapes[0];
-                        const last = shapes[count - 1];
-                        const totalSpan = (last.top + last.height) - first.top;
-                        const totalShapeHeight = shapes.reduce((sum, s) => sum + s.height, 0);
-                        const gap = (totalSpan - totalShapeHeight) / (count - 1);
-                        let pos = first.top + first.height + gap;
-                        for (let i = 1; i < count - 1; i++) {
-                            shapes[i].item.top = pos;
-                            pos += shapes[i].height + gap;
-                        }
-                    }
-                    await context.sync();
-                    showAlignStatus(`Distributed ${count} shapes`, 'success');
-                });
-            });
-        }
-
-        // Match size
-        function matchSize(dimension) {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['width', 'height']);
-                    if (!items || items.length < 2) { showAlignStatus('Select at least 2 shapes', 'error'); return; }
-                    
-                    const refWidth = items[0].width;
-                    const refHeight = items[0].height;
-                    
-                    for (let i = 1; i < items.length; i++) {
-                        if (dimension === 'width' || dimension === 'both') items[i].width = refWidth;
-                        if (dimension === 'height' || dimension === 'both') items[i].height = refHeight;
-                    }
-                    await context.sync();
-                    showAlignStatus(`Matched ${dimension}`, 'success');
-                });
-            });
-        }
-
-        // Swap positions
-        function swapPositions() {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top']);
-                    if (!items || items.length !== 2) { showAlignStatus('Select exactly 2 shapes', 'error'); return; }
-                    
-                    const pos1 = { left: items[0].left, top: items[0].top };
-                    const pos2 = { left: items[1].left, top: items[1].top };
-                    
-                    items[0].left = pos2.left;
-                    items[0].top = pos2.top;
-                    items[1].left = pos1.left;
-                    items[1].top = pos1.top;
-                    
-                    await context.sync();
-                    showAlignStatus('Swapped positions', 'success');
-                });
-            });
-        }
-
-        // Center on slide
-        function centerOnSlide() {
-            queueOperation(async () => {
-                await PowerPoint.run(async (context) => {
-                    const items = await getShapesWithProperties(context, ['left', 'top', 'width', 'height']);
-                    if (!items) { showAlignStatus('Select at least 1 shape', 'error'); return; }
-                    
-                    let minLeft = Infinity, minTop = Infinity;
-                    let maxRight = -Infinity, maxBottom = -Infinity;
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        const s = items[i];
-                        minLeft = Math.min(minLeft, s.left);
-                        minTop = Math.min(minTop, s.top);
-                        maxRight = Math.max(maxRight, s.left + s.width);
-                        maxBottom = Math.max(maxBottom, s.top + s.height);
-                    }
-                    
-                    const offsetX = (SLIDE_WIDTH - (maxRight - minLeft)) / 2 - minLeft;
-                    const offsetY = (SLIDE_HEIGHT - (maxBottom - minTop)) / 2 - minTop;
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        items[i].left = items[i].left + offsetX;
-                        items[i].top = items[i].top + offsetY;
-                    }
-                    
-                    await context.sync();
-                    showAlignStatus(`Centered ${items.length} shape(s)`, 'success');
-                });
-            });
         }
 
         // ======================
         // Feedback
         // ======================
         function submitFeedback() {
-            const feedback = elements.feedbackText.value.trim();
-            const type = elements.feedbackType.value;
+            const feedback = el.feedbackText.value.trim();
             if (!feedback) {
                 alert('Please enter your feedback before submitting.');
                 return;
             }
+            const type = el.feedbackType.value;
             console.log('Feedback submitted:', { type, feedback });
-            alert('Thank you for your feedback! 🎉');
-            elements.feedbackText.value = '';
-        }
-
-        // ======================
-        // Background Color
-        // ======================
-        function showBackgroundStatus(message, type) {
-            const statusEl = document.getElementById('backgroundStatusMessage');
-            if (!statusEl) return;
-            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
-            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.className = `status-message visible ${type}`;
-            if (type === 'success' || type === 'info') {
-                setTimeout(() => statusEl.classList.remove('visible'), 3000);
-            }
-        }
-
-        async function changeBackgroundColor(hexColor) {
-            showBackgroundStatus('Changing background color...', 'info');
-            
-            try {
-                await PowerPoint.run(async (context) => {
-                    const slide = context.presentation.getSelectedSlides().getItemAt(0);
-                    slide.load('layout');
-                    await context.sync();
-                    
-                    // Access the slide's layout
-                    const layout = slide.layout;
-                    const shapes = layout.shapes;
-                    shapes.load('items/name');
-                    await context.sync();
-                    
-                    // Find the shape named 'dynamic-background' on the layout
-                    let targetShape = null;
-                    for (let i = 0; i < shapes.items.length; i++) {
-                        if (shapes.items[i].name === 'dynamic-background') {
-                            targetShape = shapes.items[i];
-                            break;
-                        }
-                    }
-                    
-                    if (!targetShape) {
-                        showBackgroundStatus("Shape 'dynamic-background' not found on slide layout", 'error');
-                        return;
-                    }
-                    
-                    // Change the fill color
-                    targetShape.fill.setSolidColor(hexColor);
-                    await context.sync();
-                    
-                    // Update button selection state
-                    document.querySelectorAll('.background-color-btn').forEach(btn => {
-                        btn.classList.toggle('selected', btn.dataset.color === hexColor);
-                    });
-                    
-                    showBackgroundStatus(`Background changed to ${hexColor}`, 'success');
-                });
-            } catch (error) {
-                console.error('Error changing background:', error);
-                showBackgroundStatus('Failed to change background: ' + error.message, 'error');
-            }
-        }
-
-        // ======================
-        // UI Helpers
-        // ======================
-        function updateGenerateButtons() {
-            const hasApiKey = (state.apiKey && state.apiKey.length > 0) || (window._openaiApiKey && window._openaiApiKey.length > 0);
-            elements.btnGenerate.disabled = !elements.promptInput.value.trim() || !hasApiKey || state.isGenerating;
-            elements.btnGenerateIcon.disabled = !elements.iconSubjectInput.value.trim() || !hasApiKey || state.isGenerating;
-            
-            if (state.isGenerating) {
-                elements.btnGenerate.classList.add('loading');
-                elements.btnGenerateIcon.classList.add('loading');
-                elements.btnGenerate.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
-                elements.btnGenerateIcon.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
-            } else {
-                elements.btnGenerate.classList.remove('loading');
-                elements.btnGenerateIcon.classList.remove('loading');
-                elements.btnGenerate.innerHTML = '<span>Generate Image</span>';
-                elements.btnGenerateIcon.innerHTML = '<span>Generate Icon</span>';
-            }
-        }
-
-        function showStatus(message, type, tab) {
-            let statusEl;
-            if (tab === 'images') statusEl = elements.statusMessage;
-            else if (tab === 'icons') statusEl = elements.iconStatusMessage;
-            else return;
-
-            const icon = type === 'success' ? 'CheckMark' : type === 'error' ? 'ErrorBadge' : 'Info';
-            statusEl.innerHTML = `<i class="ms-Icon ms-Icon--${icon}"></i><span>${message}</span>`;
-            statusEl.className = `status-message visible ${type}`;
-            
-            if (type === 'success' || type === 'info') {
-                setTimeout(() => statusEl.classList.remove('visible'), 3000);
-            }
+            alert('Thank you for your feedback!');
+            el.feedbackText.value = '';
         }
 
         // ======================
         // Usage Tracking
         // ======================
-        function formatNumber(num) {
-            return num.toLocaleString('en-US');
-        }
-
-        function calculateCost() {
-            const inputCost = (state.usage.totalInputTokens / 1000000) * PRICING.inputPerMillion;
-            const outputCost = (state.usage.totalOutputTokens / 1000000) * PRICING.outputPerMillion;
-            return inputCost + outputCost;
-        }
-
-        function updateUsageDisplay() {
-            if (elements.usageImages) {
-                elements.usageImages.textContent = formatNumber(state.usage.totalImages);
-            }
-            if (elements.usageInputTokens) {
-                elements.usageInputTokens.textContent = formatNumber(state.usage.totalInputTokens);
-            }
-            if (elements.usageOutputTokens) {
-                elements.usageOutputTokens.textContent = formatNumber(state.usage.totalOutputTokens);
-            }
-            if (elements.usageCost) {
-                const cost = calculateCost();
-                elements.usageCost.textContent = '$' + cost.toFixed(4);
-            }
-        }
-
-        function saveUsageToStorage() {
-            try {
-                localStorage.setItem('aiImageGenerator_usage', JSON.stringify(state.usage));
-            } catch (e) {
-                console.log('Could not save usage to storage');
-            }
-        }
-
-        function loadUsageFromStorage() {
-            try {
-                const saved = localStorage.getItem('aiImageGenerator_usage');
-                if (saved) {
+        function loadUsage() {
+            const saved = storageGet(STORAGE_KEYS.usage);
+            if (saved) {
+                try {
                     const parsed = JSON.parse(saved);
-                    state.usage = {
-                        totalInputTokens: parsed.totalInputTokens || 0,
-                        totalOutputTokens: parsed.totalOutputTokens || 0,
-                        totalImages: parsed.totalImages || 0,
-                        sessionStart: parsed.sessionStart || new Date().toISOString()
-                    };
-                }
-            } catch (e) {
-                console.log('Could not load usage from storage');
+                    state.usage.totalInputTokens = parsed.totalInputTokens || 0;
+                    state.usage.totalOutputTokens = parsed.totalOutputTokens || 0;
+                    state.usage.totalImages = parsed.totalImages || 0;
+                    state.usage.sessionStart = parsed.sessionStart || state.usage.sessionStart;
+                } catch (e) { /* ignore */ }
             }
             updateUsageDisplay();
+        }
+
+        function saveUsage() {
+            storageSet(STORAGE_KEYS.usage, JSON.stringify(state.usage));
         }
 
         function resetUsage() {
@@ -2180,21 +1306,57 @@
                 totalImages: 0,
                 sessionStart: new Date().toISOString()
             };
-            saveUsageToStorage();
+            saveUsage();
             updateUsageDisplay();
         }
 
-        // Initialize usage tracking
-        loadUsageFromStorage();
+        function updateUsageDisplay() {
+            const fmt = (n) => n.toLocaleString('en-US');
+            el.usageImages.textContent = fmt(state.usage.totalImages);
+            el.usageInputTokens.textContent = fmt(state.usage.totalInputTokens);
+            el.usageOutputTokens.textContent = fmt(state.usage.totalOutputTokens);
 
-        // Reset usage button listener
-        if (elements.btnResetUsage) {
-            elements.btnResetUsage.addEventListener('click', () => {
-                if (confirm('Reset all usage statistics?')) {
-                    resetUsage();
+            const cost = (state.usage.totalInputTokens / 1e6) * PRICING.inputPerMillion
+                       + (state.usage.totalOutputTokens / 1e6) * PRICING.outputPerMillion;
+            el.usageCost.textContent = '$' + cost.toFixed(4);
+        }
+
+        // ======================
+        // UI Helpers
+        // ======================
+        function updateGenerateButtons() {
+            const hasKey = state.apiKey.length > 0;
+            el.btnGenerate.disabled = !el.promptInput.value.trim() || !hasKey || state.isGenerating;
+            el.btnGenerateIcon.disabled = !el.iconSubjectInput.value.trim() || !hasKey || state.isGenerating;
+
+            const genBtns = [el.btnGenerate, el.btnGenerateIcon];
+            const labels = ['Generate Image', 'Generate Icon'];
+
+            genBtns.forEach((btn, i) => {
+                if (state.isGenerating) {
+                    btn.classList.add('loading');
+                    btn.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
+                } else {
+                    btn.classList.remove('loading');
+                    btn.innerHTML = '<span>' + labels[i] + '</span>';
                 }
             });
         }
+
+        function showStatus(message, type, tab) {
+            const statusEl = tab === 'images' ? el.statusMessage : tab === 'icons' ? el.iconStatusMessage : null;
+            if (!statusEl) return;
+
+            const iconMap = { success: 'CheckMark', error: 'ErrorBadge', info: 'Info' };
+            statusEl.innerHTML = '<i class="ms-Icon ms-Icon--' + (iconMap[type] || 'Info') + '"></i><span>' + message + '</span>';
+            statusEl.className = 'status-message visible ' + type;
+
+            if (type !== 'error') {
+                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+            }
+        }
+
+    })();
     </script>
 </body>
 </html>
