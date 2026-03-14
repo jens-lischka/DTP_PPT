@@ -8,6 +8,7 @@ const ICON_STYLES = {
         name: "Spot Illustration",
         emoji: "✏️",
         description: "Flat 2D geometric",
+        avatar: "style-icon-1.png",
         previewStyle: "background: #FFFFFF; border: 2px solid #000B39;",
         
         generatePrompt: function(subject) {
@@ -82,6 +83,7 @@ const ICON_STYLES = {
         name: "Spot (White BG)",
         emoji: "⬜",
         description: "Flat 2D, white bg",
+        avatar: "style-icon-2.png",
         previewStyle: "background: #FFFFFF; border: 2px solid #FFBF00;",
         
         generatePrompt: function(subject) {
@@ -156,6 +158,7 @@ const ICON_STYLES = {
         name: "Photo Realism",
         emoji: "📷",
         description: "Hyperrealistic",
+        avatar: "style-icon-3.png",
         previewStyle: "background: linear-gradient(135deg, #f5f5f5, #e0e0e0);",
         
         generatePrompt: function(subject) {
@@ -246,6 +249,7 @@ const ICON_STYLES = {
         name: "Isometric Flat",
         emoji: "🔷",
         description: "Corporate geometric",
+        avatar: "style-icon-4.png",
         previewStyle: "background: linear-gradient(135deg, #000F47, #163A78);",
         
         generatePrompt: function(subject) {

@@ -8,6 +8,7 @@ const IMAGE_STYLES = {
         name: "Macro Close-up",
         emoji: "🔬",
         description: "Extreme detail",
+        avatar: "style-image-1.png",
         previewStyle: "background: linear-gradient(135deg, #2d5016, #4a7c23);",
         
         generatePrompt: function(subject, userPrompt) {
@@ -219,9 +220,10 @@ const IMAGE_STYLES = {
         name: "Style 2",
         emoji: "🔜",
         description: "Coming soon",
+        avatar: "style-image-2.png",
         previewStyle: "background: linear-gradient(135deg, #e0e0e0, #9e9e9e);",
         comingSoon: true,
-        
+
         generatePrompt: function(subject, userPrompt) {
             return userPrompt;
         }
@@ -231,9 +233,10 @@ const IMAGE_STYLES = {
         name: "Style 3",
         emoji: "🔜",
         description: "Coming soon",
+        avatar: "style-image-3.png",
         previewStyle: "background: linear-gradient(135deg, #e0e0e0, #9e9e9e);",
         comingSoon: true,
-        
+
         generatePrompt: function(subject, userPrompt) {
             return userPrompt;
         }
@@ -243,9 +246,10 @@ const IMAGE_STYLES = {
         name: "Style 4",
         emoji: "🔜",
         description: "Coming soon",
+        avatar: "style-image-4.png",
         previewStyle: "background: linear-gradient(135deg, #e0e0e0, #9e9e9e);",
         comingSoon: true,
-        
+
         generatePrompt: function(subject, userPrompt) {
             return userPrompt;
         }
