@@ -9,9 +9,9 @@
     <script src="icon-styles.js"></script>
     <script src="image-styles.js"></script>
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"/>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
 
         :root {
             --black: #1a1a2e;
@@ -883,6 +883,9 @@
         // Initialization
         // ======================
         let initialized = false;
+        let currentAbortController = null;
+        let shapeDetectionRunning = false;
+        let statusTimers = {};
 
         Office.onReady(() => { initializeApp(); });
 
@@ -972,7 +975,10 @@
                 card.className = 'style-card' + (index === 0 ? ' selected' : '') + (isDisabled ? ' disabled' : '');
                 card.dataset.style = styleNum;
                 card.title = style.name + ' \u2013 ' + style.description;
-                card.innerHTML = '<div class="style-card-name">' + style.name + '</div>';
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'style-card-name';
+                nameDiv.textContent = style.name;
+                card.appendChild(nameDiv);
 
                 card.addEventListener('click', () => {
                     if (isDisabled) return;
@@ -1036,6 +1042,8 @@
         // Shape Detection
         // ======================
         async function detectSelectedShape() {
+            if (shapeDetectionRunning) return;
+            shapeDetectionRunning = true;
             try {
                 await PowerPoint.run(async (context) => {
                     const shapes = context.presentation.getSelectedShapes();
@@ -1065,6 +1073,8 @@
                 });
             } catch (e) {
                 state.selectedShape = null;
+            } finally {
+                shapeDetectionRunning = false;
             }
         }
 
@@ -1113,6 +1123,11 @@
 
             if (!prompt || !state.apiKey || state.isGenerating) return;
 
+            // Abort any in-flight request
+            if (currentAbortController) currentAbortController.abort();
+            currentAbortController = new AbortController();
+            const signal = currentAbortController.signal;
+
             state.isGenerating = true;
             updateGenerateButtons();
 
@@ -1122,6 +1137,9 @@
 
             const size = isImages ? getGenerationSize() : '1024x1024';
             showStatus('Generating ' + size + ' image...', 'info', tab);
+
+            // 120s timeout
+            const timeoutId = setTimeout(() => currentAbortController.abort(), 120000);
 
             try {
                 const response = await fetch('https://api.openai.com/v1/images/generations', {
@@ -1136,7 +1154,8 @@
                         n: 1,
                         size: size,
                         quality: quality
-                    })
+                    }),
+                    signal: signal
                 });
 
                 if (!response.ok) {
@@ -1170,9 +1189,15 @@
                 previewLoading.style.display = 'none';
                 showStatus('Image generated successfully!', 'success', tab);
             } catch (error) {
-                showStatus(error.message || 'Failed to generate image', 'error', tab);
+                if (error.name === 'AbortError') {
+                    showStatus('Generation cancelled or timed out', 'info', tab);
+                } else {
+                    showStatus(error.message || 'Failed to generate image', 'error', tab);
+                }
                 previewLoading.style.display = 'none';
             } finally {
+                clearTimeout(timeoutId);
+                currentAbortController = null;
                 state.isGenerating = false;
                 updateGenerateButtons();
             }
@@ -1224,7 +1249,9 @@
                 if (state.history.length > MAX_HISTORY) {
                     state.history = state.history.slice(0, MAX_HISTORY);
                 }
-                const toSave = state.history.map(item => ({ url: item.url, prompt: item.prompt, size: item.size }));
+                const toSave = state.history.map(item => ({
+                    url: item.url, fullUrl: item.fullUrl, prompt: item.prompt, size: item.size
+                }));
                 storageSet(STORAGE_KEYS.history, JSON.stringify(toSave));
                 renderHistory();
             });
@@ -1252,12 +1279,18 @@
                 el.historyGrid.innerHTML = '<div class="history-empty">No images generated yet</div>';
                 return;
             }
-            el.historyGrid.innerHTML = state.history.map((item, i) =>
-                '<div class="history-item" data-index="' + i + '" title="' + (item.prompt || '') + '"><img src="' + item.url + '" alt="Generated image"></div>'
-            ).join('');
-
-            el.historyGrid.querySelectorAll('.history-item').forEach(item => {
-                item.addEventListener('click', () => loadFromHistory(parseInt(item.dataset.index)));
+            el.historyGrid.innerHTML = '';
+            state.history.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.dataset.index = i;
+                div.title = item.prompt || '';
+                const img = document.createElement('img');
+                img.src = item.url;
+                img.alt = 'Generated image';
+                div.appendChild(img);
+                div.addEventListener('click', () => loadFromHistory(i));
+                el.historyGrid.appendChild(div);
             });
         }
 
@@ -1301,7 +1334,9 @@
                 if (state.iconHistory.length > MAX_HISTORY) {
                     state.iconHistory = state.iconHistory.slice(0, MAX_HISTORY);
                 }
-                const toSave = state.iconHistory.map(item => ({ url: item.url, prompt: item.prompt }));
+                const toSave = state.iconHistory.map(item => ({
+                    url: item.url, fullUrl: item.fullUrl, prompt: item.prompt
+                }));
                 storageSet(STORAGE_KEYS.iconHistory, JSON.stringify(toSave));
                 renderIconHistory();
             });
@@ -1312,12 +1347,18 @@
                 el.iconHistoryGrid.innerHTML = '<div class="history-empty">No icons generated yet</div>';
                 return;
             }
-            el.iconHistoryGrid.innerHTML = state.iconHistory.map((item, i) =>
-                '<div class="history-item" data-index="' + i + '" title="' + (item.prompt || '') + '"><img src="' + item.url + '" alt="Generated icon"></div>'
-            ).join('');
-
-            el.iconHistoryGrid.querySelectorAll('.history-item').forEach(item => {
-                item.addEventListener('click', () => loadFromIconHistory(parseInt(item.dataset.index)));
+            el.iconHistoryGrid.innerHTML = '';
+            state.iconHistory.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.dataset.index = i;
+                div.title = item.prompt || '';
+                const img = document.createElement('img');
+                img.src = item.url;
+                img.alt = 'Generated icon';
+                div.appendChild(img);
+                div.addEventListener('click', () => loadFromIconHistory(i));
+                el.iconHistoryGrid.appendChild(div);
             });
         }
 
@@ -1428,11 +1469,19 @@
             if (!statusEl) return;
 
             const iconMap = { success: 'CheckMark', error: 'ErrorBadge', info: 'Info' };
-            statusEl.innerHTML = '<i class="ms-Icon ms-Icon--' + (iconMap[type] || 'Info') + '"></i><span>' + message + '</span>';
+            statusEl.innerHTML = '';
+            const icon = document.createElement('i');
+            icon.className = 'ms-Icon ms-Icon--' + (iconMap[type] || 'Info');
+            const span = document.createElement('span');
+            span.textContent = message;
+            statusEl.appendChild(icon);
+            statusEl.appendChild(span);
             statusEl.className = 'status-message visible ' + type;
 
+            // Clear previous timer for this tab to avoid premature hiding
+            if (statusTimers[tab]) clearTimeout(statusTimers[tab]);
             if (type !== 'error') {
-                setTimeout(() => statusEl.classList.remove('visible'), 3000);
+                statusTimers[tab] = setTimeout(() => statusEl.classList.remove('visible'), 3000);
             }
         }
 
