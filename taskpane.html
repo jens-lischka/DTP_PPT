@@ -971,7 +971,8 @@
                 const card = document.createElement('div');
                 card.className = 'style-card' + (index === 0 ? ' selected' : '') + (isDisabled ? ' disabled' : '');
                 card.dataset.style = styleNum;
-                card.innerHTML = '<div class="style-card-name">Style ' + styleNum + '</div>';
+                card.title = style.name + ' \u2013 ' + style.description;
+                card.innerHTML = '<div class="style-card-name">' + style.name + '</div>';
 
                 card.addEventListener('click', () => {
                     if (isDisabled) return;
