@@ -695,6 +695,16 @@
                     <button class="btn-action btn-insert" id="btnInsertIcon"><i class="ms-Icon ms-Icon--CheckMark"></i>Insert</button>
                 </div>
             </div>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h3 class="section-label" style="margin-bottom:0">Recent Icons</h3>
+                    <button class="btn-clear-history" id="btnClearIconHistory">Clear</button>
+                </div>
+                <div id="iconHistoryGrid" class="history-grid">
+                    <div class="history-empty">No icons generated yet</div>
+                </div>
+            </div>
         </div>
 
         <!-- ==================== MORE TAB ==================== -->
@@ -778,6 +788,7 @@
         const STORAGE_KEYS = {
             apiKey: 'openai_api_key',
             history: 'image_history',
+            iconHistory: 'icon_history',
             usage: 'aiImageGenerator_usage'
         };
 
@@ -790,6 +801,7 @@
             currentImageSize: '1024x1024',
             insertMode: 'auto',
             history: [],
+            iconHistory: [],
             isGenerating: false,
             selectedShape: null,
             activeTab: 'images',
@@ -840,6 +852,8 @@
             iconPreviewImage: $('iconPreviewImage'),
             btnRegenerateIcon: $('btnRegenerateIcon'),
             btnInsertIcon: $('btnInsertIcon'),
+            iconHistoryGrid: $('iconHistoryGrid'),
+            btnClearIconHistory: $('btnClearIconHistory'),
             feedbackText: $('feedbackText'),
             feedbackType: $('feedbackType'),
             btnSubmitFeedback: $('btnSubmitFeedback'),
@@ -881,13 +895,14 @@
             initialized = true;
 
             // Clear oversized history
-            const historyData = storageGet(STORAGE_KEYS.history);
-            if (historyData && historyData.length > 50000) {
-                storageRemove(STORAGE_KEYS.history);
-            }
+            [STORAGE_KEYS.history, STORAGE_KEYS.iconHistory].forEach(key => {
+                const data = storageGet(key);
+                if (data && data.length > 50000) storageRemove(key);
+            });
 
             loadApiKey();
             loadHistory();
+            loadIconHistory();
             loadUsage();
             renderIconStyles();
             renderImageStyles();
@@ -918,8 +933,11 @@
             setApiKeyStatus(true);
 
             storageRemove(STORAGE_KEYS.history);
+            storageRemove(STORAGE_KEYS.iconHistory);
             state.history = [];
+            state.iconHistory = [];
             renderHistory();
+            renderIconHistory();
             storageSet(STORAGE_KEYS.apiKey, key);
             showStatus('API key saved!', 'success', 'images');
             updateGenerateButtons();
@@ -1004,6 +1022,7 @@
             el.iconSubjectInput.addEventListener('input', updateGenerateButtons);
             el.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
             el.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
+            el.btnClearIconHistory.addEventListener('click', clearIconHistory);
 
             el.btnSubmitFeedback.addEventListener('click', submitFeedback);
 
@@ -1142,6 +1161,7 @@
                     addToHistory(imageUrl, el.promptInput.value.trim(), size);
                 } else {
                     state.iconImageBase64 = base64Data;
+                    addToIconHistory(imageUrl, el.iconSubjectInput.value.trim());
                 }
 
                 previewImage.src = imageUrl;
@@ -1261,6 +1281,65 @@
             storageRemove(STORAGE_KEYS.history);
             renderHistory();
             showStatus('History cleared', 'info', 'images');
+        }
+
+        // ======================
+        // Icon History
+        // ======================
+        function loadIconHistory() {
+            const saved = storageGet(STORAGE_KEYS.iconHistory);
+            if (saved) {
+                try { state.iconHistory = JSON.parse(saved); } catch (e) { state.iconHistory = []; }
+                renderIconHistory();
+            }
+        }
+
+        function addToIconHistory(imageUrl, subject) {
+            createThumbnail(imageUrl, THUMBNAIL_SIZE, (thumbnailUrl) => {
+                state.iconHistory.unshift({ url: thumbnailUrl, fullUrl: imageUrl, prompt: subject });
+                if (state.iconHistory.length > MAX_HISTORY) {
+                    state.iconHistory = state.iconHistory.slice(0, MAX_HISTORY);
+                }
+                const toSave = state.iconHistory.map(item => ({ url: item.url, prompt: item.prompt }));
+                storageSet(STORAGE_KEYS.iconHistory, JSON.stringify(toSave));
+                renderIconHistory();
+            });
+        }
+
+        function renderIconHistory() {
+            if (state.iconHistory.length === 0) {
+                el.iconHistoryGrid.innerHTML = '<div class="history-empty">No icons generated yet</div>';
+                return;
+            }
+            el.iconHistoryGrid.innerHTML = state.iconHistory.map((item, i) =>
+                '<div class="history-item" data-index="' + i + '" title="' + (item.prompt || '') + '"><img src="' + item.url + '" alt="Generated icon"></div>'
+            ).join('');
+
+            el.iconHistoryGrid.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', () => loadFromIconHistory(parseInt(item.dataset.index)));
+            });
+        }
+
+        function loadFromIconHistory(index) {
+            const item = state.iconHistory[index];
+            if (!item) return;
+
+            const imageUrl = item.fullUrl || item.url;
+            state.iconImageBase64 = imageUrl.split(',')[1];
+
+            el.iconPreviewImage.src = imageUrl;
+            el.iconPreviewImage.style.display = 'block';
+            el.iconPreviewLoading.style.display = 'none';
+            el.iconPreviewSection.classList.add('visible');
+            el.iconSubjectInput.value = item.prompt;
+            showStatus('Icon loaded from history', 'info', 'icons');
+        }
+
+        function clearIconHistory() {
+            state.iconHistory = [];
+            storageRemove(STORAGE_KEYS.iconHistory);
+            renderIconHistory();
+            showStatus('History cleared', 'info', 'icons');
         }
 
         // ======================
