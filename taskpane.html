@@ -7,12 +7,10 @@
 
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <script src="icon-styles.js"></script>
-    <script src="image-styles.js"></script>
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"/>
 
     <style>
-
         :root {
             --black: #1a1a2e;
             --dark: #2d2d44;
@@ -55,12 +53,12 @@
 
         .tab {
             flex: 1;
-            padding: 14px 8px 12px;
+            padding: 14px 4px 12px;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
             font-family: 'Noto Sans', sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
             color: var(--gray-400);
             cursor: pointer;
@@ -83,23 +81,6 @@
         .tab-content { display: none; flex: 1; overflow-y: auto; padding: 20px; }
         .tab-content.active { display: flex; flex-direction: column; gap: 16px; }
 
-        /* Cards */
-        .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-        }
-
-        .card-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray-400);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-
-        /* Section Label (shared) */
         .section-label {
             display: block;
             font-size: 11px;
@@ -110,33 +91,13 @@
             margin-bottom: 16px;
         }
 
-        /* API Key */
-        .api-key-section {
+        .card {
             background: var(--white);
             border-radius: var(--radius);
             padding: 20px;
         }
 
-        .api-key-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .api-key-status {
-            font-size: 11px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-
-        .api-key-status.connected { background: #e8f5e9; color: var(--success); }
-        .api-key-status.disconnected { background: var(--gray-100); color: var(--gray-500); }
-
-        .api-key-input-wrapper { display: flex; gap: 12px; align-items: flex-end; }
-
-        /* Input (underline style) */
+        /* Inputs */
         .input-underline {
             flex: 1;
             padding: 12px 0;
@@ -147,40 +108,12 @@
             background: transparent;
             transition: border-color 0.2s;
         }
-
-        .input-underline:focus {
-            outline: none;
-            border-bottom-color: var(--black);
-        }
-
+        .input-underline:focus { outline: none; border-bottom-color: var(--black); }
         .input-underline::placeholder { color: var(--gray-400); }
-
-        .btn-save-key {
-            padding: 10px 20px;
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            border-radius: var(--radius-btn);
-            font-family: 'Noto Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-save-key:hover { background: var(--dark); }
-
-        /* Prompt Section */
-        .prompt-section {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-        }
 
         .prompt-textarea {
             width: 100%;
-            min-height: 100px;
+            min-height: 140px;
             padding: 0 0 12px 0;
             border: none;
             border-bottom: 1px solid var(--gray-300);
@@ -191,35 +124,18 @@
             transition: border-color 0.2s;
             background: transparent;
         }
-
-        .prompt-textarea:focus {
-            outline: none;
-            border-bottom-color: var(--black);
-        }
-
+        .prompt-textarea:focus { outline: none; border-bottom-color: var(--black); }
         .prompt-textarea::placeholder { color: var(--gray-400); }
 
-        /* Options Row */
-        .options-row {
-            display: flex;
-            gap: 24px;
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid var(--gray-100);
+        .prompt-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
         }
 
+        .options-row { display: flex; gap: 24px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
         .option-group { flex: 1; }
-
-        .option-group label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--gray-400);
-            margin-bottom: 8px;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
+        .option-group label { font-size: 11px; font-weight: 500; color: var(--gray-400); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
         .option-group select {
             width: 100%;
             padding: 10px 20px 10px 0;
@@ -232,13 +148,35 @@
             transition: border-color 0.2s;
             appearance: none;
         }
+        .option-group select:focus { outline: none; border-bottom-color: var(--black); }
 
-        .option-group select:focus {
-            outline: none;
-            border-bottom-color: var(--black);
+        /* Buttons */
+        .btn-run {
+            width: 100%;
+            padding: 16px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-btn);
+            font-family: 'Noto Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s;
         }
+        .btn-run::after { content: '\2192'; font-size: 16px; transition: transform 0.2s; }
+        .btn-run:hover:not(:disabled) { background: var(--dark); }
+        .btn-run:hover:not(:disabled)::after { transform: translateX(4px); }
+        .btn-run:disabled { background: var(--gray-300); cursor: not-allowed; }
+        .btn-run:disabled::after { display: none; }
+        .btn-run .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .btn-run.loading::after { display: none; }
+        .btn-run.no-arrow::after { display: none; }
 
-        /* Generate Button */
         .btn-generate {
             width: 100%;
             padding: 16px 24px;
@@ -257,388 +195,109 @@
             transition: background 0.2s;
             margin-top: 20px;
         }
-
-        .btn-generate::after {
-            content: '\2192';
-            font-size: 16px;
-            transition: transform 0.2s;
-        }
-
+        .btn-generate::after { content: '\2192'; font-size: 16px; transition: transform 0.2s; }
         .btn-generate:hover:not(:disabled) { background: var(--dark); }
         .btn-generate:hover:not(:disabled)::after { transform: translateX(4px); }
         .btn-generate:disabled { background: var(--gray-300); cursor: not-allowed; }
         .btn-generate:disabled::after { display: none; }
-
-        .btn-generate .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
+        .btn-generate .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         .btn-generate.loading::after { display: none; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Shape Info */
-        .shape-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 0;
-            margin-top: 12px;
-            font-size: 12px;
-            color: var(--gray-500);
-            border-top: 1px solid var(--gray-100);
-        }
-
-        .shape-info.detected { color: var(--black); }
-        .shape-info i { font-size: 16px; color: var(--gray-400); }
-        .shape-info.detected i { color: var(--black); }
-
-        /* Preview Section */
-        .preview-section {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-            display: none;
-        }
-
-        .preview-section.visible { display: block; animation: fadeIn 0.3s ease; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .preview-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .preview-image-container {
-            position: relative;
-            background: var(--gray-100);
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            aspect-ratio: 1;
-        }
-
-        .preview-image { width: 100%; height: 100%; object-fit: contain; display: block; }
-
-        .preview-loading {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            background: var(--gray-100);
-        }
-
-        .preview-loading .spinner-large {
-            width: 32px;
-            height: 32px;
-            border: 2px solid var(--gray-300);
-            border-top-color: var(--black);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .preview-loading p { font-size: 13px; color: var(--gray-500); }
-
-        /* Action Buttons */
-        .action-buttons { display: flex; gap: 10px; margin-top: 16px; }
-
-        .btn-action {
-            flex: 1;
-            padding: 14px 20px;
-            border-radius: var(--radius-btn);
-            font-family: 'Noto Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-regenerate {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            color: var(--gray-600);
-        }
+        .btn-action { flex: 1; padding: 14px 20px; border-radius: var(--radius-btn); font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .btn-regenerate { background: var(--white); border: 1px solid var(--gray-200); color: var(--gray-600); }
         .btn-regenerate:hover { background: var(--gray-50); border-color: var(--gray-300); }
-
-        .btn-insert {
-            background: var(--black);
-            border: 1px solid var(--black);
-            color: var(--white);
-        }
+        .btn-insert { background: var(--black); border: 1px solid var(--black); color: var(--white); }
         .btn-insert:hover { background: var(--dark); border-color: var(--dark); }
 
-        /* Insert Options */
-        .insert-options { display: flex; gap: 8px; margin-top: 12px; }
+        .btn-save-key { padding: 10px 20px; background: var(--black); color: var(--white); border: none; border-radius: var(--radius-btn); font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+        .btn-save-key:hover { background: var(--dark); }
 
-        .insert-option {
-            flex: 1;
-            padding: 14px 12px;
-            background: var(--gray-50);
-            border: 2px solid transparent;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
+        .btn-clear-history { font-size: 12px; color: var(--gray-400); background: none; border: none; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 500; }
+        .btn-clear-history:hover { color: var(--black); }
 
-        .insert-option:hover { background: var(--gray-100); }
-        .insert-option.selected { border-color: var(--black); background: var(--white); }
-        .insert-option i { display: block; font-size: 20px; margin-bottom: 6px; color: var(--gray-400); }
-        .insert-option.selected i { color: var(--black); }
-        .insert-option span { font-size: 11px; color: var(--gray-500); font-weight: 500; }
-        .insert-option.selected span { color: var(--black); }
+        .btn-submit-feedback { width: 100%; padding: 16px 24px; background: var(--black); color: var(--white); border: none; border-radius: var(--radius-btn); font-family: 'Noto Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-submit-feedback:hover { background: var(--dark); }
 
-        /* Status Messages */
-        .status-message {
-            padding: 14px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-        }
-
+        /* Status */
+        .status-message { padding: 14px 16px; border-radius: var(--radius-sm); font-size: 13px; display: none; align-items: center; gap: 10px; font-weight: 500; }
         .status-message.visible { display: flex; animation: fadeIn 0.3s ease; }
         .status-message.success { background: #e8f5e9; color: var(--success); }
         .status-message.error { background: #ffebee; color: var(--error); }
         .status-message.info { background: var(--gray-100); color: var(--gray-600); }
 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Preview */
+        .preview-section { background: var(--white); border-radius: var(--radius); padding: 20px; display: none; }
+        .preview-section.visible { display: block; animation: fadeIn 0.3s ease; }
+        .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .preview-image-container { position: relative; background: var(--gray-100); border-radius: var(--radius-sm); overflow: hidden; aspect-ratio: 1; }
+        .preview-image { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .preview-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: var(--gray-100); }
+        .preview-loading .spinner-large { width: 32px; height: 32px; border: 2px solid var(--gray-300); border-top-color: var(--black); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .preview-loading p { font-size: 13px; color: var(--gray-500); }
+
+        .action-buttons { display: flex; gap: 10px; margin-top: 16px; }
+
         /* History */
         .history-section { margin-top: auto; padding-top: 20px; }
-
-        .history-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .btn-clear-history {
-            font-size: 12px;
-            color: var(--gray-400);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 500;
-        }
-        .btn-clear-history:hover { color: var(--black); }
-
+        .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .history-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-
-        .history-item {
-            aspect-ratio: 1;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
+        .history-item { aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
         .history-item:hover { border-color: var(--black); }
         .history-item img { width: 100%; height: 100%; object-fit: cover; }
-
         .history-empty { text-align: center; padding: 24px; color: var(--gray-400); font-size: 13px; }
 
-        /* Feedback / More Tab */
-        .feedback-section {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-        }
-        .feedback-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--black); }
-        .feedback-section p { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; }
+        .img-history-item { aspect-ratio: 3/2; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+        .img-history-item:hover { border-color: var(--black); }
+        .img-history-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        .feedback-textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 0 0 12px 0;
-            border: none;
-            border-bottom: 1px solid var(--gray-300);
-            font-family: 'Noto Sans', sans-serif;
-            font-size: 14px;
-            resize: none;
-            margin-bottom: 20px;
-            background: transparent;
-        }
-        .feedback-textarea:focus { outline: none; border-bottom-color: var(--black); }
-
-        .btn-submit-feedback {
-            width: 100%;
-            padding: 16px 24px;
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            border-radius: var(--radius-btn);
-            font-family: 'Noto Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-submit-feedback:hover { background: var(--dark); }
-
-        .feedback-info {
-            margin-top: 24px;
-            padding: 16px;
-            background: var(--gray-50);
-            border-radius: var(--radius-sm);
-        }
-        .feedback-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--black); }
-        .feedback-info p { margin-bottom: 0; font-size: 12px; line-height: 1.7; }
-        .feedback-info a { color: var(--black); text-decoration: underline; }
-        .feedback-info code {
-            background: var(--white);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: 'Noto Sans Mono', monospace;
-            font-size: 11px;
-            border: 1px solid var(--gray-200);
-        }
-
-        /* Style Grid */
-        .style-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .style-card {
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-btn);
-            padding: 8px 6px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--white);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            min-height: 72px;
-        }
+        /* Icon styles */
+        .style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+        .style-card { border: 2px solid var(--gray-200); border-radius: var(--radius-btn); padding: 8px 6px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--white); position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 72px; }
         .style-card:hover { border-color: var(--gray-400); }
         .style-card.selected { border-color: var(--black); background: var(--gray-50); }
         .style-card.disabled { opacity: 0.4; cursor: not-allowed; }
-        .style-card.disabled:hover { border-color: var(--gray-200); }
+        .style-card-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .style-card-name { font-size: 10px; font-weight: 600; color: var(--black); line-height: 1.3; }
+        .style-card .style-tooltip { display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--black); color: var(--white); font-size: 11px; font-weight: 500; padding: 6px 10px; border-radius: 6px; white-space: nowrap; pointer-events: none; z-index: 100; }
+        .style-card .style-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--black); }
+        .style-card:hover .style-tooltip, .style-card:focus .style-tooltip { display: block; }
 
-        .style-card-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
+        /* API Key */
+        .api-key-section { background: var(--white); border-radius: var(--radius); padding: 20px; }
+        .api-key-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .api-key-status { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+        .api-key-status.connected { background: #e8f5e9; color: var(--success); }
+        .api-key-status.disconnected { background: var(--gray-100); color: var(--gray-500); }
+        .api-key-input-wrapper { display: flex; gap: 12px; align-items: flex-end; }
 
-        .style-card-name {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--black);
-            line-height: 1.3;
-        }
+        /* Feedback */
+        .feedback-section { background: var(--white); border-radius: var(--radius); padding: 20px; }
+        .feedback-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--black); }
+        .feedback-section p { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; }
+        .feedback-textarea { width: 100%; min-height: 120px; padding: 0 0 12px 0; border: none; border-bottom: 1px solid var(--gray-300); font-family: 'Noto Sans', sans-serif; font-size: 14px; resize: none; margin-bottom: 20px; background: transparent; }
+        .feedback-textarea:focus { outline: none; border-bottom-color: var(--black); }
+        .feedback-info { margin-top: 24px; padding: 16px; background: var(--gray-50); border-radius: var(--radius-sm); }
+        .feedback-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--black); }
+        .feedback-info p { margin-bottom: 0; font-size: 12px; line-height: 1.7; }
+        .feedback-info a { color: var(--black); text-decoration: underline; }
 
-        /* Custom tooltip (native title unreliable in Office webview) */
-        .style-card .style-tooltip {
-            display: none;
-            position: absolute;
-            bottom: calc(100% + 6px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--black);
-            color: var(--white);
-            font-size: 11px;
-            font-weight: 500;
-            padding: 6px 10px;
-            border-radius: 6px;
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 100;
-        }
-        .style-card .style-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: var(--black);
-        }
-        .style-card:hover .style-tooltip,
-        .style-card:focus .style-tooltip { display: block; }
-
-        /* Focus styles */
-        .tab:focus-visible,
-        .style-card:focus-visible,
-        .insert-option:focus-visible,
-        .history-item:focus-visible,
-        .btn-generate:focus-visible,
-        .btn-action:focus-visible,
-        .btn-save-key:focus-visible,
-        .btn-clear-history:focus-visible,
-        .btn-submit-feedback:focus-visible {
-            outline: 2px solid var(--black);
-            outline-offset: 2px;
-        }
-
-        /* Screen reader only */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        /* Usage Stats */
+        /* Usage */
         .usage-stats { margin-top: 16px; }
-
-        .usage-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--gray-100);
-        }
+        .usage-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
         .usage-row:last-child { border-bottom: none; }
-
         .usage-label { font-size: 13px; color: var(--gray-500); }
-
-        .usage-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--black);
-            font-variant-numeric: tabular-nums;
-        }
-
+        .usage-value { font-size: 13px; font-weight: 600; color: var(--black); font-variant-numeric: tabular-nums; }
         .usage-divider { height: 1px; background: var(--gray-200); margin: 8px 0; }
-
         .usage-total .usage-label { font-weight: 600; color: var(--black); }
         .usage-total .usage-value { font-size: 16px; color: var(--black); }
 
-        /* Scrollbar */
+        /* Focus + a11y */
+        .tab:focus-visible, .style-card:focus-visible, .btn-run:focus-visible, .btn-generate:focus-visible, .btn-action:focus-visible, .btn-save-key:focus-visible, .btn-clear-history:focus-visible, .btn-submit-feedback:focus-visible, .history-item:focus-visible, .img-history-item:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
@@ -647,78 +306,98 @@
 </head>
 <body>
     <div class="taskpane">
-        <!-- Tabs -->
         <div class="tabs" role="tablist" aria-label="Main navigation">
-            <button class="tab active" data-tab="images" role="tab" aria-selected="true" aria-controls="tab-images" id="tabBtn-images"><i class="ms-Icon ms-Icon--Photo2" aria-hidden="true"></i><span>Images</span></button>
+            <button class="tab active" data-tab="images" role="tab" aria-selected="true" aria-controls="tab-images" id="tabBtn-images"><i class="ms-Icon ms-Icon--Camera" aria-hidden="true"></i><span>Images</span></button>
             <button class="tab" data-tab="icons" role="tab" aria-selected="false" aria-controls="tab-icons" id="tabBtn-icons"><i class="ms-Icon ms-Icon--AppIconDefaultList" aria-hidden="true"></i><span>Icons</span></button>
             <button class="tab" data-tab="more" role="tab" aria-selected="false" aria-controls="tab-more" id="tabBtn-more"><i class="ms-Icon ms-Icon--Feedback" aria-hidden="true"></i><span>More</span></button>
         </div>
 
         <!-- ==================== IMAGES TAB ==================== -->
         <div class="tab-content active" id="tab-images" role="tabpanel" aria-labelledby="tabBtn-images">
-            <div class="prompt-section">
-                <label class="section-label">Style</label>
-                <div class="style-grid" id="imageStyleGrid" role="radiogroup" aria-label="Image style"></div>
+            <div class="card">
+                <label class="section-label">Describe your scene</label>
+                <textarea id="imgPromptInput" class="prompt-textarea" maxlength="1000" placeholder="Two colleagues having coffee in a modern office lounge, morning light through large windows, relaxed conversation"></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-top:6px;">
+                    <span style="font-size:11px;color:var(--gray-400);line-height:1.5;">Who or what + doing what + where + time of day/mood</span>
+                    <span id="imgWordCount" style="font-size:11px;font-weight:600;color:var(--gray-400);">0 / 150 words</span>
+                </div>
+            </div>
 
-                <label class="section-label" for="promptInput">Describe your image</label>
-                <textarea id="promptInput" class="prompt-textarea" placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."></textarea>
-                <div class="options-row">
-                    <div class="option-group">
-                        <label>Size</label>
-                        <select id="sizeSelect">
-                            <option value="auto">Auto (from selection)</option>
-                            <option value="1024x1024">Square (1024x1024)</option>
-                            <option value="1536x1024">Landscape (1536x1024)</option>
-                            <option value="1024x1536">Portrait (1024x1536)</option>
-                        </select>
-                    </div>
-                    <div class="option-group">
-                        <label>Quality</label>
-                        <select id="qualitySelect">
+            <div class="card">
+                <label class="section-label">Reference Image (optional)</label>
+                <div style="display:flex;gap:8px;">
+                    <button id="btnUploadRef" type="button" style="flex:1;padding:12px;background:var(--gray-100);border:1px dashed var(--gray-300);border-radius:var(--radius-btn);cursor:pointer;font-family:'Noto Sans',sans-serif;font-size:12px;color:var(--gray-500);text-align:center;">
+                        <i class="ms-Icon ms-Icon--Upload" aria-hidden="true" style="display:block;font-size:18px;margin-bottom:4px;"></i>Upload Image
+                    </button>
+                    <button id="btnUseLastImage" type="button" disabled style="flex:1;padding:12px;background:var(--gray-100);border:1px dashed var(--gray-300);border-radius:var(--radius-btn);cursor:pointer;font-family:'Noto Sans',sans-serif;font-size:12px;color:var(--gray-500);text-align:center;">
+                        <i class="ms-Icon ms-Icon--Edit" aria-hidden="true" style="display:block;font-size:18px;margin-bottom:4px;"></i>Edit Last Image
+                    </button>
+                </div>
+                <input type="file" id="imgFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
+                <div id="refPreview" style="display:none;margin-top:12px;position:relative;">
+                    <img id="refPreviewImg" style="width:100%;border-radius:var(--radius-sm);max-height:120px;object-fit:contain;background:var(--gray-100);" alt="Reference image">
+                    <button id="btnClearRef" type="button" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:var(--black);color:var(--white);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">&times;</button>
+                </div>
+            </div>
+
+            <div class="card" style="padding:14px 20px;">
+                <div style="display:flex;align-items:center;gap:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;flex:1;">
+                        <label style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Quality</label>
+                        <select id="imgQualitySelect" style="flex:1;padding:8px 0;border:none;border-bottom:1px solid var(--gray-300);font-family:'Noto Sans',sans-serif;font-size:13px;background:transparent;cursor:pointer;">
                             <option value="medium">Medium</option>
                             <option value="low">Low (faster)</option>
                             <option value="high">High</option>
                         </select>
                     </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <label style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Versions</label>
+                        <select id="imgVersionCount" style="width:48px;padding:8px 0;border:none;border-bottom:1px solid var(--gray-300);font-family:'Noto Sans',sans-serif;font-size:13px;background:transparent;cursor:pointer;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="shapeInfo" class="shape-info" aria-live="polite">
-                    <i class="ms-Icon ms-Icon--RectangleShape" aria-hidden="true"></i>
-                    <span id="shapeInfoText">No shape selected - will use size setting</span>
-                </div>
-                <button class="btn-generate" id="btnGenerate" disabled>
+            </div>
+
+            <div style="display:flex;gap:8px;min-width:0;">
+                <button class="btn-run" id="btnGenerateImg" disabled style="flex:1;min-width:0;">
                     <span>Generate Image</span>
+                </button>
+                <button class="btn-run no-arrow" id="btnRegenerateImg" disabled style="flex:0 0 44px;padding:0;background:var(--dark);width:44px;" title="Regenerate with same prompt">
+                    <i class="ms-Icon ms-Icon--Refresh" aria-hidden="true" style="font-size:16px;"></i>
                 </button>
             </div>
 
-            <div id="statusMessage" class="status-message" role="status" aria-live="polite"><i class="ms-Icon" aria-hidden="true"></i><span></span></div>
+            <div id="imgStatus" class="status-message" role="status" aria-live="polite"><i class="ms-Icon" aria-hidden="true"></i><span></span></div>
 
-            <div id="previewSection" class="preview-section">
-                <div class="preview-header"><h2 class="section-label" style="margin-bottom:0">Generated Image</h2></div>
-                <div class="preview-image-container">
-                    <div id="previewLoading" class="preview-loading" role="status" aria-label="Generating image">
-                        <div class="spinner-large" aria-hidden="true"></div>
-                        <p>Generating your image...</p>
-                    </div>
-                    <img id="previewImage" class="preview-image" alt="Generated image preview">
+            <div id="imgPreviewCard" class="card" style="display:none;">
+                <label class="section-label">Generated Image</label>
+                <div id="imgVersionPicker" style="display:none;margin-bottom:10px;gap:6px;flex-wrap:wrap;"></div>
+                <div id="imgPreviewContainer" style="position:relative;width:100%;border-radius:var(--radius-sm);overflow:hidden;background:var(--gray-100);aspect-ratio:1/1;">
+                    <img id="imgPreview" style="width:100%;height:100%;object-fit:contain;display:block;" alt="Generated image">
                 </div>
-                <div class="insert-options" role="radiogroup" aria-label="Insert mode">
-                    <div class="insert-option selected" data-mode="auto" role="radio" aria-checked="true" tabindex="0"><i class="ms-Icon ms-Icon--AutoFit" aria-hidden="true"></i><span>Auto Detect</span></div>
-                    <div class="insert-option" data-mode="slide" role="radio" aria-checked="false" tabindex="0"><i class="ms-Icon ms-Icon--Presentation" aria-hidden="true"></i><span>On Slide</span></div>
-                    <div class="insert-option" data-mode="fill" role="radio" aria-checked="false" tabindex="0"><i class="ms-Icon ms-Icon--RectangleShape" aria-hidden="true"></i><span>Fill Shape</span></div>
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <button class="btn-run" id="btnExpandImg" style="flex:1;margin-top:0;font-size:13px;padding:12px 16px;background:var(--dark);"><span>Expand to 16:9</span></button>
+                    <button class="btn-run" id="btnInsertImg" style="flex:1;margin-top:0;font-size:13px;padding:12px 16px;"><span>Insert on Slide</span></button>
                 </div>
-                <div class="action-buttons">
-                    <button class="btn-action btn-regenerate" id="btnRegenerate"><i class="ms-Icon ms-Icon--Refresh" aria-hidden="true"></i>Regenerate</button>
-                    <button class="btn-action btn-insert" id="btnInsert"><i class="ms-Icon ms-Icon--CheckMark" aria-hidden="true"></i>Insert</button>
+                <button id="btnViewPrompt" type="button" style="display:none;width:100%;margin-top:8px;padding:10px;background:none;border:1px solid var(--gray-200);border-radius:var(--radius-btn);font-family:'Noto Sans',sans-serif;font-size:12px;color:var(--gray-500);cursor:pointer;text-align:left;">
+                    <i class="ms-Icon ms-Icon--Code" aria-hidden="true" style="margin-right:6px;"></i>View full prompt sent to API
+                </button>
+                <div id="promptReview" style="display:none;margin-top:8px;padding:12px;background:var(--gray-50);border-radius:var(--radius-sm);max-height:200px;overflow-y:auto;">
+                    <pre id="promptReviewText" style="font-size:11px;line-height:1.5;color:var(--gray-600);white-space:pre-wrap;word-wrap:break-word;font-family:'Noto Sans',monospace;margin:0;"></pre>
                 </div>
             </div>
 
-            <div class="history-section">
-                <div class="history-header">
-                    <h3 class="section-label" style="margin-bottom:0">Recent Images</h3>
-                    <button class="btn-clear-history" id="btnClearHistory">Clear</button>
+            <div class="card" id="imgHistoryCard">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <label class="section-label" style="margin-bottom:0">Recent Images</label>
+                    <button id="btnClearImgHistory" type="button" style="font-size:12px;color:var(--gray-400);background:none;border:none;cursor:pointer;font-family:'Noto Sans',sans-serif;">Clear</button>
                 </div>
-                <div id="historyGrid" class="history-grid">
-                    <div class="history-empty">No images generated yet</div>
+                <div id="imgHistoryGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;min-width:0;">
+                    <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--gray-400);font-size:12px;">No images yet</div>
                 </div>
             </div>
         </div>
@@ -729,7 +408,6 @@
                 <label class="section-label">Select Style</label>
                 <div class="style-grid" id="iconStyleGrid" role="radiogroup" aria-label="Icon style"></div>
             </div>
-
             <div class="prompt-section">
                 <label class="section-label" for="iconSubjectInput">Enter Subject</label>
                 <input type="text" id="iconSubjectInput" class="input-underline" placeholder="play button, house, car, lightbulb..." style="width:100%">
@@ -744,20 +422,13 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn-generate" id="btnGenerateIcon" disabled>
-                    <span>Generate Icon</span>
-                </button>
+                <button class="btn-generate" id="btnGenerateIcon" disabled><span>Generate Icon</span></button>
             </div>
-
             <div id="iconStatusMessage" class="status-message" role="status" aria-live="polite"><i class="ms-Icon" aria-hidden="true"></i><span></span></div>
-
             <div id="iconPreviewSection" class="preview-section">
                 <div class="preview-header"><h2 class="section-label" style="margin-bottom:0">Generated Icon</h2></div>
                 <div class="preview-image-container">
-                    <div id="iconPreviewLoading" class="preview-loading" role="status" aria-label="Generating icon">
-                        <div class="spinner-large" aria-hidden="true"></div>
-                        <p>Generating your icon...</p>
-                    </div>
+                    <div id="iconPreviewLoading" class="preview-loading" role="status" aria-label="Generating icon"><div class="spinner-large" aria-hidden="true"></div><p>Generating your icon...</p></div>
                     <img id="iconPreviewImage" class="preview-image" alt="Generated icon preview">
                 </div>
                 <div class="action-buttons">
@@ -765,15 +436,12 @@
                     <button class="btn-action btn-insert" id="btnInsertIcon"><i class="ms-Icon ms-Icon--CheckMark" aria-hidden="true"></i>Insert</button>
                 </div>
             </div>
-
             <div class="history-section">
                 <div class="history-header">
                     <h3 class="section-label" style="margin-bottom:0">Recent Icons</h3>
                     <button class="btn-clear-history" id="btnClearIconHistory">Clear</button>
                 </div>
-                <div id="iconHistoryGrid" class="history-grid">
-                    <div class="history-empty">No icons generated yet</div>
-                </div>
+                <div id="iconHistoryGrid" class="history-grid"><div class="history-empty">No icons generated yet</div></div>
             </div>
         </div>
 
@@ -789,34 +457,20 @@
                     <button class="btn-save-key" id="btnSaveKey" type="button">Save</button>
                 </div>
             </div>
-
             <div class="api-key-section">
                 <div class="api-key-header">
                     <label class="section-label" style="margin-bottom:0">Session Usage</label>
                     <button class="btn-clear-history" id="btnResetUsage">Reset</button>
                 </div>
                 <div class="usage-stats">
-                    <div class="usage-row">
-                        <span class="usage-label">Images generated</span>
-                        <span class="usage-value" id="usageImages">0</span>
-                    </div>
-                    <div class="usage-row">
-                        <span class="usage-label">Input tokens</span>
-                        <span class="usage-value" id="usageInputTokens">0</span>
-                    </div>
-                    <div class="usage-row">
-                        <span class="usage-label">Output tokens</span>
-                        <span class="usage-value" id="usageOutputTokens">0</span>
-                    </div>
+                    <div class="usage-row"><span class="usage-label">Images generated</span><span class="usage-value" id="usageImages">0</span></div>
+                    <div class="usage-row"><span class="usage-label">Input tokens</span><span class="usage-value" id="usageInputTokens">0</span></div>
+                    <div class="usage-row"><span class="usage-label">Output tokens</span><span class="usage-value" id="usageOutputTokens">0</span></div>
                     <div class="usage-divider"></div>
-                    <div class="usage-row usage-total">
-                        <span class="usage-label">Estimated cost</span>
-                        <span class="usage-value" id="usageCost">$0.00</span>
-                    </div>
+                    <div class="usage-row usage-total"><span class="usage-label">Estimated cost</span><span class="usage-value" id="usageCost">$0.00</span></div>
                 </div>
-                <p style="font-size: 11px; color: var(--gray-400); margin-top: 12px;">Based on $5/1M input + $10/1M output tokens</p>
+                <p style="font-size: 11px; color: var(--gray-400); margin-top: 12px;">Based on $2.50/1M input + $10/1M output tokens</p>
             </div>
-
             <div class="feedback-section">
                 <h2>Send Feedback</h2>
                 <p>Help us improve this add-in! Share your thoughts, report bugs, or request features.</p>
@@ -832,15 +486,10 @@
                 </div>
                 <button class="btn-submit-feedback" id="btnSubmitFeedback">Send Feedback</button>
             </div>
-
-            <div class="feedback-info">
-                <h3>Contact</h3>
-                <p>GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a></p>
-            </div>
-
+            <div class="feedback-info"><h3>Contact</h3><p>GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a></p></div>
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
-                <p><strong>AI Image Generator</strong><br>Version 2.2<br><br>Generate AI images and icons and insert them directly into your PowerPoint slides.</p>
+                <p><strong>AI Image Generator</strong><br>Version 3.0<br><br>Generate AI images with prompt optimization, icons, and insert them directly into your PowerPoint slides.</p>
             </div>
         </div>
     </div>
@@ -849,70 +498,67 @@
     (function() {
         'use strict';
 
-        // ======================
-        // Constants
-        // ======================
-        const PRICING = { inputPerMillion: 5.00, outputPerMillion: 10.00 };
-        const MAX_HISTORY = 4;
-        const THUMBNAIL_SIZE = 80;
+        const PRICING = { inputPerMillion: 2.50, outputPerMillion: 10.00 };
+        const MAX_ICON_HISTORY = 4;
+        const IMG_HISTORY_MAX = 5;
         const STORAGE_KEYS = {
             apiKey: 'openai_api_key',
-            history: 'image_history',
             iconHistory: 'icon_history',
+            imgHistory: 'dtp_img_history',
             usage: 'aiImageGenerator_usage'
         };
 
-        // ======================
-        // State
-        // ======================
         const state = {
             apiKey: '',
-            currentImageBase64: null,
-            currentImageSize: '1024x1024',
-            insertMode: 'auto',
-            history: [],
-            iconHistory: [],
-            isGenerating: false,
-            selectedShape: null,
             activeTab: 'images',
+            // Images
+            isGeneratingImg: false,
+            imgHistory: [],
+            currentImgBase64: null,
+            refImageBase64: null,
+            imgPromptLayers: null,
+            lastFullPrompt: '',
+            // Icons
+            isGeneratingIcon: false,
             iconStyleNumber: 1,
             iconImageBase64: null,
-            imageStyleNumber: 1,
-            usage: {
-                totalInputTokens: 0,
-                totalOutputTokens: 0,
-                totalImages: 0,
-                sessionStart: new Date().toISOString()
-            }
+            iconHistory: [],
+            // Usage
+            usage: { totalInputTokens: 0, totalOutputTokens: 0, totalImages: 0, sessionStart: new Date().toISOString() }
         };
 
-        // ======================
-        // DOM Cache
-        // ======================
         const $ = (id) => document.getElementById(id);
         const $$ = (sel) => document.querySelectorAll(sel);
 
         const el = {
             get tabs() { return $$('.tab'); },
             get tabContents() { return $$('.tab-content'); },
-            apiKeyInput: $('apiKeyInput'),
-            apiKeyStatus: $('apiKeyStatus'),
-            btnSaveKey: $('btnSaveKey'),
-            promptInput: $('promptInput'),
-            sizeSelect: $('sizeSelect'),
-            qualitySelect: $('qualitySelect'),
-            btnGenerate: $('btnGenerate'),
-            statusMessage: $('statusMessage'),
-            previewSection: $('previewSection'),
-            previewLoading: $('previewLoading'),
-            previewImage: $('previewImage'),
-            btnRegenerate: $('btnRegenerate'),
-            btnInsert: $('btnInsert'),
-            historyGrid: $('historyGrid'),
-            btnClearHistory: $('btnClearHistory'),
-            get insertOptions() { return $$('.insert-option'); },
-            shapeInfo: $('shapeInfo'),
-            shapeInfoText: $('shapeInfoText'),
+            // Images
+            imgPromptInput: $('imgPromptInput'),
+            imgWordCount: $('imgWordCount'),
+            imgVersionCount: $('imgVersionCount'),
+            imgVersionPicker: $('imgVersionPicker'),
+            imgQualitySelect: $('imgQualitySelect'),
+            btnGenerateImg: $('btnGenerateImg'),
+            btnRegenerateImg: $('btnRegenerateImg'),
+            imgStatus: $('imgStatus'),
+            imgPreviewCard: $('imgPreviewCard'),
+            imgPreview: $('imgPreview'),
+            imgPreviewContainer: $('imgPreviewContainer'),
+            btnInsertImg: $('btnInsertImg'),
+            btnExpandImg: $('btnExpandImg'),
+            btnViewPrompt: $('btnViewPrompt'),
+            promptReview: $('promptReview'),
+            promptReviewText: $('promptReviewText'),
+            btnUploadRef: $('btnUploadRef'),
+            btnUseLastImage: $('btnUseLastImage'),
+            imgFileInput: $('imgFileInput'),
+            refPreview: $('refPreview'),
+            refPreviewImg: $('refPreviewImg'),
+            btnClearRef: $('btnClearRef'),
+            imgHistoryGrid: $('imgHistoryGrid'),
+            btnClearImgHistory: $('btnClearImgHistory'),
+            // Icons
             iconSubjectInput: $('iconSubjectInput'),
             iconQualitySelect: $('iconQualitySelect'),
             btnGenerateIcon: $('btnGenerateIcon'),
@@ -924,6 +570,10 @@
             btnInsertIcon: $('btnInsertIcon'),
             iconHistoryGrid: $('iconHistoryGrid'),
             btnClearIconHistory: $('btnClearIconHistory'),
+            // More
+            apiKeyInput: $('apiKeyInput'),
+            apiKeyStatus: $('apiKeyStatus'),
+            btnSaveKey: $('btnSaveKey'),
             feedbackText: $('feedbackText'),
             feedbackType: $('feedbackType'),
             btnSubmitFeedback: $('btnSubmitFeedback'),
@@ -934,687 +584,372 @@
             btnResetUsage: $('btnResetUsage')
         };
 
-        // ======================
-        // Storage Helpers
-        // ======================
-        function storageGet(key) {
-            try { return localStorage.getItem(key); } catch (e) { return null; }
-        }
+        function storageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+        function storageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+        function storageRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
 
-        function storageSet(key, value) {
-            try { localStorage.setItem(key, value); } catch (e) { /* quota exceeded */ }
-        }
-
-        function storageRemove(key) {
-            try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
-        }
-
-        // ======================
-        // Initialization
-        // ======================
         let initialized = false;
-        let currentAbortController = null;
-        let shapeDetectionRunning = false;
         let statusTimers = {};
 
         Office.onReady(() => { initializeApp(); });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => { if (!initialized) initializeApp(); }, 1000);
-        });
+        document.addEventListener('DOMContentLoaded', () => { setTimeout(() => { if (!initialized) initializeApp(); }, 1000); });
 
         function initializeApp() {
             if (initialized) return;
             initialized = true;
-
-            // Clear oversized history
-            [STORAGE_KEYS.history, STORAGE_KEYS.iconHistory].forEach(key => {
-                const data = storageGet(key);
-                if (data && data.length > 50000) storageRemove(key);
-            });
-
             loadApiKey();
-            loadHistory();
+            loadImgHistory();
             loadIconHistory();
             loadUsage();
+            loadSystemPrompt();
             renderIconStyles();
-            renderImageStyles();
             setupEventListeners();
-            updateGenerateButtons();
-            detectSelectedShape();
-            setInterval(detectSelectedShape, 1000);
+            updateButtons();
         }
 
-        // ======================
-        // API Key
-        // ======================
+        // ==================== API Key ====================
         function loadApiKey() {
-            const savedKey = storageGet(STORAGE_KEYS.apiKey);
-            if (savedKey) {
-                state.apiKey = savedKey;
-                el.apiKeyInput.value = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
-                setApiKeyStatus(true);
-            }
+            const saved = storageGet(STORAGE_KEYS.apiKey);
+            if (saved) { state.apiKey = saved; el.apiKeyInput.value = '\u2022'.repeat(16); setApiKeyStatus(true); }
         }
-
         function saveApiKey() {
             const key = el.apiKeyInput.value.trim();
             if (!key || key.includes('\u2022')) return;
-
             state.apiKey = key;
-            el.apiKeyInput.value = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+            el.apiKeyInput.value = '\u2022'.repeat(16);
             setApiKeyStatus(true);
-
-            storageRemove(STORAGE_KEYS.history);
-            storageRemove(STORAGE_KEYS.iconHistory);
-            state.history = [];
-            state.iconHistory = [];
-            renderHistory();
-            renderIconHistory();
             storageSet(STORAGE_KEYS.apiKey, key);
-            showStatus('API key saved!', 'success', 'images');
-            updateGenerateButtons();
+            showStatus('API key saved!', 'success', el.imgStatus);
+            updateButtons();
         }
-
         function setApiKeyStatus(isSet) {
             el.apiKeyStatus.textContent = isSet ? 'Connected' : 'Not Set';
             el.apiKeyStatus.className = 'api-key-status ' + (isSet ? 'connected' : 'disconnected');
         }
 
-        // ======================
-        // Tab Switching
-        // ======================
+        // ==================== Tabs ====================
         function switchTab(tabName) {
             state.activeTab = tabName;
-            el.tabs.forEach(tab => {
-                const isActive = tab.dataset.tab === tabName;
-                tab.classList.toggle('active', isActive);
-                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-            });
+            el.tabs.forEach(tab => { const a = tab.dataset.tab === tabName; tab.classList.toggle('active', a); tab.setAttribute('aria-selected', a ? 'true' : 'false'); });
             el.tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
         }
 
-        // ======================
-        // Style Rendering
-        // ======================
-        function renderStyleGrid(gridId, styles, onSelect) {
-            const grid = $(gridId);
-            if (!grid || !styles) return;
-
+        // ==================== Icon Style Rendering ====================
+        function renderIconStyles() {
+            if (typeof ICON_STYLES === 'undefined') return;
+            const grid = $('iconStyleGrid');
+            if (!grid) return;
             grid.innerHTML = '';
-            Object.keys(styles).forEach((styleNum, index) => {
-                const style = styles[styleNum];
-                const isDisabled = style.comingSoon === true;
-                const isSelected = index === 0;
+            Object.keys(ICON_STYLES).forEach((styleNum, index) => {
+                const style = ICON_STYLES[styleNum];
                 const card = document.createElement('div');
-                card.className = 'style-card' + (isSelected ? ' selected' : '') + (isDisabled ? ' disabled' : '');
-                card.dataset.style = styleNum;
+                card.className = 'style-card' + (index === 0 ? ' selected' : '');
                 card.setAttribute('role', 'radio');
-                card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                card.setAttribute('aria-checked', index === 0 ? 'true' : 'false');
                 card.setAttribute('aria-label', style.name + ' \u2013 ' + style.description);
-                card.tabIndex = isDisabled ? -1 : 0;
-
-                // Avatar image
-                if (style.avatar) {
-                    const img = document.createElement('img');
-                    img.className = 'style-card-avatar';
-                    img.src = style.avatar;
-                    img.alt = '';
-                    img.setAttribute('aria-hidden', 'true');
-                    card.appendChild(img);
-                }
-
-                // Name label
-                const nameDiv = document.createElement('div');
-                nameDiv.className = 'style-card-name';
-                nameDiv.textContent = style.name;
-                card.appendChild(nameDiv);
-
-                // Custom tooltip
-                const tooltip = document.createElement('div');
-                tooltip.className = 'style-tooltip';
-                tooltip.setAttribute('aria-hidden', 'true');
-                tooltip.textContent = style.name + ' \u2013 ' + style.description;
-                card.appendChild(tooltip);
-
-                function selectCard() {
-                    if (isDisabled) return;
-                    grid.querySelectorAll('.style-card').forEach(c => {
-                        c.classList.remove('selected');
-                        c.setAttribute('aria-checked', 'false');
-                    });
-                    card.classList.add('selected');
-                    card.setAttribute('aria-checked', 'true');
-                    onSelect(parseInt(styleNum));
-                }
-
-                card.addEventListener('click', selectCard);
-                card.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        selectCard();
-                    }
-                });
-
+                card.tabIndex = 0;
+                if (style.avatar) { const img = document.createElement('img'); img.className = 'style-card-avatar'; img.src = style.avatar; img.alt = ''; img.setAttribute('aria-hidden', 'true'); card.appendChild(img); }
+                const nameDiv = document.createElement('div'); nameDiv.className = 'style-card-name'; nameDiv.textContent = style.name; card.appendChild(nameDiv);
+                const tooltip = document.createElement('div'); tooltip.className = 'style-tooltip'; tooltip.setAttribute('aria-hidden', 'true'); tooltip.textContent = style.name + ' \u2013 ' + style.description; card.appendChild(tooltip);
+                function sel() { grid.querySelectorAll('.style-card').forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); }); card.classList.add('selected'); card.setAttribute('aria-checked', 'true'); state.iconStyleNumber = parseInt(styleNum); }
+                card.addEventListener('click', sel);
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sel(); } });
                 grid.appendChild(card);
             });
         }
 
-        function renderIconStyles() {
-            if (typeof ICON_STYLES === 'undefined') return;
-            renderStyleGrid('iconStyleGrid', ICON_STYLES, (num) => { state.iconStyleNumber = num; });
-        }
-
-        function renderImageStyles() {
-            if (typeof IMAGE_STYLES === 'undefined') return;
-            renderStyleGrid('imageStyleGrid', IMAGE_STYLES, (num) => { state.imageStyleNumber = num; });
-        }
-
-        // ======================
-        // Event Listeners
-        // ======================
+        // ==================== Event Listeners ====================
         function setupEventListeners() {
             el.tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-
+            // Images
+            el.btnGenerateImg.addEventListener('click', generateImage);
+            el.btnRegenerateImg.addEventListener('click', generateImage);
+            el.imgPromptInput.addEventListener('input', updateButtons);
+            el.btnInsertImg.addEventListener('click', insertGeneratedImage);
+            el.btnExpandImg.addEventListener('click', expandTo16x9);
+            el.btnViewPrompt.addEventListener('click', () => { el.promptReview.style.display = el.promptReview.style.display !== 'none' ? 'none' : 'block'; });
+            el.btnUploadRef.addEventListener('click', () => el.imgFileInput.click());
+            el.imgFileInput.addEventListener('change', handleRefUpload);
+            el.btnUseLastImage.addEventListener('click', useLastImageAsRef);
+            el.btnClearRef.addEventListener('click', clearRefImage);
+            el.btnClearImgHistory.addEventListener('click', clearImgHistory);
+            // Icons
+            el.btnGenerateIcon.addEventListener('click', generateIcon);
+            el.iconSubjectInput.addEventListener('input', updateButtons);
+            el.btnRegenerateIcon.addEventListener('click', generateIcon);
+            el.btnInsertIcon.addEventListener('click', insertIcon);
+            el.btnClearIconHistory.addEventListener('click', clearIconHistory);
+            // More
             el.btnSaveKey.addEventListener('click', saveApiKey);
             el.apiKeyInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveApiKey(); });
-
-            el.btnGenerate.addEventListener('click', () => generateImage('images'));
-            el.promptInput.addEventListener('input', updateGenerateButtons);
-            el.btnRegenerate.addEventListener('click', () => generateImage('images'));
-            el.btnInsert.addEventListener('click', () => insertImage('images'));
-
-            el.insertOptions.forEach(option => {
-                function selectOption() {
-                    el.insertOptions.forEach(o => {
-                        o.classList.remove('selected');
-                        o.setAttribute('aria-checked', 'false');
-                    });
-                    option.classList.add('selected');
-                    option.setAttribute('aria-checked', 'true');
-                    state.insertMode = option.dataset.mode;
-                }
-                option.addEventListener('click', selectOption);
-                option.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        selectOption();
-                    }
-                });
-            });
-
-            el.btnClearHistory.addEventListener('click', clearHistory);
-
-            el.btnGenerateIcon.addEventListener('click', () => generateImage('icons'));
-            el.iconSubjectInput.addEventListener('input', updateGenerateButtons);
-            el.btnRegenerateIcon.addEventListener('click', () => generateImage('icons'));
-            el.btnInsertIcon.addEventListener('click', () => insertImage('icons'));
-            el.btnClearIconHistory.addEventListener('click', clearIconHistory);
-
             el.btnSubmitFeedback.addEventListener('click', submitFeedback);
-
-            el.btnResetUsage.addEventListener('click', () => {
-                if (confirm('Reset all usage statistics?')) resetUsage();
-            });
+            el.btnResetUsage.addEventListener('click', () => { if (confirm('Reset usage stats?')) resetUsage(); });
         }
 
-        // ======================
-        // Shape Detection
-        // ======================
-        async function detectSelectedShape() {
-            if (shapeDetectionRunning) return;
-            shapeDetectionRunning = true;
-            try {
-                await PowerPoint.run(async (context) => {
-                    const shapes = context.presentation.getSelectedShapes();
-                    shapes.load('items');
-                    await context.sync();
-
-                    if (shapes.items.length > 0) {
-                        const shape = shapes.items[0];
-                        shape.load(['width', 'height', 'name']);
-                        await context.sync();
-
-                        state.selectedShape = {
-                            width: shape.width,
-                            height: shape.height,
-                            aspectRatio: shape.width / shape.height,
-                            name: shape.name
-                        };
-
-                        const dalleSize = getBestDalleSize(state.selectedShape.aspectRatio);
-                        el.shapeInfo.classList.add('detected');
-                        el.shapeInfoText.textContent = shape.name + ' (' + Math.round(shape.width) + '\u00d7' + Math.round(shape.height) + 'pt) \u2192 ' + dalleSize;
-                    } else {
-                        state.selectedShape = null;
-                        el.shapeInfo.classList.remove('detected');
-                        el.shapeInfoText.textContent = 'No shape selected - will use size setting';
-                    }
-                });
-            } catch (e) {
-                state.selectedShape = null;
-            } finally {
-                shapeDetectionRunning = false;
-            }
-        }
-
-        function getBestDalleSize(aspectRatio) {
-            if (aspectRatio > 1.35) return '1536x1024';
-            if (aspectRatio < 0.75) return '1024x1536';
-            return '1024x1024';
-        }
-
-        function getGenerationSize() {
-            const selected = el.sizeSelect.value;
-            if (selected === 'auto') {
-                return state.selectedShape ? getBestDalleSize(state.selectedShape.aspectRatio) : '1024x1024';
-            }
-            return selected;
-        }
-
-        // ======================
-        // Image Generation
-        // ======================
-        async function generateImage(tab) {
-            const isImages = tab === 'images';
-            let prompt, quality, statusEl, previewSection, previewLoading, previewImage;
-
-            if (isImages) {
-                const userPrompt = el.promptInput.value.trim();
-                prompt = (typeof generateImagePrompt === 'function')
-                    ? generateImagePrompt(state.imageStyleNumber, userPrompt)
-                    : userPrompt;
-                quality = el.qualitySelect.value;
-                statusEl = el.statusMessage;
-                previewSection = el.previewSection;
-                previewLoading = el.previewLoading;
-                previewImage = el.previewImage;
-            } else {
-                const subject = el.iconSubjectInput.value.trim();
-                prompt = (typeof generateIconPrompt === 'function')
-                    ? generateIconPrompt(state.iconStyleNumber, subject)
-                    : 'Icon of ' + subject;
-                quality = el.iconQualitySelect.value;
-                statusEl = el.iconStatusMessage;
-                previewSection = el.iconPreviewSection;
-                previewLoading = el.iconPreviewLoading;
-                previewImage = el.iconPreviewImage;
-            }
-
-            if (!prompt || !state.apiKey || state.isGenerating) return;
-
-            // Abort any in-flight request
-            if (currentAbortController) currentAbortController.abort();
-            currentAbortController = new AbortController();
-            const signal = currentAbortController.signal;
-
-            state.isGenerating = true;
-            updateGenerateButtons();
-
-            previewSection.classList.add('visible');
-            previewLoading.style.display = 'flex';
-            previewImage.style.display = 'none';
-
-            const size = isImages ? getGenerationSize() : '1024x1024';
-            showStatus('Generating ' + size + ' image...', 'info', tab);
-
-            // 120s timeout
-            const timeoutId = setTimeout(() => currentAbortController.abort(), 120000);
-
-            try {
-                const response = await fetch('https://api.openai.com/v1/images/generations', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + state.apiKey
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-image-1.5',
-                        prompt: prompt,
-                        n: 1,
-                        size: size,
-                        quality: quality
-                    }),
-                    signal: signal
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'Failed to generate image');
-                }
-
-                const data = await response.json();
-                const base64Data = data.data[0].b64_json;
-                const imageUrl = 'data:image/png;base64,' + base64Data;
-
-                if (data.usage) {
-                    state.usage.totalInputTokens += data.usage.input_tokens || 0;
-                    state.usage.totalOutputTokens += data.usage.output_tokens || 0;
-                    state.usage.totalImages += 1;
-                    updateUsageDisplay();
-                    saveUsage();
-                }
-
-                if (isImages) {
-                    state.currentImageBase64 = base64Data;
-                    state.currentImageSize = size;
-                    addToHistory(imageUrl, el.promptInput.value.trim(), size);
-                } else {
-                    state.iconImageBase64 = base64Data;
-                    addToIconHistory(imageUrl, el.iconSubjectInput.value.trim());
-                }
-
-                previewImage.src = imageUrl;
-                previewImage.style.display = 'block';
-                previewLoading.style.display = 'none';
-                showStatus('Image generated successfully!', 'success', tab);
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    showStatus('Generation cancelled or timed out', 'info', tab);
-                } else {
-                    showStatus(error.message || 'Failed to generate image', 'error', tab);
-                }
-                previewLoading.style.display = 'none';
-            } finally {
-                clearTimeout(timeoutId);
-                currentAbortController = null;
-                state.isGenerating = false;
-                updateGenerateButtons();
-            }
-        }
-
-        // ======================
-        // Insert Image
-        // ======================
-        function insertImage(tab) {
-            const base64Data = tab === 'images' ? state.currentImageBase64 : state.iconImageBase64;
-            if (!base64Data) {
-                showStatus('No image to insert', 'error', tab);
-                return;
-            }
-
-            showStatus('Inserting image...', 'info', tab);
-
-            const useShape = tab === 'images' && state.selectedShape;
-            const imgWidth = useShape ? state.selectedShape.width : 300;
-            const imgHeight = useShape ? state.selectedShape.height : 300;
-
-            Office.context.document.setSelectedDataAsync(
-                base64Data,
-                { coercionType: Office.CoercionType.Image, imageWidth: imgWidth, imageHeight: imgHeight },
-                (result) => {
-                    if (result.status === Office.AsyncResultStatus.Succeeded) {
-                        showStatus('Image inserted!', 'success', tab);
-                    } else {
-                        showStatus('Failed to insert: ' + result.error.message, 'error', tab);
-                    }
-                }
-            );
-        }
-
-        // ======================
-        // History
-        // ======================
-        function loadHistory() {
-            const saved = storageGet(STORAGE_KEYS.history);
-            if (saved) {
-                try { state.history = JSON.parse(saved); } catch (e) { state.history = []; }
-                renderHistory();
-            }
-        }
-
-        function addToHistory(imageUrl, prompt, size) {
-            createThumbnail(imageUrl, THUMBNAIL_SIZE, (thumbnailUrl) => {
-                state.history.unshift({ url: thumbnailUrl, fullUrl: imageUrl, prompt: prompt, size: size });
-                if (state.history.length > MAX_HISTORY) {
-                    state.history = state.history.slice(0, MAX_HISTORY);
-                }
-                const toSave = state.history.map(item => ({
-                    url: item.url, fullUrl: item.fullUrl, prompt: item.prompt, size: item.size
-                }));
-                storageSet(STORAGE_KEYS.history, JSON.stringify(toSave));
-                renderHistory();
-            });
-        }
-
-        function createThumbnail(dataUrl, maxSize, callback) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                let w = img.width, h = img.height;
-                if (w > h) { if (w > maxSize) { h = h * (maxSize / w); w = maxSize; } }
-                else { if (h > maxSize) { w = w * (maxSize / h); h = maxSize; } }
-                canvas.width = w;
-                canvas.height = h;
-                ctx.drawImage(img, 0, 0, w, h);
-                callback(canvas.toDataURL('image/jpeg', 0.6));
-            };
-            img.onerror = function() { callback(dataUrl); };
-            img.src = dataUrl;
-        }
-
-        function renderHistory() {
-            if (state.history.length === 0) {
-                el.historyGrid.innerHTML = '<div class="history-empty">No images generated yet</div>';
-                return;
-            }
-            el.historyGrid.innerHTML = '';
-            state.history.forEach((item, i) => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.dataset.index = i;
-                div.title = item.prompt || '';
-                div.tabIndex = 0;
-                div.setAttribute('role', 'button');
-                div.setAttribute('aria-label', 'Load image: ' + (item.prompt || 'untitled'));
-                const img = document.createElement('img');
-                img.src = item.url;
-                img.alt = '';
-                div.appendChild(img);
-                div.addEventListener('click', () => loadFromHistory(i));
-                div.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadFromHistory(i); }
-                });
-                el.historyGrid.appendChild(div);
-            });
-        }
-
-        function loadFromHistory(index) {
-            const item = state.history[index];
-            if (!item) return;
-
-            const imageUrl = item.fullUrl || item.url;
-            state.currentImageBase64 = imageUrl.split(',')[1];
-            state.currentImageSize = item.size || '1024x1024';
-
-            el.previewImage.src = imageUrl;
-            el.previewImage.style.display = 'block';
-            el.previewLoading.style.display = 'none';
-            el.previewSection.classList.add('visible');
-            el.promptInput.value = item.prompt;
-            showStatus('Image loaded from history', 'info', 'images');
-        }
-
-        function clearHistory() {
-            state.history = [];
-            storageRemove(STORAGE_KEYS.history);
-            renderHistory();
-            showStatus('History cleared', 'info', 'images');
-        }
-
-        // ======================
-        // Icon History
-        // ======================
-        function loadIconHistory() {
-            const saved = storageGet(STORAGE_KEYS.iconHistory);
-            if (saved) {
-                try { state.iconHistory = JSON.parse(saved); } catch (e) { state.iconHistory = []; }
-                renderIconHistory();
-            }
-        }
-
-        function addToIconHistory(imageUrl, subject) {
-            createThumbnail(imageUrl, THUMBNAIL_SIZE, (thumbnailUrl) => {
-                state.iconHistory.unshift({ url: thumbnailUrl, fullUrl: imageUrl, prompt: subject });
-                if (state.iconHistory.length > MAX_HISTORY) {
-                    state.iconHistory = state.iconHistory.slice(0, MAX_HISTORY);
-                }
-                const toSave = state.iconHistory.map(item => ({
-                    url: item.url, fullUrl: item.fullUrl, prompt: item.prompt
-                }));
-                storageSet(STORAGE_KEYS.iconHistory, JSON.stringify(toSave));
-                renderIconHistory();
-            });
-        }
-
-        function renderIconHistory() {
-            if (state.iconHistory.length === 0) {
-                el.iconHistoryGrid.innerHTML = '<div class="history-empty">No icons generated yet</div>';
-                return;
-            }
-            el.iconHistoryGrid.innerHTML = '';
-            state.iconHistory.forEach((item, i) => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.dataset.index = i;
-                div.title = item.prompt || '';
-                div.tabIndex = 0;
-                div.setAttribute('role', 'button');
-                div.setAttribute('aria-label', 'Load icon: ' + (item.prompt || 'untitled'));
-                const img = document.createElement('img');
-                img.src = item.url;
-                img.alt = '';
-                div.appendChild(img);
-                div.addEventListener('click', () => loadFromIconHistory(i));
-                div.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadFromIconHistory(i); }
-                });
-                el.iconHistoryGrid.appendChild(div);
-            });
-        }
-
-        function loadFromIconHistory(index) {
-            const item = state.iconHistory[index];
-            if (!item) return;
-
-            const imageUrl = item.fullUrl || item.url;
-            state.iconImageBase64 = imageUrl.split(',')[1];
-
-            el.iconPreviewImage.src = imageUrl;
-            el.iconPreviewImage.style.display = 'block';
-            el.iconPreviewLoading.style.display = 'none';
-            el.iconPreviewSection.classList.add('visible');
-            el.iconSubjectInput.value = item.prompt;
-            showStatus('Icon loaded from history', 'info', 'icons');
-        }
-
-        function clearIconHistory() {
-            state.iconHistory = [];
-            storageRemove(STORAGE_KEYS.iconHistory);
-            renderIconHistory();
-            showStatus('History cleared', 'info', 'icons');
-        }
-
-        // ======================
-        // Feedback
-        // ======================
-        function submitFeedback() {
-            const feedback = el.feedbackText.value.trim();
-            if (!feedback) {
-                alert('Please enter your feedback before submitting.');
-                return;
-            }
-            const type = el.feedbackType.value;
-            console.log('Feedback submitted:', { type, feedback });
-            alert('Thank you for your feedback!');
-            el.feedbackText.value = '';
-        }
-
-        // ======================
-        // Usage Tracking
-        // ======================
-        function loadUsage() {
-            const saved = storageGet(STORAGE_KEYS.usage);
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state.usage.totalInputTokens = parsed.totalInputTokens || 0;
-                    state.usage.totalOutputTokens = parsed.totalOutputTokens || 0;
-                    state.usage.totalImages = parsed.totalImages || 0;
-                    state.usage.sessionStart = parsed.sessionStart || state.usage.sessionStart;
-                } catch (e) { /* ignore */ }
-            }
-            updateUsageDisplay();
-        }
-
-        function saveUsage() {
-            storageSet(STORAGE_KEYS.usage, JSON.stringify(state.usage));
-        }
-
-        function resetUsage() {
-            state.usage = {
-                totalInputTokens: 0,
-                totalOutputTokens: 0,
-                totalImages: 0,
-                sessionStart: new Date().toISOString()
-            };
-            saveUsage();
-            updateUsageDisplay();
-        }
-
-        function updateUsageDisplay() {
-            const fmt = (n) => n.toLocaleString('en-US');
-            el.usageImages.textContent = fmt(state.usage.totalImages);
-            el.usageInputTokens.textContent = fmt(state.usage.totalInputTokens);
-            el.usageOutputTokens.textContent = fmt(state.usage.totalOutputTokens);
-
-            const cost = (state.usage.totalInputTokens / 1e6) * PRICING.inputPerMillion
-                       + (state.usage.totalOutputTokens / 1e6) * PRICING.outputPerMillion;
-            el.usageCost.textContent = '$' + cost.toFixed(4);
-        }
-
-        // ======================
-        // UI Helpers
-        // ======================
-        function updateGenerateButtons() {
+        // ==================== UI Helpers ====================
+        function updateButtons() {
             const hasKey = state.apiKey.length > 0;
-            el.btnGenerate.disabled = !el.promptInput.value.trim() || !hasKey || state.isGenerating;
-            el.btnGenerateIcon.disabled = !el.iconSubjectInput.value.trim() || !hasKey || state.isGenerating;
-
-            const genBtns = [el.btnGenerate, el.btnGenerateIcon];
-            const labels = ['Generate Image', 'Generate Icon'];
-
-            genBtns.forEach((btn, i) => {
-                if (state.isGenerating) {
-                    btn.classList.add('loading');
-                    btn.innerHTML = '<div class="spinner"></div><span>Generating...</span>';
-                } else {
-                    btn.classList.remove('loading');
-                    btn.innerHTML = '<span>' + labels[i] + '</span>';
-                }
-            });
+            // Images
+            const words = el.imgPromptInput.value.trim() ? el.imgPromptInput.value.trim().split(/\s+/).length : 0;
+            const overLimit = words > 150;
+            el.imgWordCount.textContent = words + ' / 150 words';
+            el.imgWordCount.style.color = overLimit ? 'var(--error)' : 'var(--gray-400)';
+            el.btnGenerateImg.disabled = !hasKey || !el.imgPromptInput.value.trim() || overLimit || state.isGeneratingImg;
+            el.btnRegenerateImg.disabled = el.btnGenerateImg.disabled;
+            el.btnUseLastImage.disabled = !state.currentImgBase64;
+            el.btnExpandImg.disabled = !state.currentImgBase64 || state.isGeneratingImg;
+            if (state.isGeneratingImg) { el.btnGenerateImg.classList.add('loading'); el.btnGenerateImg.innerHTML = '<div class="spinner"></div><span>Generating...</span>'; }
+            else { el.btnGenerateImg.classList.remove('loading'); el.btnGenerateImg.innerHTML = '<span>Generate Image</span>'; }
+            // Icons
+            el.btnGenerateIcon.disabled = !hasKey || !el.iconSubjectInput.value.trim() || state.isGeneratingIcon;
+            if (state.isGeneratingIcon) { el.btnGenerateIcon.classList.add('loading'); el.btnGenerateIcon.innerHTML = '<div class="spinner"></div><span>Generating...</span>'; }
+            else { el.btnGenerateIcon.classList.remove('loading'); el.btnGenerateIcon.innerHTML = '<span>Generate Icon</span>'; }
         }
 
-        function showStatus(message, type, tab) {
-            const statusEl = tab === 'images' ? el.statusMessage : tab === 'icons' ? el.iconStatusMessage : null;
+        function showStatus(message, type, statusEl) {
             if (!statusEl) return;
-
             const iconMap = { success: 'CheckMark', error: 'ErrorBadge', info: 'Info' };
             statusEl.innerHTML = '';
-            const icon = document.createElement('i');
-            icon.className = 'ms-Icon ms-Icon--' + (iconMap[type] || 'Info');
-            const span = document.createElement('span');
-            span.textContent = message;
-            statusEl.appendChild(icon);
-            statusEl.appendChild(span);
+            const icon = document.createElement('i'); icon.className = 'ms-Icon ms-Icon--' + (iconMap[type] || 'Info'); icon.setAttribute('aria-hidden', 'true');
+            const span = document.createElement('span'); span.textContent = message;
+            statusEl.appendChild(icon); statusEl.appendChild(span);
             statusEl.className = 'status-message visible ' + type;
+            const key = statusEl.id;
+            if (statusTimers[key]) clearTimeout(statusTimers[key]);
+            if (type !== 'error') { statusTimers[key] = setTimeout(() => statusEl.classList.remove('visible'), 3000); }
+        }
 
-            // Clear previous timer for this tab to avoid premature hiding
-            if (statusTimers[tab]) clearTimeout(statusTimers[tab]);
-            if (type !== 'error') {
-                statusTimers[tab] = setTimeout(() => statusEl.classList.remove('visible'), 3000);
+        // ==================== IMAGE GENERATION ====================
+        async function loadSystemPrompt() {
+            try { const r = await fetch('image-system-prompt.json'); if (r.ok) state.imgPromptLayers = await r.json(); } catch (e) {}
+        }
+
+        async function buildImagePrompt(userScene) {
+            const sys = state.imgPromptLayers?.optimizer_system;
+            if (!sys || !state.apiKey) return userScene;
+            const r = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
+                body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'system', content: sys }, { role: 'user', content: userScene.trim() }], temperature: 0.4, max_tokens: 300 })
+            });
+            if (!r.ok) return userScene;
+            const d = await r.json();
+            if (d.usage) { state.usage.totalInputTokens += d.usage.prompt_tokens || 0; state.usage.totalOutputTokens += d.usage.completion_tokens || 0; saveUsage(); updateUsageDisplay(); }
+            return d.choices[0].message.content.trim();
+        }
+
+        function base64ToBlob(base64, mime) { const b = atob(base64); const a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new Blob([a], { type: mime || 'image/png' }); }
+
+        async function callImageApi(endpoint, opts) {
+            const c = new AbortController(); const t = setTimeout(() => c.abort(), 180000); opts.signal = c.signal;
+            const r = await fetch(endpoint, opts); clearTimeout(t);
+            if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'API failed'); }
+            const d = await r.json();
+            if (d.usage) { state.usage.totalInputTokens += d.usage.input_tokens || d.usage.prompt_tokens || 0; state.usage.totalOutputTokens += d.usage.output_tokens || d.usage.completion_tokens || 0; }
+            state.usage.totalImages += 1; saveUsage(); updateUsageDisplay();
+            return d.data.map(x => x.b64_json);
+        }
+
+        function loadImage(b64) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'data:image/png;base64,' + b64; }); }
+        function canvasToBase64(c) { return c.toDataURL('image/png').split(',')[1]; }
+
+        async function generateSquareImages(prompt, quality, n) {
+            if (state.refImageBase64) {
+                const fd = new FormData(); fd.append('image', base64ToBlob(state.refImageBase64), 'ref.png'); fd.append('prompt', prompt); fd.append('model', 'gpt-image-1.5'); fd.append('n', String(n)); fd.append('size', '1024x1024'); fd.append('quality', quality);
+                return callImageApi('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { 'Authorization': 'Bearer ' + state.apiKey }, body: fd });
             }
+            return callImageApi('https://api.openai.com/v1/images/generations', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey }, body: JSON.stringify({ model: 'gpt-image-1.5', prompt: prompt, n: n, size: '1024x1024', quality: quality }) });
+        }
+
+        async function extendTo16x9Api(squareB64, prompt, quality) {
+            const img = await loadImage(squareB64);
+            const canvas = document.createElement('canvas'); canvas.width = 1536; canvas.height = 1024;
+            canvas.getContext('2d').drawImage(img, Math.round((1536 - img.width) / 2), 0);
+            const fd = new FormData(); fd.append('image', base64ToBlob(canvasToBase64(canvas)), 'padded.png');
+            fd.append('prompt', 'Seamlessly extend the scene to fill the wider frame. Continue the same environment, lighting, colors, and perspective naturally into the left and right sides. ' + prompt);
+            fd.append('model', 'gpt-image-1.5'); fd.append('n', '1'); fd.append('size', '1536x1024'); fd.append('quality', quality);
+            const res = await callImageApi('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { 'Authorization': 'Bearer ' + state.apiKey }, body: fd });
+            const ext = await loadImage(res[0]);
+            const fc = document.createElement('canvas'); fc.width = 1536; fc.height = 864;
+            fc.getContext('2d').drawImage(ext, 0, Math.round((ext.height - 864) / 2), 1536, 864, 0, 0, 1536, 864);
+            return canvasToBase64(fc);
+        }
+
+        function showVersionPicker(versions) {
+            el.imgVersionPicker.innerHTML = '';
+            if (versions.length <= 1) { el.imgVersionPicker.style.display = 'none'; return; }
+            el.imgVersionPicker.style.display = 'flex';
+            versions.forEach((b64, i) => {
+                const d = document.createElement('div'); d.style.cssText = 'width:56px;height:56px;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid ' + (i === 0 ? 'var(--black)' : 'var(--gray-200)') + ';flex-shrink:0;';
+                const img = document.createElement('img'); img.src = 'data:image/png;base64,' + b64; img.style.cssText = 'width:100%;height:100%;object-fit:cover;'; img.alt = 'V' + (i + 1);
+                d.appendChild(img);
+                d.addEventListener('click', () => { state.currentImgBase64 = b64; el.imgPreview.src = 'data:image/png;base64,' + b64; el.imgVersionPicker.querySelectorAll('div').forEach((x, j) => { x.style.borderColor = j === i ? 'var(--black)' : 'var(--gray-200)'; }); });
+                el.imgVersionPicker.appendChild(d);
+            });
+        }
+
+        async function generateImage() {
+            const prompt = el.imgPromptInput.value.trim();
+            if (!prompt || !state.apiKey || state.isGeneratingImg) return;
+            state.isGeneratingImg = true; updateButtons();
+            const n = parseInt(el.imgVersionCount.value) || 1;
+            let sec = 0, pi = setInterval(() => { sec++; showStatus('Generating ' + (n > 1 ? n + ' versions ' : '') + '(' + sec + 's)...', 'info', el.imgStatus); }, 1000);
+            try {
+                showStatus('Optimizing prompt...', 'info', el.imgStatus);
+                const fullPrompt = await buildImagePrompt(prompt);
+                state.lastFullPrompt = fullPrompt;
+                showStatus('Generating ' + (n > 1 ? n + ' versions' : 'image') + '...', 'info', el.imgStatus);
+                const results = await generateSquareImages(fullPrompt, el.imgQualitySelect.value, n);
+                state.currentImgBase64 = results[0];
+                el.imgPreview.src = 'data:image/png;base64,' + results[0];
+                el.imgPreviewContainer.style.aspectRatio = '1/1';
+                el.imgPreviewCard.style.display = 'block';
+                el.btnExpandImg.style.display = '';
+                showVersionPicker(results);
+                results.forEach(b64 => addToImgHistory(b64, prompt));
+                el.btnViewPrompt.style.display = 'block'; el.promptReviewText.textContent = fullPrompt; el.promptReview.style.display = 'none';
+                clearInterval(pi); pi = null;
+                showStatus(n > 1 ? n + ' versions ready in ' + sec + 's!' : 'Image ready in ' + sec + 's!', 'success', el.imgStatus);
+            } catch (e) { clearInterval(pi); showStatus(e.name === 'AbortError' ? 'Timed out' : (e.message || 'Failed'), 'error', el.imgStatus); }
+            finally { state.isGeneratingImg = false; updateButtons(); }
+        }
+
+        async function expandTo16x9() {
+            if (!state.currentImgBase64 || !state.apiKey || state.isGeneratingImg) return;
+            state.isGeneratingImg = true; updateButtons();
+            let sec = 0, pi = setInterval(() => { sec++; showStatus('Extending to 16:9 (' + sec + 's)...', 'info', el.imgStatus); }, 1000);
+            try {
+                const wide = await extendTo16x9Api(state.currentImgBase64, el.imgPromptInput.value.trim(), el.imgQualitySelect.value);
+                state.currentImgBase64 = wide; el.imgPreview.src = 'data:image/png;base64,' + wide;
+                el.imgPreviewContainer.style.aspectRatio = '16/9'; el.btnExpandImg.style.display = 'none';
+                if (state.imgHistory.length > 0) state.imgHistory[0].full = 'data:image/png;base64,' + wide;
+                clearInterval(pi); showStatus('16:9 ready in ' + sec + 's!', 'success', el.imgStatus);
+            } catch (e) { clearInterval(pi); showStatus(e.message || 'Failed', 'error', el.imgStatus); }
+            finally { state.isGeneratingImg = false; updateButtons(); }
+        }
+
+        function insertGeneratedImage() {
+            if (!state.currentImgBase64) return;
+            showStatus('Inserting...', 'info', el.imgStatus);
+            const img = new Image();
+            img.onload = function() {
+                const s = Math.min(960 / img.width, 540 / img.height, 1);
+                const w = Math.round(img.width * s), h = Math.round(img.height * s);
+                Office.context.document.setSelectedDataAsync(state.currentImgBase64, { coercionType: Office.CoercionType.Image, imageWidth: w, imageHeight: h },
+                    (r) => { showStatus(r.status === Office.AsyncResultStatus.Succeeded ? 'Inserted (' + w + '\u00d7' + h + 'pt)!' : 'Failed: ' + r.error.message, r.status === Office.AsyncResultStatus.Succeeded ? 'success' : 'error', el.imgStatus); });
+            };
+            img.src = 'data:image/png;base64,' + state.currentImgBase64;
+        }
+
+        // Image history
+        function loadImgHistory() { const s = storageGet(STORAGE_KEYS.imgHistory); if (s) { try { state.imgHistory = JSON.parse(s); } catch (e) { state.imgHistory = []; } renderImgHistory(); } }
+        function saveImgHistory() {
+            const d = state.imgHistory.map(i => ({ thumb: i.thumb, full: i.full || null, prompt: i.prompt }));
+            try { localStorage.setItem(STORAGE_KEYS.imgHistory, JSON.stringify(d)); } catch (e) { for (let i = d.length - 1; i >= 0; i--) { d[i].full = null; try { localStorage.setItem(STORAGE_KEYS.imgHistory, JSON.stringify(d)); return; } catch (e2) {} } }
+        }
+        function addToImgHistory(b64, prompt) {
+            const img = new Image(); img.onload = function() {
+                const c = document.createElement('canvas'); const m = 120; let w = img.width, h = img.height;
+                if (w > h) { if (w > m) { h = h * (m / w); w = m; } } else { if (h > m) { w = w * (m / h); h = m; } }
+                c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+                state.imgHistory.unshift({ thumb: c.toDataURL('image/jpeg', 0.4), full: 'data:image/png;base64,' + b64, prompt: prompt });
+                if (state.imgHistory.length > IMG_HISTORY_MAX) state.imgHistory = state.imgHistory.slice(0, IMG_HISTORY_MAX);
+                saveImgHistory(); renderImgHistory();
+            }; img.src = 'data:image/png;base64,' + b64;
+        }
+        function renderImgHistory() {
+            const g = el.imgHistoryGrid; if (state.imgHistory.length === 0) { g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--gray-400);font-size:12px;">No images yet</div>'; return; }
+            g.innerHTML = ''; state.imgHistory.forEach((item, i) => {
+                const d = document.createElement('div'); d.className = 'img-history-item'; d.title = item.prompt || ''; d.tabIndex = 0;
+                const img = document.createElement('img'); img.src = item.thumb || item.full; img.alt = '';
+                d.appendChild(img); d.addEventListener('click', () => loadFromImgHistory(i)); d.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadFromImgHistory(i); } }); g.appendChild(d);
+            });
+        }
+        function loadFromImgHistory(i) {
+            const item = state.imgHistory[i]; if (!item) return;
+            const src = item.full || item.thumb; state.currentImgBase64 = src.split(',')[1]; el.imgPreview.src = src;
+            el.imgPreviewContainer.style.aspectRatio = ''; el.imgPreviewCard.style.display = 'block'; el.btnExpandImg.style.display = ''; el.imgVersionPicker.style.display = 'none';
+            el.imgPromptInput.value = item.prompt || ''; updateButtons();
+            showStatus(item.full ? 'Loaded from history' : 'Low res — regenerate for full quality', 'info', el.imgStatus);
+        }
+        function clearImgHistory() { state.imgHistory = []; storageRemove(STORAGE_KEYS.imgHistory); renderImgHistory(); }
+
+        // Reference image
+        function handleRefUpload() { const f = el.imgFileInput.files[0]; if (!f) return; const r = new FileReader(); r.onload = (e) => { state.refImageBase64 = e.target.result.split(',')[1]; el.refPreviewImg.src = e.target.result; el.refPreview.style.display = 'block'; }; r.readAsDataURL(f); el.imgFileInput.value = ''; }
+        function useLastImageAsRef() { if (!state.currentImgBase64) return; state.refImageBase64 = state.currentImgBase64; el.refPreviewImg.src = 'data:image/png;base64,' + state.currentImgBase64; el.refPreview.style.display = 'block'; showStatus('Set as reference', 'info', el.imgStatus); }
+        function clearRefImage() { state.refImageBase64 = null; el.refPreview.style.display = 'none'; }
+
+        // ==================== ICON GENERATION ====================
+        async function generateIcon() {
+            const subject = el.iconSubjectInput.value.trim();
+            if (!subject || !state.apiKey || state.isGeneratingIcon) return;
+            const prompt = (typeof generateIconPrompt === 'function') ? generateIconPrompt(state.iconStyleNumber, subject) : 'Icon of ' + subject;
+            const quality = el.iconQualitySelect.value;
+            state.isGeneratingIcon = true; updateButtons();
+            el.iconPreviewSection.classList.add('visible'); el.iconPreviewLoading.style.display = 'flex'; el.iconPreviewImage.style.display = 'none';
+            showStatus('Generating icon...', 'info', el.iconStatusMessage);
+            try {
+                const res = await callImageApi('https://api.openai.com/v1/images/generations', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
+                    body: JSON.stringify({ model: 'gpt-image-1.5', prompt: prompt, n: 1, size: '1024x1024', quality: quality })
+                });
+                state.iconImageBase64 = res[0]; el.iconPreviewImage.src = 'data:image/png;base64,' + res[0];
+                el.iconPreviewImage.style.display = 'block'; el.iconPreviewLoading.style.display = 'none';
+                addToIconHistory('data:image/png;base64,' + res[0], subject);
+                showStatus('Icon generated!', 'success', el.iconStatusMessage);
+            } catch (e) { showStatus(e.message || 'Failed', 'error', el.iconStatusMessage); el.iconPreviewLoading.style.display = 'none'; }
+            finally { state.isGeneratingIcon = false; updateButtons(); }
+        }
+
+        function insertIcon() {
+            if (!state.iconImageBase64) return;
+            Office.context.document.setSelectedDataAsync(state.iconImageBase64, { coercionType: Office.CoercionType.Image, imageWidth: 300, imageHeight: 300 },
+                (r) => { showStatus(r.status === Office.AsyncResultStatus.Succeeded ? 'Inserted!' : 'Failed', r.status === Office.AsyncResultStatus.Succeeded ? 'success' : 'error', el.iconStatusMessage); });
+        }
+
+        // Icon history
+        function loadIconHistory() { const s = storageGet(STORAGE_KEYS.iconHistory); if (s) { try { state.iconHistory = JSON.parse(s); } catch (e) { state.iconHistory = []; } renderIconHistory(); } }
+        function addToIconHistory(url, prompt) {
+            const img = new Image(); img.onload = function() {
+                const c = document.createElement('canvas'); const m = 80; let w = img.width, h = img.height;
+                if (w > h) { if (w > m) { h = h * (m / w); w = m; } } else { if (h > m) { w = w * (m / h); h = m; } }
+                c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+                state.iconHistory.unshift({ url: c.toDataURL('image/jpeg', 0.6), fullUrl: url, prompt: prompt });
+                if (state.iconHistory.length > MAX_ICON_HISTORY) state.iconHistory = state.iconHistory.slice(0, MAX_ICON_HISTORY);
+                storageSet(STORAGE_KEYS.iconHistory, JSON.stringify(state.iconHistory.map(i => ({ url: i.url, fullUrl: i.fullUrl, prompt: i.prompt })))); renderIconHistory();
+            }; img.onerror = () => {}; img.src = url;
+        }
+        function renderIconHistory() {
+            if (state.iconHistory.length === 0) { el.iconHistoryGrid.innerHTML = '<div class="history-empty">No icons yet</div>'; return; }
+            el.iconHistoryGrid.innerHTML = ''; state.iconHistory.forEach((item, i) => {
+                const d = document.createElement('div'); d.className = 'history-item'; d.title = item.prompt || ''; d.tabIndex = 0;
+                d.setAttribute('role', 'button'); d.setAttribute('aria-label', 'Load icon: ' + (item.prompt || ''));
+                const img = document.createElement('img'); img.src = item.url; img.alt = ''; d.appendChild(img);
+                d.addEventListener('click', () => { const u = item.fullUrl || item.url; state.iconImageBase64 = u.split(',')[1]; el.iconPreviewImage.src = u; el.iconPreviewImage.style.display = 'block'; el.iconPreviewLoading.style.display = 'none'; el.iconPreviewSection.classList.add('visible'); el.iconSubjectInput.value = item.prompt; showStatus('Loaded', 'info', el.iconStatusMessage); });
+                d.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); d.click(); } });
+                el.iconHistoryGrid.appendChild(d);
+            });
+        }
+        function clearIconHistory() { state.iconHistory = []; storageRemove(STORAGE_KEYS.iconHistory); renderIconHistory(); }
+
+        // ==================== Feedback ====================
+        function submitFeedback() {
+            const fb = el.feedbackText.value.trim(); if (!fb) { alert('Please enter feedback.'); return; }
+            console.log('Feedback:', { type: el.feedbackType.value, feedback: fb }); alert('Thank you!'); el.feedbackText.value = '';
+        }
+
+        // ==================== Usage ====================
+        function loadUsage() {
+            const s = storageGet(STORAGE_KEYS.usage); if (s) { try { const p = JSON.parse(s); state.usage.totalInputTokens = p.totalInputTokens || 0; state.usage.totalOutputTokens = p.totalOutputTokens || 0; state.usage.totalImages = p.totalImages || 0; } catch (e) {} }
+            updateUsageDisplay();
+        }
+        function saveUsage() { storageSet(STORAGE_KEYS.usage, JSON.stringify(state.usage)); }
+        function resetUsage() { state.usage = { totalInputTokens: 0, totalOutputTokens: 0, totalImages: 0, sessionStart: new Date().toISOString() }; saveUsage(); updateUsageDisplay(); }
+        function updateUsageDisplay() {
+            const f = (n) => n.toLocaleString('en-US');
+            el.usageImages.textContent = f(state.usage.totalImages);
+            el.usageInputTokens.textContent = f(state.usage.totalInputTokens);
+            el.usageOutputTokens.textContent = f(state.usage.totalOutputTokens);
+            el.usageCost.textContent = '$' + ((state.usage.totalInputTokens / 1e6) * PRICING.inputPerMillion + (state.usage.totalOutputTokens / 1e6) * PRICING.outputPerMillion).toFixed(4);
         }
 
     })();
