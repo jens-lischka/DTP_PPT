@@ -295,6 +295,31 @@
         .usage-total .usage-label { font-weight: 600; color: var(--black); }
         .usage-total .usage-value { font-size: 16px; color: var(--black); }
 
+        /* Pattern preview */
+        .pattern-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+        }
+        .pattern-preview svg { width: 100%; height: 100%; display: block; }
+
+        .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+        .color-swatch {
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--gray-200);
+            cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .color-swatch:hover { border-color: var(--black); }
+        .color-swatch.active { border-color: var(--black); box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--black); }
+        .color-swatch input[type="color"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+        .scale-control { display: flex; align-items: center; gap: 12px; }
+        .scale-control label { font-size: 12px; color: var(--gray-500); white-space: nowrap; }
+        .scale-control input[type="range"] { flex: 1; accent-color: var(--black); }
+        .scale-control .scale-value { font-size: 12px; font-weight: 600; color: var(--black); width: 28px; text-align: right; }
+
         /* Focus + a11y */
         .tab:focus-visible, .style-card:focus-visible, .btn-run:focus-visible, .btn-generate:focus-visible, .btn-action:focus-visible, .btn-save-key:focus-visible, .btn-clear-history:focus-visible, .btn-submit-feedback:focus-visible, .history-item:focus-visible, .img-history-item:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
 
@@ -309,6 +334,7 @@
         <div class="tabs" role="tablist" aria-label="Main navigation">
             <button class="tab active" data-tab="images" role="tab" aria-selected="true" aria-controls="tab-images" id="tabBtn-images"><i class="ms-Icon ms-Icon--Camera" aria-hidden="true"></i><span>Images</span></button>
             <button class="tab" data-tab="icons" role="tab" aria-selected="false" aria-controls="tab-icons" id="tabBtn-icons"><i class="ms-Icon ms-Icon--AppIconDefaultList" aria-hidden="true"></i><span>Icons</span></button>
+            <button class="tab" data-tab="patterns" role="tab" aria-selected="false" aria-controls="tab-patterns" id="tabBtn-patterns"><i class="ms-Icon ms-Icon--GridViewMedium" aria-hidden="true"></i><span>Patterns</span></button>
             <button class="tab" data-tab="more" role="tab" aria-selected="false" aria-controls="tab-more" id="tabBtn-more"><i class="ms-Icon ms-Icon--Feedback" aria-hidden="true"></i><span>More</span></button>
         </div>
 
@@ -445,6 +471,60 @@
             </div>
         </div>
 
+        <!-- ==================== PATTERNS TAB ==================== -->
+        <div class="tab-content" id="tab-patterns" role="tabpanel" aria-labelledby="tabBtn-patterns">
+            <div class="card">
+                <label class="section-label">Style Preset</label>
+                <select id="patternPreset" style="width:100%;padding:10px 20px 10px 0;border:none;border-bottom:1px solid var(--gray-300);font-family:'Noto Sans',sans-serif;font-size:14px;background:transparent;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239898a8' d='M5 6L0 0h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;">
+                    <option value="islamic">Islamic Geometric</option>
+                    <option value="artdeco">Art Deco</option>
+                    <option value="celtic">Celtic Knots</option>
+                    <option value="japanese">Japanese Wave (Seigaiha)</option>
+                    <option value="moroccan">Moroccan Zellige</option>
+                    <option value="minimalist">Minimalist Lines</option>
+                    <option value="hexagonal">Hexagonal Grid</option>
+                    <option value="custom">Custom (use prompt below)</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label class="section-label">Theme Prompt (optional)</label>
+                <textarea id="patternPrompt" class="prompt-textarea" style="min-height:60px;" maxlength="500" placeholder="Describe a variation, e.g. 'interlocking stars with thick borders' or 'organic flowing curves with leaf motifs'"></textarea>
+            </div>
+
+            <button class="btn-run" id="btnGeneratePattern" disabled><span>Generate Pattern</span></button>
+
+            <div id="patternStatus" class="status-message" role="status" aria-live="polite"><i class="ms-Icon" aria-hidden="true"></i><span></span></div>
+
+            <!-- Preview -->
+            <div id="patternPreviewCard" class="card" style="display:none;">
+                <label class="section-label">Pattern Preview</label>
+                <div class="pattern-preview" id="patternPreview"></div>
+
+                <div style="margin-top:12px;">
+                    <div class="scale-control">
+                        <label>Scale</label>
+                        <input type="range" id="patternScale" min="1" max="6" value="3" step="1" aria-label="Pattern scale">
+                        <span class="scale-value" id="patternScaleValue">3x</span>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px;">
+                    <label class="section-label" style="margin-bottom:8px;">Colors</label>
+                    <div class="color-swatches" id="patternColors">
+                        <div class="color-swatch active" style="background:#1a1a2e;" data-role="stroke"><input type="color" value="#1a1a2e" title="Stroke color"></div>
+                        <div class="color-swatch" style="background:#ffffff;" data-role="fill"><input type="color" value="#ffffff" title="Fill color"></div>
+                        <div class="color-swatch" style="background:#c4a35a;" data-role="accent"><input type="color" value="#c4a35a" title="Accent color"></div>
+                        <div class="color-swatch" style="background:#f0f0f4;" data-role="bg"><input type="color" value="#f0f0f4" title="Background color"></div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:16px;">
+                    <button class="btn-run" id="btnInsertPattern" style="flex:1;margin-top:0;font-size:13px;padding:12px 16px;"><span>Insert on Slide</span></button>
+                </div>
+            </div>
+        </div>
+
         <!-- ==================== MORE TAB ==================== -->
         <div class="tab-content" id="tab-more" role="tabpanel" aria-labelledby="tabBtn-more">
             <div class="api-key-section">
@@ -518,6 +598,9 @@
             refImageBase64: null,
             imgPromptLayers: null,
             lastFullPrompt: '',
+            // Patterns
+            isGeneratingPattern: false,
+            currentPatternSvg: null,
             // Icons
             isGeneratingIcon: false,
             iconStyleNumber: 1,
@@ -558,6 +641,17 @@
             btnClearRef: $('btnClearRef'),
             imgHistoryGrid: $('imgHistoryGrid'),
             btnClearImgHistory: $('btnClearImgHistory'),
+            // Patterns
+            patternPreset: $('patternPreset'),
+            patternPrompt: $('patternPrompt'),
+            btnGeneratePattern: $('btnGeneratePattern'),
+            patternStatus: $('patternStatus'),
+            patternPreviewCard: $('patternPreviewCard'),
+            patternPreview: $('patternPreview'),
+            patternScale: $('patternScale'),
+            patternScaleValue: $('patternScaleValue'),
+            patternColors: $('patternColors'),
+            btnInsertPattern: $('btnInsertPattern'),
             // Icons
             iconSubjectInput: $('iconSubjectInput'),
             iconQualitySelect: $('iconQualitySelect'),
@@ -673,6 +767,13 @@
             el.btnUseLastImage.addEventListener('click', useLastImageAsRef);
             el.btnClearRef.addEventListener('click', clearRefImage);
             el.btnClearImgHistory.addEventListener('click', clearImgHistory);
+            // Patterns
+            el.btnGeneratePattern.addEventListener('click', generatePattern);
+            el.btnInsertPattern.addEventListener('click', insertPattern);
+            el.patternScale.addEventListener('input', () => { el.patternScaleValue.textContent = el.patternScale.value + 'x'; renderPatternPreview(); });
+            el.patternColors.querySelectorAll('input[type="color"]').forEach(input => {
+                input.addEventListener('input', (e) => { e.target.parentElement.style.background = e.target.value; renderPatternPreview(); });
+            });
             // Icons
             el.btnGenerateIcon.addEventListener('click', generateIcon);
             el.iconSubjectInput.addEventListener('input', updateButtons);
@@ -700,6 +801,10 @@
             el.btnExpandImg.disabled = !state.currentImgBase64 || state.isGeneratingImg;
             if (state.isGeneratingImg) { el.btnGenerateImg.classList.add('loading'); el.btnGenerateImg.innerHTML = '<div class="spinner"></div><span>Generating...</span>'; }
             else { el.btnGenerateImg.classList.remove('loading'); el.btnGenerateImg.innerHTML = '<span>Generate Image</span>'; }
+            // Patterns
+            el.btnGeneratePattern.disabled = !hasKey || state.isGeneratingPattern;
+            if (state.isGeneratingPattern) { el.btnGeneratePattern.classList.add('loading'); el.btnGeneratePattern.innerHTML = '<div class="spinner"></div><span>Generating...</span>'; }
+            else { el.btnGeneratePattern.classList.remove('loading'); el.btnGeneratePattern.innerHTML = '<span>Generate Pattern</span>'; }
             // Icons
             el.btnGenerateIcon.disabled = !hasKey || !el.iconSubjectInput.value.trim() || state.isGeneratingIcon;
             if (state.isGeneratingIcon) { el.btnGenerateIcon.classList.add('loading'); el.btnGenerateIcon.innerHTML = '<div class="spinner"></div><span>Generating...</span>'; }
@@ -877,6 +982,176 @@
         function handleRefUpload() { const f = el.imgFileInput.files[0]; if (!f) return; const r = new FileReader(); r.onload = (e) => { state.refImageBase64 = e.target.result.split(',')[1]; el.refPreviewImg.src = e.target.result; el.refPreview.style.display = 'block'; }; r.readAsDataURL(f); el.imgFileInput.value = ''; }
         function useLastImageAsRef() { if (!state.currentImgBase64) return; state.refImageBase64 = state.currentImgBase64; el.refPreviewImg.src = 'data:image/png;base64,' + state.currentImgBase64; el.refPreview.style.display = 'block'; showStatus('Set as reference', 'info', el.imgStatus); }
         function clearRefImage() { state.refImageBase64 = null; el.refPreview.style.display = 'none'; }
+
+        // ==================== PATTERN GENERATION ====================
+
+        const PATTERN_PRESETS = {
+            islamic: 'Islamic geometric pattern with interlocking stars and polygons, p6m hexagonal symmetry',
+            artdeco: 'Art Deco pattern with fan shapes, chevrons, and sunburst motifs, linear symmetry',
+            celtic: 'Celtic knotwork pattern with interlacing bands, continuous weave, no loose ends',
+            japanese: 'Japanese Seigaiha wave pattern with concentric arcs in overlapping rows',
+            moroccan: 'Moroccan zellige mosaic pattern with 8-pointed stars and cross shapes',
+            minimalist: 'Minimalist geometric pattern with thin lines, simple grid-based shapes',
+            hexagonal: 'Hexagonal honeycomb grid pattern with clean uniform hexagons',
+            custom: ''
+        };
+
+        function buildPatternSystemPrompt() {
+            return `You are an expert SVG pattern designer. Generate a single seamless tile as raw SVG markup.
+
+STRICT RULES:
+1. Output ONLY the raw SVG content inside the <svg> tag. No markdown, no explanation, no code fences.
+2. The SVG must use viewBox="0 0 100 100" exactly.
+3. The pattern MUST tile seamlessly: any path that exits one edge must re-enter from the opposite edge at the exact same position.
+4. Use only <path>, <line>, <circle>, <rect>, <polygon>, <polyline>, <g> elements.
+5. All strokes must use stroke="currentColor" and fill="none" by default (unless the design requires filled shapes, then use fill="currentColor").
+6. Default stroke-width between 1 and 2.5.
+7. No <text>, no <image>, no <foreignObject>, no <script>, no <style> elements.
+8. No transforms that break tiling. Keep it flat.
+9. The SVG tag must include xmlns="http://www.w3.org/2000/svg".
+10. Aim for elegant geometric precision. Clean intersections, mathematical symmetry.
+
+Output format: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...</svg>`;
+        }
+
+        async function generatePattern() {
+            if (!state.apiKey || state.isGeneratingPattern) return;
+            state.isGeneratingPattern = true;
+            updateButtons();
+
+            const preset = el.patternPreset.value;
+            const userPrompt = el.patternPrompt.value.trim();
+            const themeDesc = preset !== 'custom' ? PATTERN_PRESETS[preset] : '';
+            const fullTheme = [themeDesc, userPrompt].filter(Boolean).join('. ') || 'Geometric pattern';
+
+            let sec = 0, pi = setInterval(() => { sec++; showStatus('Generating pattern (' + sec + 's)...', 'info', el.patternStatus); }, 1000);
+
+            try {
+                showStatus('Generating pattern...', 'info', el.patternStatus);
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
+                    body: JSON.stringify({
+                        model: 'gpt-4o',
+                        messages: [
+                            { role: 'system', content: buildPatternSystemPrompt() },
+                            { role: 'user', content: 'Create a seamless tile pattern: ' + fullTheme }
+                        ],
+                        temperature: 0.8,
+                        max_tokens: 2000
+                    })
+                });
+
+                if (!response.ok) { const e = await response.json(); throw new Error(e.error?.message || 'API failed'); }
+                const data = await response.json();
+
+                if (data.usage) {
+                    state.usage.totalInputTokens += data.usage.prompt_tokens || 0;
+                    state.usage.totalOutputTokens += data.usage.completion_tokens || 0;
+                    state.usage.totalImages += 1;
+                    saveUsage(); updateUsageDisplay();
+                }
+
+                let svgContent = data.choices[0].message.content.trim();
+                // Extract SVG tag if wrapped in markdown
+                svgContent = svgContent.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '');
+                const svgMatch = svgContent.match(/<svg[\s\S]*<\/svg>/i);
+                if (!svgMatch) throw new Error('No valid SVG returned');
+
+                state.currentPatternSvg = svgMatch[0];
+                renderPatternPreview();
+                el.patternPreviewCard.style.display = 'block';
+
+                clearInterval(pi); pi = null;
+                showStatus('Pattern ready in ' + sec + 's!', 'success', el.patternStatus);
+
+            } catch (e) {
+                clearInterval(pi);
+                showStatus(e.message || 'Pattern generation failed', 'error', el.patternStatus);
+            } finally {
+                state.isGeneratingPattern = false;
+                updateButtons();
+            }
+        }
+
+        function renderPatternPreview() {
+            if (!state.currentPatternSvg) return;
+
+            const scale = parseInt(el.patternScale.value) || 3;
+            const tileSize = 100 * scale;
+            const viewSize = 300;
+
+            // Get colors from swatches
+            const swatches = el.patternColors.querySelectorAll('input[type="color"]');
+            const strokeColor = swatches[0]?.value || '#1a1a2e';
+            const fillColor = swatches[1]?.value || '#ffffff';
+            const accentColor = swatches[2]?.value || '#c4a35a';
+            const bgColor = swatches[3]?.value || '#f0f0f4';
+
+            // Recolor the SVG
+            let coloredSvg = state.currentPatternSvg
+                .replace(/stroke="currentColor"/g, 'stroke="' + strokeColor + '"')
+                .replace(/fill="currentColor"/g, 'fill="' + accentColor + '"')
+                .replace(/fill="none"/g, 'fill="none"');
+
+            // Remove the outer <svg> wrapper to get inner content
+            const innerMatch = coloredSvg.match(/<svg[^>]*>([\s\S]*)<\/svg>/i);
+            const innerSvg = innerMatch ? innerMatch[1] : coloredSvg;
+
+            const patternSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ' + viewSize + ' ' + viewSize + '">'
+                + '<defs><pattern id="tile" patternUnits="userSpaceOnUse" width="' + tileSize / scale + '" height="' + tileSize / scale + '" viewBox="0 0 100 100">'
+                + innerSvg
+                + '</pattern></defs>'
+                + '<rect width="' + viewSize + '" height="' + viewSize + '" fill="' + bgColor + '"/>'
+                + '<rect width="' + viewSize + '" height="' + viewSize + '" fill="url(#tile)"/>'
+                + '</svg>';
+
+            el.patternPreview.innerHTML = patternSvg;
+        }
+
+        function insertPattern() {
+            if (!state.currentPatternSvg) return;
+            showStatus('Rendering for insert...', 'info', el.patternStatus);
+
+            // Render tiled pattern to a canvas, then insert as image
+            const size = 960;
+            const scale = parseInt(el.patternScale.value) || 3;
+            const tileSize = 100 * scale;
+
+            const swatches = el.patternColors.querySelectorAll('input[type="color"]');
+            const strokeColor = swatches[0]?.value || '#1a1a2e';
+            const accentColor = swatches[2]?.value || '#c4a35a';
+            const bgColor = swatches[3]?.value || '#f0f0f4';
+
+            let coloredSvg = state.currentPatternSvg
+                .replace(/stroke="currentColor"/g, 'stroke="' + strokeColor + '"')
+                .replace(/fill="currentColor"/g, 'fill="' + accentColor + '"');
+
+            const innerMatch = coloredSvg.match(/<svg[^>]*>([\s\S]*)<\/svg>/i);
+            const innerSvg = innerMatch ? innerMatch[1] : coloredSvg;
+
+            const fullSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">'
+                + '<defs><pattern id="t" patternUnits="userSpaceOnUse" width="' + tileSize / scale + '" height="' + tileSize / scale + '" viewBox="0 0 100 100">'
+                + innerSvg + '</pattern></defs>'
+                + '<rect width="' + size + '" height="' + size + '" fill="' + bgColor + '"/>'
+                + '<rect width="' + size + '" height="' + size + '" fill="url(#t)"/></svg>';
+
+            const blob = new Blob([fullSvg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = size; canvas.height = size;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+                const base64 = canvas.toDataURL('image/png').split(',')[1];
+                Office.context.document.setSelectedDataAsync(base64, { coercionType: Office.CoercionType.Image, imageWidth: 540, imageHeight: 540 },
+                    (r) => { showStatus(r.status === Office.AsyncResultStatus.Succeeded ? 'Pattern inserted!' : 'Failed: ' + r.error.message, r.status === Office.AsyncResultStatus.Succeeded ? 'success' : 'error', el.patternStatus); });
+            };
+            img.onerror = () => { showStatus('Failed to render pattern', 'error', el.patternStatus); };
+            img.src = url;
+        }
 
         // ==================== ICON GENERATION ====================
         async function generateIcon() {
