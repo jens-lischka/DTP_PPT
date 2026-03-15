@@ -8,6 +8,8 @@
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <script src="icon-styles.js"></script>
     <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
+    <!-- DOMPurify for SVG sanitization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"/>
 
     <style>
@@ -321,7 +323,7 @@
         .scale-control .scale-value { font-size: 12px; font-weight: 600; color: var(--black); width: 28px; text-align: right; }
 
         /* Focus + a11y */
-        .tab:focus-visible, .style-card:focus-visible, .btn-run:focus-visible, .btn-generate:focus-visible, .btn-action:focus-visible, .btn-save-key:focus-visible, .btn-clear-history:focus-visible, .btn-submit-feedback:focus-visible, .history-item:focus-visible, .img-history-item:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+        .tab:focus-visible, .style-card:focus-visible, .btn-run:focus-visible, .btn-generate:focus-visible, .btn-action:focus-visible, .btn-save-key:focus-visible, .btn-clear-history:focus-visible, .btn-submit-feedback:focus-visible, .history-item:focus-visible, .img-history-item:focus-visible, .color-swatch:focus-visible, button:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -362,7 +364,7 @@
                 <input type="file" id="imgFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
                 <div id="refPreview" style="display:none;margin-top:12px;position:relative;">
                     <img id="refPreviewImg" style="width:100%;border-radius:var(--radius-sm);max-height:120px;object-fit:contain;background:var(--gray-100);" alt="Reference image">
-                    <button id="btnClearRef" type="button" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:var(--black);color:var(--white);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">&times;</button>
+                    <button id="btnClearRef" type="button" aria-label="Clear reference image" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:var(--black);color:var(--white);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">&times;</button>
                 </div>
             </div>
 
@@ -475,15 +477,8 @@
         <div class="tab-content" id="tab-patterns" role="tabpanel" aria-labelledby="tabBtn-patterns">
             <div class="card">
                 <label class="section-label">Style Preset</label>
-                <select id="patternPreset" style="width:100%;padding:10px 20px 10px 0;border:none;border-bottom:1px solid var(--gray-300);font-family:'Noto Sans',sans-serif;font-size:14px;background:transparent;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239898a8' d='M5 6L0 0h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;">
-                    <option value="islamic">Islamic Geometric</option>
-                    <option value="artdeco">Art Deco</option>
-                    <option value="celtic">Celtic Knots</option>
-                    <option value="japanese">Japanese Wave (Seigaiha)</option>
-                    <option value="moroccan">Moroccan Zellige</option>
-                    <option value="minimalist">Minimalist Lines</option>
-                    <option value="hexagonal">Hexagonal Grid</option>
-                    <option value="custom">Custom (use prompt below)</option>
+                <select id="patternPreset" aria-label="Pattern style preset" style="width:100%;padding:10px 20px 10px 0;border:none;border-bottom:1px solid var(--gray-300);font-family:'Noto Sans',sans-serif;font-size:14px;background:transparent;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239898a8' d='M5 6L0 0h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right center;">
+                    <option value="">Loading...</option>
                 </select>
             </div>
 
@@ -518,11 +513,11 @@
                         </div>
                         <div style="display:flex;align-items:center;gap:10px;">
                             <span style="font-size:11px;color:var(--gray-500);width:80px;">Accent 1</span>
-                            <div class="color-swatch" style="background:#1a1a2e;"><input type="color" id="patternAccent1" value="#1a1a2e"></div>
+                            <div class="color-swatch" style="background:#1a1a2e;"><input type="color" id="patternAccent1" value="#1a1a2e" aria-label="Accent 1 color"></div>
                         </div>
                         <div style="display:flex;align-items:center;gap:10px;">
                             <span style="font-size:11px;color:var(--gray-500);width:80px;">Accent 2</span>
-                            <div class="color-swatch" style="background:#c4a35a;"><input type="color" id="patternAccent2" value="#c4a35a"></div>
+                            <div class="color-swatch" style="background:#c4a35a;"><input type="color" id="patternAccent2" value="#c4a35a" aria-label="Accent 2 color"></div>
                         </div>
                     </div>
                 </div>
@@ -577,7 +572,7 @@
             <div class="feedback-info"><h3>Contact</h3><p>GitHub: <a href="https://github.com/jens-lischka/DTP_PPT" target="_blank">Report an issue</a></p></div>
             <div class="feedback-section" style="margin-top: 16px;">
                 <h2>About</h2>
-                <p><strong>AI Image Generator</strong><br>Version 3.0<br><br>Generate AI images with prompt optimization, icons, and insert them directly into your PowerPoint slides.</p>
+                <p><strong>AI Image Generator</strong><br>Version 3.1<br><br>Generate AI images with prompt optimization, icons, seamless patterns, and insert them directly into your PowerPoint slides.</p>
             </div>
         </div>
     </div>
@@ -1084,7 +1079,11 @@
                 const svgMatch = svgContent.match(/<svg[\s\S]*<\/svg>/i);
                 if (!svgMatch) throw new Error('No valid SVG returned');
 
-                state.currentPatternSvg = svgMatch[0];
+                // Sanitize SVG to prevent XSS
+                const sanitized = typeof DOMPurify !== 'undefined'
+                    ? DOMPurify.sanitize(svgMatch[0], { USE_PROFILES: { svg: true }, ADD_TAGS: ['svg'], ADD_ATTR: ['viewBox', 'xmlns'] })
+                    : svgMatch[0];
+                state.currentPatternSvg = sanitized;
                 renderPatternPreview();
                 el.patternPreviewCard.style.display = 'block';
 
