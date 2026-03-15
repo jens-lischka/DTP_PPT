@@ -511,11 +511,19 @@
 
                 <div style="margin-top:12px;">
                     <label class="section-label" style="margin-bottom:8px;">Colors</label>
-                    <div class="color-swatches" id="patternColors">
-                        <div class="color-swatch active" style="background:#1a1a2e;" data-role="stroke"><input type="color" value="#1a1a2e" title="Stroke color"></div>
-                        <div class="color-swatch" style="background:#ffffff;" data-role="fill"><input type="color" value="#ffffff" title="Fill color"></div>
-                        <div class="color-swatch" style="background:#c4a35a;" data-role="accent"><input type="color" value="#c4a35a" title="Accent color"></div>
-                        <div class="color-swatch" style="background:#f0f0f4;" data-role="bg"><input type="color" value="#f0f0f4" title="Background color"></div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:11px;color:var(--gray-500);width:80px;">Background</span>
+                            <div id="patternBgPicker" style="display:flex;gap:6px;"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:11px;color:var(--gray-500);width:80px;">Accent 1</span>
+                            <div class="color-swatch" style="background:#1a1a2e;"><input type="color" id="patternAccent1" value="#1a1a2e"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:11px;color:var(--gray-500);width:80px;">Accent 2</span>
+                            <div class="color-swatch" style="background:#c4a35a;"><input type="color" id="patternAccent2" value="#c4a35a"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -601,6 +609,8 @@
             // Patterns
             isGeneratingPattern: false,
             currentPatternSvg: null,
+            patternConfig: null,
+            selectedBgColor: '#ffffff',
             // Icons
             isGeneratingIcon: false,
             iconStyleNumber: 1,
@@ -650,7 +660,9 @@
             patternPreview: $('patternPreview'),
             patternScale: $('patternScale'),
             patternScaleValue: $('patternScaleValue'),
-            patternColors: $('patternColors'),
+            patternBgPicker: $('patternBgPicker'),
+            patternAccent1: $('patternAccent1'),
+            patternAccent2: $('patternAccent2'),
             btnInsertPattern: $('btnInsertPattern'),
             // Icons
             iconSubjectInput: $('iconSubjectInput'),
@@ -696,6 +708,7 @@
             loadIconHistory();
             loadUsage();
             loadSystemPrompt();
+            loadPatternConfig();
             renderIconStyles();
             setupEventListeners();
             updateButtons();
@@ -771,9 +784,8 @@
             el.btnGeneratePattern.addEventListener('click', generatePattern);
             el.btnInsertPattern.addEventListener('click', insertPattern);
             el.patternScale.addEventListener('input', () => { el.patternScaleValue.textContent = el.patternScale.value + 'x'; renderPatternPreview(); });
-            el.patternColors.querySelectorAll('input[type="color"]').forEach(input => {
-                input.addEventListener('input', (e) => { e.target.parentElement.style.background = e.target.value; renderPatternPreview(); });
-            });
+            el.patternAccent1.addEventListener('input', (e) => { e.target.parentElement.style.background = e.target.value; renderPatternPreview(); });
+            el.patternAccent2.addEventListener('input', (e) => { e.target.parentElement.style.background = e.target.value; renderPatternPreview(); });
             // Icons
             el.btnGenerateIcon.addEventListener('click', generateIcon);
             el.iconSubjectInput.addEventListener('input', updateButtons);
@@ -985,33 +997,45 @@
 
         // ==================== PATTERN GENERATION ====================
 
-        const PATTERN_PRESETS = {
-            islamic: 'Islamic geometric pattern with interlocking stars and polygons, p6m hexagonal symmetry',
-            artdeco: 'Art Deco pattern with fan shapes, chevrons, and sunburst motifs, linear symmetry',
-            celtic: 'Celtic knotwork pattern with interlacing bands, continuous weave, no loose ends',
-            japanese: 'Japanese Seigaiha wave pattern with concentric arcs in overlapping rows',
-            moroccan: 'Moroccan zellige mosaic pattern with 8-pointed stars and cross shapes',
-            minimalist: 'Minimalist geometric pattern with thin lines, simple grid-based shapes',
-            hexagonal: 'Hexagonal honeycomb grid pattern with clean uniform hexagons',
-            custom: ''
-        };
+        async function loadPatternConfig() {
+            try {
+                const r = await fetch('pattern-config.json');
+                if (r.ok) {
+                    state.patternConfig = await r.json();
+                    renderPatternBgPicker();
+                    renderPatternPresetOptions();
+                }
+            } catch (e) { console.log('Pattern config not loaded'); }
+        }
 
-        function buildPatternSystemPrompt() {
-            return `You are an expert SVG pattern designer. Generate a single seamless tile as raw SVG markup.
+        function renderPatternBgPicker() {
+            const bgs = state.patternConfig?.backgrounds || [];
+            el.patternBgPicker.innerHTML = '';
+            bgs.forEach((bg, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'color-swatch' + (bg.value === state.selectedBgColor ? ' active' : '');
+                btn.style.background = bg.value;
+                btn.title = bg.label;
+                btn.addEventListener('click', () => {
+                    state.selectedBgColor = bg.value;
+                    el.patternBgPicker.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderPatternPreview();
+                });
+                el.patternBgPicker.appendChild(btn);
+            });
+        }
 
-STRICT RULES:
-1. Output ONLY the raw SVG content inside the <svg> tag. No markdown, no explanation, no code fences.
-2. The SVG must use viewBox="0 0 100 100" exactly.
-3. The pattern MUST tile seamlessly: any path that exits one edge must re-enter from the opposite edge at the exact same position.
-4. Use only <path>, <line>, <circle>, <rect>, <polygon>, <polyline>, <g> elements.
-5. All strokes must use stroke="currentColor" and fill="none" by default (unless the design requires filled shapes, then use fill="currentColor").
-6. Default stroke-width between 1 and 2.5.
-7. No <text>, no <image>, no <foreignObject>, no <script>, no <style> elements.
-8. No transforms that break tiling. Keep it flat.
-9. The SVG tag must include xmlns="http://www.w3.org/2000/svg".
-10. Aim for elegant geometric precision. Clean intersections, mathematical symmetry.
-
-Output format: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...</svg>`;
+        function renderPatternPresetOptions() {
+            const presets = state.patternConfig?.presets || {};
+            el.patternPreset.innerHTML = '';
+            Object.keys(presets).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key === 'custom' ? 'Custom (use prompt below)' : key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+                el.patternPreset.appendChild(opt);
+            });
         }
 
         async function generatePattern() {
@@ -1021,7 +1045,8 @@ Output format: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...
 
             const preset = el.patternPreset.value;
             const userPrompt = el.patternPrompt.value.trim();
-            const themeDesc = preset !== 'custom' ? PATTERN_PRESETS[preset] : '';
+            const presets = state.patternConfig?.presets || {};
+            const themeDesc = preset !== 'custom' ? (presets[preset] || '') : '';
             const fullTheme = [themeDesc, userPrompt].filter(Boolean).join('. ') || 'Geometric pattern';
 
             let sec = 0, pi = setInterval(() => { sec++; showStatus('Generating pattern (' + sec + 's)...', 'info', el.patternStatus); }, 1000);
@@ -1035,7 +1060,7 @@ Output format: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...
                     body: JSON.stringify({
                         model: 'gpt-4o',
                         messages: [
-                            { role: 'system', content: buildPatternSystemPrompt() },
+                            { role: 'system', content: state.patternConfig?.system_prompt || 'Generate a seamless SVG tile pattern with viewBox="0 0 100 100".' },
                             { role: 'user', content: 'Create a seamless tile pattern: ' + fullTheme }
                         ],
                         temperature: 0.8,
@@ -1075,66 +1100,53 @@ Output format: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...
             }
         }
 
+        function getPatternColors() {
+            return {
+                bg: state.selectedBgColor || '#ffffff',
+                accent1: el.patternAccent1?.value || '#1a1a2e',
+                accent2: el.patternAccent2?.value || '#c4a35a'
+            };
+        }
+
+        function colorizePatternSvg(rawSvg, colors) {
+            return rawSvg
+                .replace(/stroke="currentColor"/g, 'stroke="' + colors.accent1 + '"')
+                .replace(/fill="currentColor"/g, 'fill="' + colors.accent2 + '"');
+        }
+
+        function getPatternInnerSvg(coloredSvg) {
+            const m = coloredSvg.match(/<svg[^>]*>([\s\S]*)<\/svg>/i);
+            return m ? m[1] : coloredSvg;
+        }
+
         function renderPatternPreview() {
             if (!state.currentPatternSvg) return;
 
             const scale = parseInt(el.patternScale.value) || 3;
-            const tileSize = 100 * scale;
             const viewSize = 300;
+            const colors = getPatternColors();
+            const innerSvg = getPatternInnerSvg(colorizePatternSvg(state.currentPatternSvg, colors));
 
-            // Get colors from swatches
-            const swatches = el.patternColors.querySelectorAll('input[type="color"]');
-            const strokeColor = swatches[0]?.value || '#1a1a2e';
-            const fillColor = swatches[1]?.value || '#ffffff';
-            const accentColor = swatches[2]?.value || '#c4a35a';
-            const bgColor = swatches[3]?.value || '#f0f0f4';
-
-            // Recolor the SVG
-            let coloredSvg = state.currentPatternSvg
-                .replace(/stroke="currentColor"/g, 'stroke="' + strokeColor + '"')
-                .replace(/fill="currentColor"/g, 'fill="' + accentColor + '"')
-                .replace(/fill="none"/g, 'fill="none"');
-
-            // Remove the outer <svg> wrapper to get inner content
-            const innerMatch = coloredSvg.match(/<svg[^>]*>([\s\S]*)<\/svg>/i);
-            const innerSvg = innerMatch ? innerMatch[1] : coloredSvg;
-
-            const patternSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ' + viewSize + ' ' + viewSize + '">'
-                + '<defs><pattern id="tile" patternUnits="userSpaceOnUse" width="' + tileSize / scale + '" height="' + tileSize / scale + '" viewBox="0 0 100 100">'
-                + innerSvg
-                + '</pattern></defs>'
-                + '<rect width="' + viewSize + '" height="' + viewSize + '" fill="' + bgColor + '"/>'
-                + '<rect width="' + viewSize + '" height="' + viewSize + '" fill="url(#tile)"/>'
-                + '</svg>';
-
-            el.patternPreview.innerHTML = patternSvg;
+            el.patternPreview.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ' + viewSize + ' ' + viewSize + '">'
+                + '<defs><pattern id="tile" patternUnits="userSpaceOnUse" width="' + (100 / scale) + '" height="' + (100 / scale) + '" viewBox="0 0 100 100">'
+                + innerSvg + '</pattern></defs>'
+                + '<rect width="' + viewSize + '" height="' + viewSize + '" fill="' + colors.bg + '"/>'
+                + '<rect width="' + viewSize + '" height="' + viewSize + '" fill="url(#tile)"/></svg>';
         }
 
         function insertPattern() {
             if (!state.currentPatternSvg) return;
             showStatus('Rendering for insert...', 'info', el.patternStatus);
 
-            // Render tiled pattern to a canvas, then insert as image
             const size = 960;
             const scale = parseInt(el.patternScale.value) || 3;
-            const tileSize = 100 * scale;
-
-            const swatches = el.patternColors.querySelectorAll('input[type="color"]');
-            const strokeColor = swatches[0]?.value || '#1a1a2e';
-            const accentColor = swatches[2]?.value || '#c4a35a';
-            const bgColor = swatches[3]?.value || '#f0f0f4';
-
-            let coloredSvg = state.currentPatternSvg
-                .replace(/stroke="currentColor"/g, 'stroke="' + strokeColor + '"')
-                .replace(/fill="currentColor"/g, 'fill="' + accentColor + '"');
-
-            const innerMatch = coloredSvg.match(/<svg[^>]*>([\s\S]*)<\/svg>/i);
-            const innerSvg = innerMatch ? innerMatch[1] : coloredSvg;
+            const colors = getPatternColors();
+            const innerSvg = getPatternInnerSvg(colorizePatternSvg(state.currentPatternSvg, colors));
 
             const fullSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">'
-                + '<defs><pattern id="t" patternUnits="userSpaceOnUse" width="' + tileSize / scale + '" height="' + tileSize / scale + '" viewBox="0 0 100 100">'
+                + '<defs><pattern id="t" patternUnits="userSpaceOnUse" width="' + (100 / scale) + '" height="' + (100 / scale) + '" viewBox="0 0 100 100">'
                 + innerSvg + '</pattern></defs>'
-                + '<rect width="' + size + '" height="' + size + '" fill="' + bgColor + '"/>'
+                + '<rect width="' + size + '" height="' + size + '" fill="' + colors.bg + '"/>'
                 + '<rect width="' + size + '" height="' + size + '" fill="url(#t)"/></svg>';
 
             const blob = new Blob([fullSvg], { type: 'image/svg+xml' });

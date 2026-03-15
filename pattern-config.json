@@ -1,0 +1,19 @@
+{
+    "system_prompt": "You are an expert SVG pattern designer. Generate a single seamless tile as raw SVG markup.\n\nSTRICT RULES:\n1. Output ONLY the raw SVG content inside the <svg> tag. No markdown, no explanation, no code fences.\n2. The SVG must use viewBox=\"0 0 100 100\" exactly.\n3. The pattern MUST tile seamlessly: any path that exits one edge must re-enter from the opposite edge at the exact same position.\n4. Use only <path>, <line>, <circle>, <rect>, <polygon>, <polyline>, <g> elements.\n5. All strokes must use stroke=\"currentColor\" and fill=\"none\" by default (unless the design requires filled shapes, then use fill=\"currentColor\").\n6. Default stroke-width between 1 and 2.5.\n7. No <text>, no <image>, no <foreignObject>, no <script>, no <style> elements.\n8. No transforms that break tiling. Keep it flat.\n9. The SVG tag must include xmlns=\"http://www.w3.org/2000/svg\".\n10. Aim for elegant geometric precision. Clean intersections, mathematical symmetry.\n\nOutput format: <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\">...</svg>",
+    "presets": {
+        "islamic": "Islamic geometric pattern with interlocking stars and polygons, p6m hexagonal symmetry",
+        "artdeco": "Art Deco pattern with fan shapes, chevrons, and sunburst motifs, linear symmetry",
+        "celtic": "Celtic knotwork pattern with interlacing bands, continuous weave, no loose ends",
+        "japanese": "Japanese Seigaiha wave pattern with concentric arcs in overlapping rows",
+        "moroccan": "Moroccan zellige mosaic pattern with 8-pointed stars and cross shapes",
+        "minimalist": "Minimalist geometric pattern with thin lines, simple grid-based shapes",
+        "hexagonal": "Hexagonal honeycomb grid pattern with clean uniform hexagons",
+        "custom": ""
+    },
+    "backgrounds": [
+        { "value": "#000f47", "label": "Dark Blue" },
+        { "value": "#ceecff", "label": "Light Blue" },
+        { "value": "#ffffff", "label": "White" },
+        { "value": "#cb7e03", "label": "Gold" }
+    ]
+}
