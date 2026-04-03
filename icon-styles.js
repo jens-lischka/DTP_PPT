@@ -5,6 +5,14 @@
 
 const ICON_STYLES = {
     1: {
+
+name: "Line illustration",
+        emoji: "⬜",
+        description: "Flat 2D, digital blue",
+        avatar: "style-icon-2.png",
+
+
+        
 generatePrompt: function(subject) {
     return {
         "instruction": "Generate a minimal geometric line icon. Follow ALL rules strictly. No deviation allowed.",
@@ -87,7 +95,7 @@ generatePrompt: function(subject) {
             "outline_color": "#000f47",
             "highlight_color": "#0b4bff",
             "neutral_fill": "#FFFFFF",
-            "max_colors": 2,
+            "max_colors": 3,
             "strict_palette": true
         },
 
