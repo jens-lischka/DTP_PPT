@@ -53,7 +53,7 @@ const ICON_STYLES = {
                     "outline_elements": {
                         "usage": "stroke_only",
                         "stroke_color": "#000f47",
-                        "stroke_weight": "thin_uniform",
+                        "stroke_weight": "1px",
                         "fill": "none"
                     },
                     "highlight_elements": {
@@ -64,7 +64,8 @@ const ICON_STYLES = {
                     "neutral_elements": {
                         "usage": "optional_fill",
                         "fill_color": "#FFFFFF",
-                        "stroke": "#000f47"
+                        "stroke_color": "#000f47",
+                        "stroke_weight": "1px"
                     }
                 },
                 "rules": [
@@ -96,7 +97,8 @@ const ICON_STYLES = {
                 "ground_line": {
                     "allowed": true,
                     "style": "thin_line",
-                    "color": "#000f47"
+                    "color": "#000f47",
+                    "weight": "1px"
                 }
             },
 
