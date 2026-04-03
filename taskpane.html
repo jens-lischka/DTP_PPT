@@ -1165,26 +1165,94 @@
         }
 
         // ==================== ICON GENERATION ====================
-        async function generateIcon() {
-            const subject = el.iconSubjectInput.value.trim();
-            if (!subject || !state.apiKey || state.isGeneratingIcon) return;
-            const prompt = (typeof generateIconPrompt === 'function') ? generateIconPrompt(state.iconStyleNumber, subject) : 'Icon of ' + subject;
-            const quality = el.iconQualitySelect.value;
-            state.isGeneratingIcon = true; updateButtons();
-            el.iconPreviewSection.classList.add('visible'); el.iconPreviewLoading.style.display = 'flex'; el.iconPreviewImage.style.display = 'none';
-            showStatus('Generating icon...', 'info', el.iconStatusMessage);
-            try {
-                const res = await callImageApi('https://api.openai.com/v1/images/generations', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
-                    body: JSON.stringify({ model: 'gpt-image-1.5', prompt: prompt, n: 1, size: '1024x1024', quality: quality })
-                });
-                state.iconImageBase64 = res[0]; el.iconPreviewImage.src = 'data:image/png;base64,' + res[0];
-                el.iconPreviewImage.style.display = 'block'; el.iconPreviewLoading.style.display = 'none';
-                addToIconHistory('data:image/png;base64,' + res[0], subject);
-                showStatus('Icon generated!', 'success', el.iconStatusMessage);
-            } catch (e) { showStatus(e.message || 'Failed', 'error', el.iconStatusMessage); el.iconPreviewLoading.style.display = 'none'; }
-            finally { state.isGeneratingIcon = false; updateButtons(); }
+async function generateIcon() {
+    const subject = el.iconSubjectInput.value.trim();
+    if (!subject || !state.apiKey || state.isGeneratingIcon) return;
+
+    const prompt = (typeof generateIconPrompt === 'function')
+        ? generateIconPrompt(state.iconStyleNumber, subject)
+        : 'Icon of ' + subject;
+
+    const quality = el.iconQualitySelect.value;
+
+    state.isGeneratingIcon = true;
+    updateButtons();
+
+    el.iconPreviewSection.classList.add('visible');
+    el.iconPreviewLoading.style.display = 'flex';
+    el.iconPreviewImage.style.display = 'none';
+
+    showStatus('Generating icon...', 'info', el.iconStatusMessage);
+
+    try {
+        const style = ICON_STYLES[state.iconStyleNumber];
+        let res;
+
+        // 🔥 NEW: Use reference image if available
+        if (style.reference) {
+            const formData = new FormData();
+
+            // Load local reference image
+            const refResponse = await fetch(style.reference);
+            const refBlob = await refResponse.blob();
+
+            formData.append('image', refBlob, 'reference.jpg');
+            formData.append('prompt', prompt);
+            formData.append('model', 'gpt-image-1.5');
+            formData.append('n', '1');
+            formData.append('size', '1024x1024');
+            formData.append('quality', quality);
+
+            res = await callImageApi(
+                'https://api.openai.com/v1/images/edits',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + state.apiKey
+                    },
+                    body: formData
+                }
+            );
+
+        } else {
+            // fallback (no reference)
+            res = await callImageApi(
+                'https://api.openai.com/v1/images/generations',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + state.apiKey
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-image-1.5',
+                        prompt: prompt,
+                        n: 1,
+                        size: '1024x1024',
+                        quality: quality
+                    })
+                }
+            );
         }
+
+        state.iconImageBase64 = res[0];
+        el.iconPreviewImage.src = 'data:image/png;base64,' + res[0];
+
+        el.iconPreviewImage.style.display = 'block';
+        el.iconPreviewLoading.style.display = 'none';
+
+        addToIconHistory('data:image/png;base64,' + res[0], subject);
+
+        showStatus('Icon generated!', 'success', el.iconStatusMessage);
+
+    } catch (e) {
+        showStatus(e.message || 'Failed', 'error', el.iconStatusMessage);
+        el.iconPreviewLoading.style.display = 'none';
+    } finally {
+        state.isGeneratingIcon = false;
+        updateButtons();
+    }
+}
 
         function insertIcon() {
             if (!state.iconImageBase64) return;
